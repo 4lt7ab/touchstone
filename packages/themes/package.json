@@ -1,0 +1,37 @@
+{
+  "name": "@touchstone/themes",
+  "version": "0.0.0",
+  "description": "Theme contract and presets (light, dark) for Touchstone, powered by Vanilla Extract.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/index.css"
+  },
+  "files": ["dist"],
+  "sideEffects": ["**/*.css", "**/*.css.js"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "echo 'no tests'",
+    "lint": "eslint src",
+    "typecheck": "tsc -b --pretty",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@touchstone/tokens": "workspace:*",
+    "@vanilla-extract/css": "^1.15.3"
+  },
+  "devDependencies": {
+    "@touchstone/tsconfig": "workspace:*",
+    "@touchstone/tsup-config": "workspace:*",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.3"
+  }
+}

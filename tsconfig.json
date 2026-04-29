@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/tokens" },
+    { "path": "./packages/themes" },
+    { "path": "./packages/icons" },
+    { "path": "./packages/hooks" },
+    { "path": "./packages/atoms" },
+    { "path": "./packages/molecules" },
+    { "path": "./packages/organisms" },
+    { "path": "./packages/react" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@touchstone/tsup-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": ["index.js", "index.d.ts"],
+  "dependencies": {
+    "@vanilla-extract/esbuild-plugin": "^2.3.13",
+    "tsup": "^8.2.4"
+  }
+}

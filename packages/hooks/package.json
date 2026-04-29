@@ -1,0 +1,41 @@
+{
+  "name": "@touchstone/hooks",
+  "version": "0.0.0",
+  "description": "Shared React hooks for Touchstone components.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "typecheck": "tsc -b --pretty",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@touchstone/tsconfig": "workspace:*",
+    "@touchstone/tsup-config": "workspace:*",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^18.3.3",
+    "jsdom": "^24.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.4"
+  }
+}

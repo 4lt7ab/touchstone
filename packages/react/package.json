@@ -1,0 +1,48 @@
+{
+  "name": "@touchstone/react",
+  "version": "0.0.0",
+  "description": "Touchstone — umbrella React package re-exporting every atomic layer.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/index.css"
+  },
+  "files": ["dist"],
+  "sideEffects": ["**/*.css", "**/*.css.js"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "echo 'no tests'",
+    "lint": "eslint src",
+    "typecheck": "tsc -b --pretty",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@touchstone/atoms": "workspace:*",
+    "@touchstone/hooks": "workspace:*",
+    "@touchstone/icons": "workspace:*",
+    "@touchstone/molecules": "workspace:*",
+    "@touchstone/organisms": "workspace:*",
+    "@touchstone/themes": "workspace:*",
+    "@touchstone/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@touchstone/tsconfig": "workspace:*",
+    "@touchstone/tsup-config": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.3"
+  }
+}

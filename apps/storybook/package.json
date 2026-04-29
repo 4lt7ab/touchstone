@@ -1,0 +1,36 @@
+{
+  "name": "@touchstone/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "echo 'no tests'",
+    "lint": "eslint .storybook",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf storybook-static"
+  },
+  "dependencies": {
+    "@touchstone/atoms": "workspace:*",
+    "@touchstone/icons": "workspace:*",
+    "@touchstone/molecules": "workspace:*",
+    "@touchstone/themes": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^8.2.6",
+    "@storybook/addon-essentials": "^8.2.6",
+    "@storybook/addon-interactions": "^8.2.6",
+    "@storybook/addon-themes": "^8.2.6",
+    "@storybook/react": "^8.2.6",
+    "@storybook/react-vite": "^8.2.6",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vanilla-extract/vite-plugin": "^4.0.13",
+    "storybook": "^8.2.6",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4"
+  }
+}

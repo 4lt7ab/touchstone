@@ -1,0 +1,15 @@
+/* Apply theme tokens to the Storybook canvas. The withThemeByClassName
+ * decorator toggles the lightTheme / darkTheme class on <body>. */
+body {
+  margin: 0;
+  background: var(--touchstone-bg, #ffffff);
+  color: var(--touchstone-fg, #13161a);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  min-height: 100vh;
+}
