@@ -84,3 +84,34 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 - **Styling is vanilla-extract recipes.** Variants, sizes, and stateful styles live in `*.css.ts` next to the component. Recipes (`@vanilla-extract/recipes`) handle variant props; raw `style`/`globalStyle` is reserved for things recipes can't express.
 - **Accessible primitives come from Radix.** When a component needs focus management, dismiss/escape behavior, or composed semantics, reach for `@radix-ui/react-*` (and `@radix-ui/react-slot` for `asChild` composition) before rolling our own.
 - **Storybook is the QA surface.** Every component should have a story under `apps/storybook` covering its variants and a11y states. `addon-a11y` and `addon-themes` are wired up in `.storybook/main.ts` — use them.
+
+## Adding a new package
+
+1. `mkdir -p packages/<name>/src` and create `tsconfig.json`, `tsup.config.ts`, and a `package.json` mirroring an existing leaf package (e.g. `packages/atoms`).
+2. Set `"name": "@touchstone/<name>"`, `"type": "module"`, the same `exports` block, and `sideEffects` if the package ships CSS.
+3. Add it as a `workspace:*` dependency wherever it should be consumed; if it should be re-exported from the umbrella, add the export in `packages/react/src/index.ts`.
+4. Add a `{ "path": "./packages/<name>" }` reference in the root `tsconfig.json` so it joins the solution build.
+5. `bun install` to register it in the workspace.
+
+## Adding a new component
+
+1. Create a folder under the appropriate atomic-design layer (`packages/atoms/src/Foo/`, `packages/molecules/src/Foo/`, etc.).
+2. Component in `Foo.tsx`, recipe in `Foo.css.ts`, public surface re-exported from the package's `src/index.ts`.
+3. Read all visual values from `vars.*` (no hardcoded design tokens). Compose Radix primitives where applicable.
+4. Co-locate tests as `Foo.test.tsx` next to the component; vitest + jsdom + Testing Library are already configured at the package level.
+5. Add a story under `apps/storybook` covering the main variants and a11y states.
+
+## Things that are stubbed
+
+- **Thin vertical slice only.** atoms ships Box / Text / Button / Input; molecules ships Field; organisms is an empty placeholder. The full catalogue is intentionally deferred.
+- **No release tooling.** No Changesets, no CI publish, no visual regression yet. Versions are all `0.0.0` and the repo root is `private: true`.
+- **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
+- **Hooks package has two hooks** (`useMergedRefs`, `useControllableState`).
+
+## Style
+
+- TypeScript: strict + `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `moduleResolution: Bundler`, `jsx: react-jsx`. ESM only; use `import type` for type-only imports.
+- React: function components and hooks, no class components. `forwardRef` where a ref is part of the public surface.
+- Lint/format: ESLint flat config (typescript-eslint, react, react-hooks, jsx-a11y) + Prettier. Run `bun run format` before committing.
+- Tests: Vitest + Testing Library + jsdom. Co-locate tests next to source as `*.test.ts(x)`.
+- No comments unless the *why* is non-obvious.
