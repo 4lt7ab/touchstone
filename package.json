@@ -1,0 +1,44 @@
+{
+  "name": "touchstone",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Touchstone — a React component library that is the team's measure of quality.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "bun@1.3.11",
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.3"
+  },
+  "workspaces": ["packages/*", "apps/*", "tooling/*"],
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "dev": "bun run --filter '*' dev",
+    "test": "bun run --filter '*' test",
+    "lint": "bun run --filter '*' lint",
+    "typecheck": "tsc -b --pretty",
+    "storybook": "bun run --filter @touchstone/storybook storybook",
+    "build-storybook": "bun run --filter @touchstone/storybook build-storybook",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "clean": "bun run --filter '*' clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.0",
+    "@eslint/js": "^9.8.0",
+    "@touchstone/eslint-config": "workspace:*",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.8.0",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "globals": "^15.8.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.0"
+  }
+}
