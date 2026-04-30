@@ -2,6 +2,8 @@ export const font = {
   family: {
     sans: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+    serif: 'ui-serif, Georgia, "Times New Roman", serif',
+    display: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   },
   size: {
     xs: '0.75rem',

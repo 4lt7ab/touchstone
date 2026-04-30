@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/organisms",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Atomic-design 'organisms' — larger compositions (DataTable, Dialog, NavBar, ...). Placeholder for now.",
   "license": "MIT",
   "type": "module",

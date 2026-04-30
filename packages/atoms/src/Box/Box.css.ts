@@ -26,10 +26,22 @@ export const box = recipe({
       raised: { background: vars.color.bgRaised },
       muted: { background: vars.color.bgMuted },
     },
+    glow: {
+      none: {},
+      soft: { boxShadow: vars.shadow.md },
+      pulse: {
+        boxShadow:
+          `0 0 calc(var(--ts-glow-strength, 0) * 16px) ` +
+          `calc(var(--ts-glow-strength, 0) * 2px) ` +
+          `color-mix(in srgb, ${vars.color.glow} ` +
+          `calc(var(--ts-glow-strength, 0) * 70%), transparent)`,
+      },
+    },
   },
   defaultVariants: {
     padding: 'none',
     radius: 'none',
     surface: 'none',
+    glow: 'none',
   },
 });

@@ -1,10 +1,10 @@
 {
   "name": "@touchstone/storybook",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p ${PORT:-6006}",
     "build-storybook": "storybook build",
     "test": "echo 'no tests'",
     "lint": "eslint .storybook",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@touchstone/atoms": "workspace:*",
+    "@touchstone/hooks": "workspace:*",
     "@touchstone/icons": "workspace:*",
     "@touchstone/molecules": "workspace:*",
     "@touchstone/themes": "workspace:*",

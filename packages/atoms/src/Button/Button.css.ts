@@ -13,14 +13,17 @@ export const button = recipe({
     fontWeight: vars.font.weight.medium,
     lineHeight: vars.font.lineHeight.tight,
     cursor: 'pointer',
-    transition: 'background-color 120ms ease, border-color 120ms ease, color 120ms ease',
+    transition:
+      `background-color ${vars.duration.base} ${vars.easing.standard}, ` +
+      `border-color ${vars.duration.base} ${vars.easing.standard}, ` +
+      `color ${vars.duration.base} ${vars.easing.standard}`,
     ':disabled': {
       cursor: 'not-allowed',
       opacity: 0.55,
     },
     ':focus-visible': {
-      outline: `2px solid ${vars.color.accent}`,
-      outlineOffset: '2px',
+      outline: `${vars.focus.ringWidth} solid ${vars.focus.ringColor}`,
+      outlineOffset: vars.focus.ringOffset,
     },
   },
   variants: {

@@ -9,15 +9,17 @@ export const input = recipe({
     paddingInline: vars.space[3],
     border: `1px solid ${vars.color.border}`,
     borderRadius: vars.radius.md,
-    background: vars.color.bg,
+    background: vars.color.bgInput,
     color: vars.color.fg,
     fontFamily: vars.font.family.sans,
     fontSize: vars.font.size.md,
-    transition: 'border-color 120ms ease, box-shadow 120ms ease',
+    transition:
+      `border-color ${vars.duration.base} ${vars.easing.standard}, ` +
+      `box-shadow ${vars.duration.base} ${vars.easing.standard}`,
     ':focus-visible': {
       outline: 'none',
-      borderColor: vars.color.accent,
-      boxShadow: `0 0 0 2px ${vars.color.accent}`,
+      borderColor: vars.color.borderFocus,
+      boxShadow: `0 0 0 ${vars.focus.ringWidth} ${vars.focus.ringColor}`,
     },
     ':disabled': {
       cursor: 'not-allowed',
@@ -33,7 +35,7 @@ export const input = recipe({
         borderColor: vars.color.danger,
         ':focus-visible': {
           borderColor: vars.color.danger,
-          boxShadow: `0 0 0 2px ${vars.color.danger}`,
+          boxShadow: `0 0 0 ${vars.focus.ringWidth} ${vars.color.danger}`,
         },
       },
     },
