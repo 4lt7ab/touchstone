@@ -16,10 +16,10 @@ touchstone/
 │   ├── tokens/             raw scales (color, space, font, radius, zIndex)
 │   ├── themes/             theme contract + light/dark presets (vanilla-extract)
 │   ├── icons/              icon components
-│   ├── hooks/              shared hooks (useMergedRefs, useControllableState)
-│   ├── atoms/              Box, Text, Button, Input
-│   ├── molecules/          Field
-│   ├── organisms/          placeholder for future organisms
+│   ├── hooks/              shared hooks (focus, dismiss, controllable state, …)
+│   ├── atoms/              Surface, Stack, Text, Button, Input, Badge, Divider, Spinner, Skeleton, Switch, Checkbox, Slot
+│   ├── molecules/          Field, SegmentedControl, AlertBanner, Disclosure
+│   ├── organisms/          Dialog, Popover
 │   └── react/              umbrella re-export — install this
 ├── apps/
 │   └── storybook/          docs and visual QA for every package
@@ -82,8 +82,37 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 - **`@touchstone/react` is the only package consumers should install.** It re-exports every other package; the leaf packages can still be installed individually but that is a deliberate choice, not a default. The umbrella's `src/index.ts` is the public surface — anything not re-exported from there is implementation detail.
 - **Theming flows through one place.** `@touchstone/themes` defines the `vars` contract via `createThemeContract`, plus `lightTheme` / `darkTheme` class-based presets. Everything visual reads from `vars.*` — components must not hardcode colors, spacing, font scales, radii, or z-indices.
 - **Styling is vanilla-extract recipes.** Variants, sizes, and stateful styles live in `*.css.ts` next to the component. Recipes (`@vanilla-extract/recipes`) handle variant props; raw `style`/`globalStyle` is reserved for things recipes can't express.
-- **Accessible primitives come from Radix.** When a component needs focus management, dismiss/escape behavior, or composed semantics, reach for `@radix-ui/react-*` (and `@radix-ui/react-slot` for `asChild` composition) before rolling our own.
+- **Accessible primitives live in `@touchstone/hooks`.** Focus traps, focus return, click-outside, escape-key, scroll lock, disclosure state, roving focus, controllable state, compound contexts, and `asChild` composition (via the in-house `Slot` atom) are all owned in-house. New components compose those hooks; new behavior earns its way into the hooks package alongside a test. The library has no third-party UI dependencies.
 - **Storybook is the QA surface.** Every component should have a story under `apps/storybook` covering its variants and a11y states. `addon-a11y` and `addon-themes` are wired up in `.storybook/main.ts` — use them.
+- **Components extend `BaseComponentProps`, not `HTMLAttributes`.** `BaseComponentProps` (in `@touchstone/atoms`) is `{ id?, 'data-testid'? }` — every other prop must be explicitly enumerated by the component. This prevents consumers from smuggling `style={...}` or `className=...` overrides that bypass the recipe + theme contract. The exception is `Surface`, which is the layout primitive: it accepts `style` and `className` so consumers can compose flex/grid/gap layouts that the recipe doesn't express. Visual tokens — colors, shadows, radii, font sizes — must always come through the variant API.
+
+## Design tenets
+
+Two tenets, paired. The first decides what doesn't belong in the library; the second decides what happens when two things that *do* belong overlap. Apply both before any retirement or consolidation proposal.
+
+### 1. Keep consumer chrome to an absolute minimum
+
+This is the load-bearing tenet the rest of the library answers to. "Chrome" is everything a consumer has to see, configure, or reason about that isn't the thing they came here to build. Every new component, prop, or API surface has to justify the attention it takes from the consumer.
+
+In practice:
+
+- **Prefer fewer components over more.** A component earns its place by carrying non-trivial behavior (accessibility, focus management, async lifecycles, theme rhythm) that a consumer would otherwise rebuild. Thin wrappers that only arrange layout are documented compositions, not components.
+- **Prefer tighter props over more props.** A new prop competes for the consumer's attention every time they read an API table. Before adding one, check whether composition already expresses the same thing. Before keeping a prop, check whether it's still earning the documentation real estate.
+- **Defaults do the work.** Opt-in flags default to off, and the zero-config call site renders correctly. Opt-outs are a last resort — if a behavior is opt-out by default, it's chrome the consumer never asked for.
+- **No chrome in the consumer's app shell.** The library renders inside the consumer's app, not around it. Page envelopes (AppShell, DataTablePage, DetailPage) are deliberately not in scope — let the consuming app own its layout.
+- **When a choice belongs to the consumer, return it to them.** A component that presets a layout the consumer would naturally compose themselves is chrome.
+
+This tenet is why the right move on a "we could fold these into one richer component" proposal is usually yes — and the right move on a "let's add another flag" proposal is usually no.
+
+### 2. Merge before retire
+
+A component reused across projects earns its place — find the duplication, don't cut the utility. When two or more components pass the reuse-and-quality test (the component is reused across consumers *and* it's built to primitive-level quality) and they overlap in responsibility, the move is *merge*, not retire. Retiring destroys utility; merging preserves it while shrinking surface area. A merged component with one extra prop is almost always cheaper than two near-duplicate components.
+
+This tenet is the counterweight to tenet 1. Chrome still goes — but before a retirement proposal, run the two-clause test. If the component passes, the question isn't "retire or keep," it's "keep or merge."
+
+The atomic-design tier (atom / molecule / organism) is a taxonomy for reasoning about scope, not a retirement criterion. Demoting an organism to a molecule because it didn't earn its tier is a *merge* (with a smaller relative), not a retire.
+
+When a retirement proposal surfaces, check the test first. Passing components merge; failing components retire.
 
 ## Adding a new package
 
@@ -97,16 +126,16 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 
 1. Create a folder under the appropriate atomic-design layer (`packages/atoms/src/Foo/`, `packages/molecules/src/Foo/`, etc.).
 2. Component in `Foo.tsx`, recipe in `Foo.css.ts`, public surface re-exported from the package's `src/index.ts`.
-3. Read all visual values from `vars.*` (no hardcoded design tokens). Compose Radix primitives where applicable.
+3. Read all visual values from `vars.*` (no hardcoded design tokens). Compose hooks from `@touchstone/hooks` (focus, dismiss, disclosure, roving focus, …) for accessible behavior — no third-party UI deps.
 4. Co-locate tests as `Foo.test.tsx` next to the component; vitest + jsdom + Testing Library are already configured at the package level.
 5. Add a story under `apps/storybook` covering the main variants and a11y states.
 
 ## Things that are stubbed
 
-- **Thin vertical slice only.** atoms ships Box / Text / Button / Input; molecules ships Field; organisms is an empty placeholder. The full catalogue is intentionally deferred.
-- **No release tooling.** No Changesets, no CI publish, no visual regression yet. Versions are all `0.0.0` and the repo root is `private: true`.
+- **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions earn their place per the design tenets.
+- **No release tooling.** No Changesets, no CI publish, no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `/commit`.
 - **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
-- **Hooks package has two hooks** (`useMergedRefs`, `useControllableState`).
+- **Hooks package owns the in-house accessibility primitives** (focus trap, focus return, click-outside, escape-key, scroll lock, disclosure, roving focus, controllable state, compound contexts, anchored positioning); new behavior lands here alongside a test when a component needs it.
 
 ## Style
 

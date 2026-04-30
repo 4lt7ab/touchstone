@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { Switch } from '@touchstone/atoms';
 import { Field } from './Field.js';
+import { SegmentedControl } from '../SegmentedControl/SegmentedControl.js';
 
 describe('Field', () => {
   it('associates label with the input', () => {
@@ -27,5 +29,32 @@ describe('Field', () => {
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input.getAttribute('aria-describedby')).toBe(error.id);
     expect(screen.queryByText('Helper text')).not.toBeInTheDocument();
+  });
+
+  it('wraps a Switch child with id + aria-describedby', () => {
+    render(
+      <Field label="Verbose mode" hint="Print extra debug output">
+        <Switch defaultChecked />
+      </Field>,
+    );
+    const sw = screen.getByRole('switch', { name: 'Verbose mode' });
+    const hint = screen.getByText('Print extra debug output');
+    expect(sw.getAttribute('aria-describedby')).toBe(hint.id);
+  });
+
+  it('wraps a SegmentedControl child and points aria-describedby at the error', () => {
+    render(
+      <Field label="Mode" error="pick one">
+        <SegmentedControl
+          options={[
+            { value: 'a', label: 'A' },
+            { value: 'b', label: 'B' },
+          ]}
+        />
+      </Field>,
+    );
+    const group = screen.getByRole('radiogroup', { name: 'Mode' });
+    const error = screen.getByRole('alert');
+    expect(group.getAttribute('aria-describedby')).toBe(error.id);
   });
 });

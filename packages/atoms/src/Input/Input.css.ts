@@ -23,19 +23,20 @@ export const input = recipe({
     },
     ':disabled': {
       cursor: 'not-allowed',
-      opacity: 0.55,
+      background: vars.color.bgDisabled,
+      color: vars.color.fgDisabled,
     },
     '::placeholder': {
-      color: vars.color.fgMuted,
+      color: vars.color.fgPlaceholder,
     },
   },
   variants: {
     invalid: {
       true: {
-        borderColor: vars.color.danger,
+        borderColor: vars.color.borderError,
         ':focus-visible': {
-          borderColor: vars.color.danger,
-          boxShadow: `0 0 0 ${vars.focus.ringWidth} ${vars.color.danger}`,
+          borderColor: vars.color.borderError,
+          boxShadow: `0 0 0 ${vars.focus.ringWidth} ${vars.color.borderError}`,
         },
       },
     },

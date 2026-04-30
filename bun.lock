@@ -31,6 +31,7 @@
         "@touchstone/hooks": "workspace:*",
         "@touchstone/icons": "workspace:*",
         "@touchstone/molecules": "workspace:*",
+        "@touchstone/organisms": "workspace:*",
         "@touchstone/themes": "workspace:*",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
@@ -55,7 +56,6 @@
       "name": "@touchstone/atoms",
       "version": "0.0.2",
       "dependencies": {
-        "@radix-ui/react-slot": "^1.1.0",
         "@touchstone/hooks": "workspace:*",
         "@touchstone/themes": "workspace:*",
         "@vanilla-extract/css": "^1.15.3",
@@ -121,8 +121,10 @@
       "version": "0.0.2",
       "dependencies": {
         "@touchstone/atoms": "workspace:*",
+        "@touchstone/hooks": "workspace:*",
         "@touchstone/themes": "workspace:*",
         "@vanilla-extract/css": "^1.15.3",
+        "@vanilla-extract/recipes": "^0.5.3",
       },
       "devDependencies": {
         "@testing-library/jest-dom": "^6.4.6",
@@ -148,13 +150,28 @@
     "packages/organisms": {
       "name": "@touchstone/organisms",
       "version": "0.0.2",
+      "dependencies": {
+        "@touchstone/atoms": "workspace:*",
+        "@touchstone/hooks": "workspace:*",
+        "@touchstone/themes": "workspace:*",
+        "@vanilla-extract/css": "^1.15.3",
+        "@vanilla-extract/recipes": "^0.5.3",
+      },
       "devDependencies": {
+        "@testing-library/jest-dom": "^6.4.6",
+        "@testing-library/react": "^16.0.0",
+        "@testing-library/user-event": "^14.5.2",
         "@touchstone/tsconfig": "workspace:*",
         "@touchstone/tsup-config": "workspace:*",
         "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vanilla-extract/vite-plugin": "^4.0.13",
+        "jsdom": "^24.1.0",
         "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "tsup": "^8.2.4",
         "typescript": "^5.5.3",
+        "vitest": "^2.0.4",
       },
       "peerDependencies": {
         "react": "^18.2.0 || ^19.0.0",
@@ -394,10 +411,6 @@
     "@mdx-js/react": ["@mdx-js/react@3.1.1", "", { "dependencies": { "@types/mdx": "^2.0.0" }, "peerDependencies": { "@types/react": ">=16", "react": ">=16" } }, "sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw=="],
 
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
-
-    "@radix-ui/react-compose-refs": ["@radix-ui/react-compose-refs@1.1.2", "", { "peerDependencies": { "@types/react": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react"] }, "sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg=="],
-
-    "@radix-ui/react-slot": ["@radix-ui/react-slot@1.2.4", "", { "dependencies": { "@radix-ui/react-compose-refs": "1.1.2" }, "peerDependencies": { "@types/react": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react"] }, "sha512-Jl+bCv8HxKnlTLVrcDE8zTMJ09R9/ukw4qBs/oZClOfoQk/cOTbDn+NceXfV7j09YPVQUryJPHurafcSg6EVKA=="],
 
     "@rollup/pluginutils": ["@rollup/pluginutils@5.3.0", "", { "dependencies": { "@types/estree": "^1.0.0", "estree-walker": "^2.0.2", "picomatch": "^4.0.2" }, "peerDependencies": { "rollup": "^1.20.0||^2.0.0||^3.0.0||^4.0.0" }, "optionalPeers": ["rollup"] }, "sha512-5EdhGZtnu3V88ces7s53hhfK5KSASnJZv8Lulpc04cWO3REESroJXg73DFsOmgbU2BhwV0E20bu2IDZb3VKW4Q=="],
 

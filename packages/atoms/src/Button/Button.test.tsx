@@ -40,4 +40,13 @@ describe('Button', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Off' }));
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it('renders an icon-shaped button with shape="square"', () => {
+    render(
+      <Button shape="square" size="sm" aria-label="dismiss">
+        x
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: 'dismiss' })).toBeInTheDocument();
+  });
 });

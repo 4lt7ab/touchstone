@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Box, Button, Input, Text } from '@touchstone/atoms';
+import { Button, Input, Surface, Text } from '@touchstone/atoms';
 
 const meta = {
   title: 'Themes/Gallery',
@@ -15,10 +15,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Showcase: Story = {
   render: () => (
-    <Box
+    <Surface
       as="section"
       padding="lg"
-      surface="base"
+      level="base"
       style={{
         minHeight: '100vh',
         display: 'flex',
@@ -26,44 +26,43 @@ export const Showcase: Story = {
         gap: '1.5rem',
       }}
     >
-      <Box>
-        <Text size="2xl" weight="bold">
-          Theme gallery
+      <Surface>
+        <Text size="2xl" weight="bold" as="h1">
+          the dye-cabinet
         </Text>
         <Text tone="muted">
-          Switch the theme via the toolbar. Watch the glowing card pulse on
-          rhythmic themes (synthwave, terminal).
+          each drawer holds a different fire. choose the one whose pulse keeps
+          your tools warm.
         </Text>
-      </Box>
+      </Surface>
 
-      <Box style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <Button intent="primary">Primary</Button>
-        <Button intent="secondary">Secondary</Button>
-        <Button intent="ghost">Ghost</Button>
-        <Button intent="danger">Delete</Button>
-      </Box>
+      <Surface style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <Button intent="primary">strike</Button>
+        <Button intent="secondary">set aside</Button>
+        <Button intent="ghost">linger</Button>
+        <Button intent="danger">unmake</Button>
+      </Surface>
 
-      <Box style={{ maxWidth: '24rem' }}>
-        <Input placeholder="Type something" />
-      </Box>
+      <Surface style={{ maxWidth: '24rem' }}>
+        <Input placeholder="what would the apprentice carry to your bench?" />
+      </Surface>
 
-      <Box
+      <Surface
         glow="pulse"
-        surface="raised"
+        level="raised"
         radius="lg"
         padding="lg"
         style={{ maxWidth: '32rem' }}
       >
-        <Text size="lg" weight="semibold">
-          Border-glow surface
+        <Text size="lg" weight="semibold" as="h2">
+          the breathing rim
         </Text>
         <Text tone="muted">
-          On synthwave the glow breathes pink at 80 BPM with a sine ease. On
-          terminal it flickers green at 140 BPM with a square wave. On light /
-          dark the glow stays at zero — the same recipe, different theme
-          rhythm.
+          on synthwave the rim breathes pink in long sines. on terminal it
+          flickers green in squares. on the still themes the rim sleeps. one
+          recipe, four heartbeats.
         </Text>
-      </Box>
-    </Box>
+      </Surface>
+    </Surface>
   ),
 };

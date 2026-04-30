@@ -29,18 +29,22 @@ export const button = recipe({
   variants: {
     intent: {
       primary: {
-        background: vars.color.accent,
+        background: vars.color.actionPrimary,
         color: vars.color.accentFg,
         selectors: {
-          '&:hover:not(:disabled)': { filter: 'brightness(0.95)' },
+          '&:hover:not(:disabled)': {
+            background: vars.color.actionPrimaryHover,
+          },
         },
       },
       secondary: {
-        background: vars.color.bgRaised,
+        background: vars.color.actionSecondary,
         color: vars.color.fg,
         borderColor: vars.color.border,
         selectors: {
-          '&:hover:not(:disabled)': { background: vars.color.bgMuted },
+          '&:hover:not(:disabled)': {
+            background: vars.color.actionSecondaryHover,
+          },
         },
       },
       ghost: {
@@ -54,7 +58,7 @@ export const button = recipe({
         background: vars.color.danger,
         color: vars.color.dangerFg,
         selectors: {
-          '&:hover:not(:disabled)': { filter: 'brightness(0.95)' },
+          '&:hover:not(:disabled)': { background: vars.color.dangerHover },
         },
       },
     },
@@ -78,10 +82,32 @@ export const button = recipe({
     fullWidth: {
       true: { width: '100%' },
     },
+    shape: {
+      rect: {},
+      square: {
+        paddingInline: 0,
+        flexShrink: 0,
+      },
+    },
   },
+  compoundVariants: [
+    {
+      variants: { shape: 'square', size: 'sm' },
+      style: { width: vars.space[8] },
+    },
+    {
+      variants: { shape: 'square', size: 'md' },
+      style: { width: vars.space[10] },
+    },
+    {
+      variants: { shape: 'square', size: 'lg' },
+      style: { width: vars.space[12] },
+    },
+  ],
   defaultVariants: {
     intent: 'primary',
     size: 'md',
     fullWidth: false,
+    shape: 'rect',
   },
 });

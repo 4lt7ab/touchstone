@@ -23,29 +23,48 @@ const mapToNull = <T extends Record<string, unknown>>(
 
 export const vars = createThemeContract({
   color: {
+    // ── Surfaces ─────────────────────────────────────────────────────────
     bg: null,
+    bgSolid: null,
     bgRaised: null,
     bgMuted: null,
+    bgPanel: null,
     bgOverlay: null,
     bgInput: null,
+    bgDisabled: null,
     bgPage: null,
+    // ── Foreground (text) ────────────────────────────────────────────────
     fg: null,
+    fgSecondary: null,
     fgMuted: null,
+    fgPlaceholder: null,
+    fgDisabled: null,
     fgInverse: null,
     fgLink: null,
+    // ── Borders ──────────────────────────────────────────────────────────
     border: null,
     borderFocus: null,
+    borderError: null,
+    // ── Accent ───────────────────────────────────────────────────────────
     accent: null,
     accentFg: null,
+    // ── Actions ──────────────────────────────────────────────────────────
     actionPrimary: null,
     actionPrimaryHover: null,
     actionSecondary: null,
     actionSecondaryHover: null,
+    // ── Feedback (foreground + tinted background pairs) ──────────────────
     danger: null,
+    dangerHover: null,
     dangerFg: null,
+    dangerBg: null,
     success: null,
+    successBg: null,
     warning: null,
+    warningBg: null,
     info: null,
+    infoBg: null,
+    // ── Theme accents (rhythm/glow) ──────────────────────────────────────
     glow: null,
     glowFg: null,
   },

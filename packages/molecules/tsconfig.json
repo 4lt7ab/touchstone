@@ -8,6 +8,7 @@
   "include": ["src"],
   "references": [
     { "path": "../atoms" },
+    { "path": "../hooks" },
     { "path": "../themes" }
   ]
 }

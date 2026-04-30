@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/themes",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Theme contract and presets (light, dark) for Touchstone, powered by Vanilla Extract.",
   "license": "MIT",
   "type": "module",

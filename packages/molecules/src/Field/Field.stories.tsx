@@ -5,8 +5,8 @@ const meta = {
   title: 'Molecules/Field',
   component: Field,
   args: {
-    label: 'Email',
-    placeholder: 'you@example.com',
+    label: "maker's mark",
+    placeholder: "the name you'll strike on every vessel",
   },
   parameters: {
     layout: 'centered',
@@ -22,17 +22,20 @@ export const Basic: Story = {};
 
 export const WithHint: Story = {
   args: {
-    hint: 'We never share your email.',
+    hint: 'the ledger keeps it; no other forge will see.',
   },
 };
 
 export const WithError: Story = {
   args: {
-    error: 'Email is required',
-    defaultValue: 'not-an-email',
+    error: 'no mark struck — the vessel cannot leave the workshop.',
+    defaultValue: '(unsigned)',
   },
 };
 
 export const Disabled: Story = {
-  args: { disabled: true, hint: 'Account email cannot be changed.' },
+  args: {
+    disabled: true,
+    hint: 'the master sealed this drawer; it cannot be re-cut.',
+  },
 };

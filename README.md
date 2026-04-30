@@ -29,7 +29,7 @@ touchstone/
 │  ├─ themes/                   # theme contract + light/dark presets
 │  ├─ icons/                    # icon components
 │  ├─ hooks/                    # shared hooks
-│  ├─ atoms/                    # Box, Text, Button, Input
+│  ├─ atoms/                    # Surface, Text, Button, Input
 │  ├─ molecules/                # Field
 │  ├─ organisms/                # placeholder for future organisms
 │  └─ react/                    # umbrella re-export — install this

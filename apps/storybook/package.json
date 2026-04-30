@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/storybook",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,6 +16,7 @@
     "@touchstone/hooks": "workspace:*",
     "@touchstone/icons": "workspace:*",
     "@touchstone/molecules": "workspace:*",
+    "@touchstone/organisms": "workspace:*",
     "@touchstone/themes": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

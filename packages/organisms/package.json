@@ -1,7 +1,7 @@
 {
   "name": "@touchstone/organisms",
-  "version": "0.0.2",
-  "description": "Atomic-design 'organisms' — larger compositions (DataTable, Dialog, NavBar, ...). Placeholder for now.",
+  "version": "0.0.3",
+  "description": "Atomic-design 'organisms' — larger compositions (Dialog, ...).",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,14 +11,15 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./styles.css": "./dist/index.css"
   },
   "files": ["dist"],
-  "sideEffects": false,
+  "sideEffects": ["**/*.css", "**/*.css.js"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo 'no tests yet'",
+    "test": "vitest run",
     "lint": "eslint src",
     "typecheck": "tsc -b --pretty",
     "clean": "rm -rf dist *.tsbuildinfo"
@@ -27,12 +28,27 @@
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
+  "dependencies": {
+    "@touchstone/atoms": "workspace:*",
+    "@touchstone/hooks": "workspace:*",
+    "@touchstone/themes": "workspace:*",
+    "@vanilla-extract/css": "^1.15.3",
+    "@vanilla-extract/recipes": "^0.5.3"
+  },
   "devDependencies": {
     "@touchstone/tsconfig": "workspace:*",
     "@touchstone/tsup-config": "workspace:*",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vanilla-extract/vite-plugin": "^4.0.13",
+    "jsdom": "^24.1.0",
     "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tsup": "^8.2.4",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.4"
   }
 }

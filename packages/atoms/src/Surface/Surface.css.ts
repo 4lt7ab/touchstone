@@ -1,7 +1,7 @@
 import { recipe } from '@vanilla-extract/recipes';
 import { vars } from '@touchstone/themes';
 
-export const box = recipe({
+export const surface = recipe({
   base: {
     boxSizing: 'border-box',
     minWidth: 0,
@@ -20,11 +20,17 @@ export const box = recipe({
       lg: { borderRadius: vars.radius.lg },
       full: { borderRadius: vars.radius.full },
     },
-    surface: {
+    level: {
       none: {},
       base: { background: vars.color.bg },
+      solid: { background: vars.color.bgSolid },
       raised: { background: vars.color.bgRaised },
       muted: { background: vars.color.bgMuted },
+      panel: { background: vars.color.bgPanel },
+      input: { background: vars.color.bgInput },
+      overlay: { background: vars.color.bgOverlay },
+      disabled: { background: vars.color.bgDisabled },
+      page: { background: vars.color.bgPage },
     },
     glow: {
       none: {},
@@ -41,7 +47,7 @@ export const box = recipe({
   defaultVariants: {
     padding: 'none',
     radius: 'none',
-    surface: 'none',
+    level: 'none',
     glow: 'none',
   },
 });

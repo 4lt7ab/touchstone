@@ -16,11 +16,21 @@ export {
   type UseDisclosureContentProps,
 } from './useDisclosure.js';
 export { useFocusTrap } from './useFocusTrap.js';
+export { useFocusReturn } from './useFocusReturn.js';
 export { useClickOutside } from './useClickOutside.js';
+export { useEscapeKey } from './useEscapeKey.js';
+export { useScrollLock } from './useScrollLock.js';
 export { useInjectStyles } from './useInjectStyles.js';
 export {
   useRovingFocus,
   type UseRovingFocusOptions,
   type UseRovingFocusReturn,
 } from './useRovingFocus.js';
+export {
+  useAnchoredPosition,
+  type AnchoredPositionAlign,
+  type AnchoredPositionSide,
+  type UseAnchoredPositionOptions,
+  type UseAnchoredPositionReturn,
+} from './useAnchoredPosition.js';
 export { createCompoundContext } from './createCompoundContext.js';
