@@ -115,3 +115,16 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 - Lint/format: ESLint flat config (typescript-eslint, react, react-hooks, jsx-a11y) + Prettier. Run `bun run format` before committing.
 - Tests: Vitest + Testing Library + jsdom. Co-locate tests next to source as `*.test.ts(x)`.
 - No comments unless the *why* is non-obvious.
+
+## Commit rules
+
+One commit per coherent change, in the workshop voice. Use `/commit` to wrap a session — it bumps every workspace `package.json` in lockstep (patch by default) and commits the tree as a single change.
+
+**Voice.** Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable; blank line; a `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer. Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone. Speak to the substance of the staged diff, not the file list. Mention version bumps only when they are the principal change.
+
+**Structure.**
+- Stage explicit paths — never `git add -A` / `git add .`.
+- Workspace versions move in lockstep across every `package.json`.
+- Never include secrets, build artifacts, editor / OS junk, or harness state under `.claude/` (other than checked-in `commands/`, `agents/`, `skills/`, and `settings.json`).
+- No `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. Never push as part of a commit.
+- If a pre-commit hook fails, fix the root cause and make a **new** commit.

@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/icons",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Icon components for Touchstone.",
   "license": "MIT",
   "type": "module",

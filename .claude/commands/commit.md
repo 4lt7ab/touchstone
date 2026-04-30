@@ -4,16 +4,11 @@ argument-hint: [major|minor|patch]
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git ls-files:*), Bash(git add:*), Bash(git commit:*), Bash(git rev-parse:*), Bash(git check-ignore:*), Bash(find:*), Bash(stat:*), Bash(wc:*), Read, Edit
 ---
 
-You are committing the working tree of the Touchstone repo. The user wants you to:
-
-1. Stage every legitimate change.
-2. Make sure nothing that shouldn't be in the commit quietly slips through.
-3. Bump every workspace package version by **`$ARGUMENTS`** (one of `major`, `minor`, `patch`).
-4. Make one git commit, in the repository's commit-message voice.
+Wrap the session: bump every workspace `package.json` and commit the working tree as one change, following the **Commit rules** in `CLAUDE.md`.
 
 ## Argument
 
-`$ARGUMENTS` must be exactly `major`, `minor`, or `patch`. If it is empty, malformed, or anything else, stop and ask the user — do not guess.
+`$ARGUMENTS` is `major`, `minor`, or `patch`. **Default: `patch`** — if `$ARGUMENTS` is empty, treat it as `patch`. If it is anything else, stop and ask.
 
 ## Step 1 — Survey
 
@@ -26,27 +21,36 @@ In parallel:
 
 ## Step 2 — Suspicion guard
 
-Before staging, walk every file that would be touched (modified, untracked, deleted, renamed) and flag anything matching:
+Walk every file that would be touched (modified, untracked, deleted, renamed) and flag anything matching:
 
-- **Secrets**: `.env`, `.env.*` (except `.env.example`), `*.pem`, `*.key`, `id_rsa*`, `*.p12`, `*credentials*`, `*secret*`, `*token*` (case-insensitive name match)
-- **Build artifacts** that escaped `.gitignore`: anything under `dist/`, `node_modules/`, `storybook-static/`, `coverage/`, `.cache/`, `.parcel-cache/`, `.next/`, `out/`, `*.tsbuildinfo`, `*.vanilla.css`
-- **Editor / OS junk**: `.DS_Store`, `*.swp`, `*.swo`, `Thumbs.db`, untracked `.vscode/` or `.idea/`
-- **Harness state under `.claude/`**: include checked-in commands, agents, skills, and `settings.json`; flag everything else (e.g. `launch.json`, `*.lock`, `debug/`, `projects/`, `settings.local.json`)
-- **Anything binary or larger than 1 MiB** (`stat`/`wc -c`)
+- **Secrets:** `.env`, `.env.*` (except `.env.example`), `*.pem`, `*.key`, `id_rsa*`, `*.p12`, `*credentials*`, `*secret*`, `*token*` (case-insensitive)
+- **Build artifacts:** anything under `dist/`, `node_modules/`, `storybook-static/`, `coverage/`, `.cache/`, `.parcel-cache/`, `.next/`, `out/`, plus `*.tsbuildinfo`, `*.vanilla.css`
+- **Editor / OS junk:** `.DS_Store`, `*.swp`, `*.swo`, `Thumbs.db`, untracked `.vscode/` or `.idea/`
+- **Harness state under `.claude/`:** include checked-in `commands/`, `agents/`, `skills/`, and `settings.json`; flag everything else (e.g. `launch.json`, `*.lock`, `debug/`, `projects/`, `settings.local.json`)
+- **Anything binary or larger than 1 MiB** (`stat` / `wc -c`)
 
-Print a one-line note per suspicious file (`path — reason`) and **do not stage it without confirmation**. If the list is non-empty, ask the user once, with the full list, which (if any) to include. If the list is empty, say so and proceed.
+Print one line per suspicious file (`path — reason`). If the list is non-empty, ask the user once which (if any) to include. If empty, say so and continue.
 
-## Step 3 — Bump versions
+## Step 3 — Pass over CLAUDE.md
 
-Find every `package.json` in the workspace whose `"version"` is a real semver string:
+Read `CLAUDE.md` and make a small, surgical pass:
+
+- Trim sections that have grown stale, redundant, or over-long.
+- Confirm the **Commit rules** section is present and concise. If a recent rule has hardened (a new file pattern to flag, a new artifact to ignore, a clarification the workshop voice now demands), fold it in here so the rules stay the single source of truth.
+
+Edit only what genuinely improves the file — if nothing needs changing, say so and move on. If you edit `CLAUDE.md`, stage it with the rest of the commit.
+
+## Step 4 — Bump versions
+
+Find every workspace `package.json`:
 
 ```
 git ls-files '*package.json'
 ```
 
-Plus any untracked `package.json` from `git status`. Read each and confirm they all share the same current version — if they do not, **stop and ask** before desyncing the workspace.
+Plus any untracked `package.json` from `git status`. Read each and confirm they share the same current version — if they do not, **stop and ask** before desyncing the workspace.
 
-Bump each `"version"` field in lockstep using `Edit`:
+Bump each `"version"` field in lockstep with `Edit`:
 
 - `patch`: `x.y.z` → `x.y.(z+1)`
 - `minor`: `x.y.z` → `x.(y+1).0`, patch resets to `0`
@@ -54,31 +58,14 @@ Bump each `"version"` field in lockstep using `Edit`:
 
 Do **not** run `npm version` / `bun version` — those create tags and we want one combined commit. Skip any `package.json` without a `version` field.
 
-## Step 4 — Stage and verify
+## Step 5 — Stage and verify
 
-- Stage the explicit list of non-suspicious files plus the bumped `package.json`s. Avoid `git add -A` and `git add .` — name the paths.
+- Stage the explicit list of non-suspicious files plus the bumped `package.json`s and (if edited) `CLAUDE.md`. No `git add -A` / `git add .` — name the paths.
 - Show `git status` and `git diff --cached --stat` so the user can glance and see exactly what is about to land.
 
-## Step 5 — Compose the message
+## Step 6 — Compose and commit
 
-The repository's commit style is deliberate: a lowercase poetic title in **workshop / craft allegory**, blank line, a 3–4 line **two-space-indented** verse describing the change as a parable, blank line, then the `Co-Authored-By` trailer. Read the recent log; imitate the voice. Vocabulary lives around **bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone**.
-
-Example shape (do not copy the words — match the cadence):
-
-```
-the recipe named a stone the pantry never held
-
-  An apprentice read aloud from the bench-book —
-  'extends the elder pattern' — and the workshop fell silent,
-  for the elder pattern's name was nowhere on the shelf.
-  Now the shelf bears its label, and the page reads through.
-
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
-```
-
-Write the title + verse from the **staged diff**, not the file list. Speak to the substantive change. Mention the version bump in the verse only if it is the principal change of the commit; otherwise let the cadence of the workshop carry it implicitly.
-
-## Step 6 — Commit
+Draft the title and verse from the **staged diff**, following the **Commit rules** section of `CLAUDE.md`. Speak to the substantive change; mention the version bump only if it is the principal change.
 
 Use a heredoc so indentation survives:
 
@@ -100,8 +87,4 @@ Then run `git status` and report whether the tree is clean (or, if suspicious fi
 
 ## Hard rules
 
-- Do **not** push.
-- Do **not** use `--amend`, `--no-verify`, `--no-gpg-sign`, or `-i`.
-- Do **not** create or move tags.
-- If a pre-commit hook fails, fix the root cause and make a **new** commit — never amend.
-- If anything is ambiguous (argument, version desync, a suspicious file), stop and ask before acting.
+The **Commit rules** in `CLAUDE.md` are authoritative. In particular: no push, no `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. If a pre-commit hook fails, fix the root cause and make a **new** commit. If anything is ambiguous (argument, version desync, a suspicious file, a CLAUDE.md edit you're unsure about), stop and ask before acting.

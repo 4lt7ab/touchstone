@@ -9,13 +9,13 @@ import {
   rhythms,
   synthwaveTheme,
   terminalTheme,
+  vars,
 } from '@touchstone/themes';
 import { ThemeRhythmProvider } from '@touchstone/hooks';
 import '@touchstone/themes/styles.css';
 import '@touchstone/atoms/styles.css';
 import '@touchstone/molecules/styles.css';
 import { resolveStorybookTheme } from './themes';
-import './preview.css';
 
 const ThemedDocsContainer = ({ children, context }: DocsContainerProps) => {
   const readTheme = React.useCallback(() => {
@@ -69,6 +69,14 @@ const preview: Preview = {
       parentSelector: 'body',
     }),
     (Story, ctx) => {
+      React.useEffect(() => {
+        const body = document.body;
+        body.style.margin = '0';
+        body.style.minHeight = '100vh';
+        body.style.background = vars.color.bgPage;
+        body.style.color = vars.color.fg;
+        body.style.fontFamily = vars.font.family.sans;
+      });
       const themeName = ctx.globals.theme as keyof typeof rhythms | undefined;
       const rhythm =
         themeName && themeName in rhythms ? rhythms[themeName] : null;
