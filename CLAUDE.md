@@ -6,7 +6,7 @@ A React component library that is the team's measure of quality. A Bun + workspa
 
 ```
 touchstone/
-├── .tool-versions          asdf pins (nodejs, bun)
+├── .tool-versions          asdf pins (nodejs, bun, just)
 ├── package.json            bun workspace root + repo-wide scripts
 ├── tsconfig.json           solution-style root with project references
 ├── tsconfig.base.json      shared strict TS settings
@@ -65,7 +65,7 @@ bun run clean            # rm dist + node_modules everywhere
 
 `bun run --filter '*' <task>` walks the workspace dependency graph topologically, so layers build in order (tokens → themes → atoms → molecules → react). There is no Turbo-style cross-run cache — every invocation re-runs from scratch. Run a single package's task with `bun run --filter @touchstone/atoms test`.
 
-Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the one to know is `just bump [patch|minor|major]`, which is the only sanctioned way to move workspace versions. **`just bump` is a human lever** — run it yourself before invoking `/commit` if a release is intended. The agent never runs it (see **Commit rules** below).
+Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the two to know are `just bump [patch|minor|major]` (the only sanctioned way to move workspace versions) and `just release` (the only sanctioned way to publish to npm — see `scripts/publish.ts`, which builds, asserts a clean tree + lockstep versions, then `bun publish --access public` for each public package in topological order). **Both are human levers** — run them yourself; the agent never runs either (see **Commit rules** below). The release ritual is `just bump <level>` → `/commit` → `just release [--otp <code>] [--dry-run]`.
 
 ## Build flow
 
@@ -135,7 +135,7 @@ When a retirement proposal surfaces, check the test first. Passing components me
 ## Things that are stubbed
 
 - **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions earn their place per the design tenets.
-- **No release tooling.** No Changesets, no CI publish, no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump`, run by a human (never the agent).
+- **Release tooling is local-only.** Publishing goes through `just release` (see `scripts/publish.ts`); there is no CI publish, no Changesets, and no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump`. Both levers are human-only — never the agent.
 - **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
 - **Hooks package owns the in-house accessibility primitives** (focus trap, focus return, click-outside, escape-key, scroll lock, disclosure, roving focus, controllable state, compound contexts, anchored positioning); new behavior lands here alongside a test when a component needs it.
 
@@ -156,6 +156,7 @@ One commit per coherent change, in the workshop voice. Use `/commit` to wrap a s
 **Structure.**
 - Stage explicit paths — never `git add -A` / `git add .`.
 - **Versioning is human-only.** The agent must never edit a `"version"` field in `package.json` (no `Edit`, no `Write`), never run `just bump`, and never run `npm version` / `bun version`. Workspace bumps go through `just bump <patch|minor|major>` (see `justfile` → `scripts/bump-versions.ts`), which a human invokes when a release is intended. The agent only carries the resulting diff into a commit alongside everything else.
+- **Publishing is human-only.** The agent must never run `just release`, `bun publish`, or `npm publish` — not even with `--dry-run`. Releases go through `just release` (see `scripts/publish.ts`), which a human invokes after `just bump` and `/commit`. The npm registry is downstream of this repo; the agent never reaches it.
 - Never include secrets, build artifacts, editor / OS junk, or harness state under `.claude/` (other than checked-in `commands/`, `agents/`, `skills/`, and `settings.json`).
 - No `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. Never push as part of a commit.
 - If a pre-commit hook fails, fix the root cause and make a **new** commit.

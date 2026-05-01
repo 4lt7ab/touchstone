@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Touchstone — umbrella React package re-exporting every atomic layer.",
   "license": "MIT",
   "type": "module",
