@@ -36,6 +36,7 @@ interface Pkg {
   dir: string;
   rel: string;
   workspaceDeps: string[];
+  private: boolean;
 }
 
 interface Args {
@@ -84,21 +85,24 @@ function listPackageJsons(): string[] {
     .sort();
 }
 
-function collectPublishable(): Pkg[] {
+function collectVersioned(): Pkg[] {
   const pkgs: Pkg[] = [];
   for (const rel of listPackageJsons()) {
     const abs = resolve(repoRoot, rel);
     const json = JSON.parse(readFileSync(abs, 'utf8')) as Record<string, unknown>;
-    if (json.private === true) continue;
     if (typeof json.version !== 'string' || typeof json.name !== 'string') continue;
     const deps = (json.dependencies as Record<string, string> | undefined) ?? {};
-    const workspaceDeps = Object.keys(deps).filter((d) => d.startsWith('@touchstone/'));
+    const devDeps = (json.devDependencies as Record<string, string> | undefined) ?? {};
+    const workspaceDeps = [...Object.keys(deps), ...Object.keys(devDeps)].filter((d) =>
+      d.startsWith('@touchstone/'),
+    );
     pkgs.push({
       name: json.name,
       version: json.version,
       dir: dirname(abs),
       rel,
       workspaceDeps,
+      private: json.private === true,
     });
   }
   return pkgs;
@@ -148,14 +152,20 @@ function main(): void {
 
   gitCleanOrBail();
 
-  const all = collectPublishable();
+  const all = collectVersioned();
   if (all.length === 0) {
-    console.error('publish: no publishable workspace packages found.');
+    console.error('publish: no versioned workspace packages found.');
     process.exit(1);
   }
   assertLockstep(all);
 
-  const ordered = topoSort(all);
+  const publishable = all.filter((p) => !p.private);
+  if (publishable.length === 0) {
+    console.error('publish: every versioned package is private — nothing to publish.');
+    process.exit(1);
+  }
+
+  const ordered = topoSort(publishable);
   const version = ordered[0]!.version;
 
   console.log(`publish: ${ordered.length} packages at ${version}`);

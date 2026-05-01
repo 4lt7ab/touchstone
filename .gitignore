@@ -50,6 +50,9 @@ web_modules/
 # Optional npm cache directory
 .npm
 
+# Bun install cache (only created when sandboxed agents need a writable cache dir)
+.bun-cache/
+
 # Optional eslint cache
 .eslintcache
 

@@ -1,6 +1,6 @@
 {
   "name": "touchstone",
-  "version": "0.0.5",
+  "version": "0.0.1",
   "private": true,
   "description": "Touchstone — a React component library that is the team's measure of quality.",
   "license": "MIT",
@@ -16,7 +16,7 @@
     "tooling/*"
   ],
   "scripts": {
-    "build": "bun run --filter '*' build && bun run verify-exports",
+    "build": "bun run --filter '@touchstone/*' build && bun run --filter '@4lt7ab/touchstone' build && bun run verify-exports",
     "verify-exports": "bun run scripts/verify-exports.ts",
     "dev": "bun run --filter '*' dev",
     "test": "bun run --filter '*' test",

@@ -85,6 +85,21 @@ function extractStarReExports(source: string): Set<string> {
   return targets;
 }
 
+/**
+ * Resolve a `@touchstone/<leaf>` re-export target to the named exports the
+ * leaf actually ships in its built `dist/index.d.ts`. Used when a star
+ * re-export was inlined (rather than preserved verbatim) so we can still
+ * verify every transitive name landed in the umbrella's dist.
+ */
+function resolveLeafDistExports(target: string): Set<string> | null {
+  const prefix = '@touchstone/';
+  if (!target.startsWith(prefix)) return null;
+  const leaf = target.slice(prefix.length);
+  const distDts = join(packagesDir, leaf, 'dist', 'index.d.ts');
+  if (!existsSync(distDts)) return null;
+  return extractNamedExports(readFileSync(distDts, 'utf8'));
+}
+
 function verifyPackage(packagePath: string): PackageReport {
   const pkgJsonPath = join(packagePath, 'package.json');
   const name = existsSync(pkgJsonPath)
@@ -118,12 +133,24 @@ function verifyPackage(packagePath: string): PackageReport {
   for (const name of sourceExports) {
     if (!distExports.has(name)) missing.push(name);
   }
-  missing.sort();
 
   const missingStarReExports: string[] = [];
   for (const target of sourceStars) {
-    if (!distStars.has(target)) missingStarReExports.push(target);
+    if (distStars.has(target)) continue;
+    // The star wasn't preserved verbatim. If the target is a workspace leaf
+    // and its named exports are all present in our dist, treat it as inlined
+    // (the bundled-umbrella case). Otherwise it's a real drop.
+    const leafExports = resolveLeafDistExports(target);
+    if (leafExports === null) {
+      missingStarReExports.push(target);
+      continue;
+    }
+    for (const sym of leafExports) {
+      if (!distExports.has(sym)) missing.push(sym);
+    }
   }
+
+  missing.sort();
   missingStarReExports.sort();
 
   return { name, missing, missingStarReExports };

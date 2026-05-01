@@ -1,6 +1,6 @@
 # Touchstone
 
-A React component library that is the team's measure of quality. A Bun + workspaces monorepo of atomic-design layers (tokens → themes → atoms → molecules → organisms) re-exported through the umbrella `@touchstone/react` package, with Storybook for docs and visual QA.
+A React component library that is the team's measure of quality. A Bun + workspaces monorepo of atomic-design layers (tokens → themes → atoms → molecules → organisms) re-exported through the umbrella `@4lt7ab/touchstone` package, with Storybook for docs and visual QA. Internally the workspace packages are still named `@touchstone/*` and stay private; only the umbrella publishes to npm, bundling every layer into one tarball.
 
 ## Layout
 
@@ -20,7 +20,7 @@ touchstone/
 │   ├── atoms/              Surface, Stack, Text, Button, Input, Badge, Divider, Spinner, Skeleton, Switch, Checkbox, Slot
 │   ├── molecules/          Field, SegmentedControl, AlertBanner, Disclosure
 │   ├── organisms/          Dialog, Popover
-│   └── react/              umbrella re-export — install this
+│   └── react/              umbrella — bundled and published as @4lt7ab/touchstone
 ├── apps/
 │   └── storybook/          docs and visual QA for every package
 └── tooling/                shared build/lint config (not published)
@@ -65,7 +65,7 @@ bun run clean            # rm dist + node_modules everywhere
 
 `bun run --filter '*' <task>` walks the workspace dependency graph topologically, so layers build in order (tokens → themes → atoms → molecules → react). There is no Turbo-style cross-run cache — every invocation re-runs from scratch. Run a single package's task with `bun run --filter @touchstone/atoms test`.
 
-Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the two to know are `just bump [patch|minor|major]` (the only sanctioned way to move workspace versions) and `just release` (the only sanctioned way to publish to npm — see `scripts/publish.ts`, which builds, asserts a clean tree + lockstep versions, then `bun publish --access public` for each public package in topological order). **Both are human levers** — run them yourself; the agent never runs either (see **Commit rules** below). The release ritual is `just bump <level>` → `/commit` → `just release [--otp <code>] [--dry-run]`.
+Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the three to know are `just bump [patch|minor|major]` (incrementing every workspace version in lockstep), `just set <version>` (forcing every workspace version to a literal value — for one-off resets) and `just release` (the only sanctioned way to publish to npm — see `scripts/publish.ts`, which builds, asserts a clean tree + lockstep versions, then `bun publish --access public` for each public package in topological order). **All three are human levers** — run them yourself; the agent never runs any of them (see **Commit rules** below). The release ritual is `just bump <level>` → `/commit` → `just release [--otp <code>] [--dry-run]`.
 
 ## Build flow
 
@@ -74,14 +74,14 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 - ESM only, target `es2022`
 - `.d.ts` emitted by tsup (the source-of-truth typecheck still runs through `tsc -b` from the root)
 - vanilla-extract `*.css.ts` files are compiled by `@vanilla-extract/esbuild-plugin` into a single `dist/index.css` — packages that ship styles expose them at the `./styles.css` subpath export and set `sideEffects: ["**/*.css", "**/*.css.js"]` so the CSS survives consumer tree-shaking
-- `react`, `react-dom`, and any `@touchstone/*` import are always external, so workspace deps stay un-bundled and the umbrella package composes via re-export rather than re-bundle
+- `react`, `react-dom`, and any `@touchstone/*` import are always external for leaf packages, so workspace deps stay un-bundled and each leaf composes via re-export rather than re-bundle. The umbrella (`packages/react`) is the deliberate exception: it has its own `tsup.config.ts` that bundles every `@touchstone/*` workspace dep into one self-contained `dist/index.js` + `dist/index.css`, so the published `@4lt7ab/touchstone` tarball needs no leaf-package resolution at install time.
 
 `tsc -b` from the root drives the project-reference graph defined in `tsconfig.json`. Each package's tsconfig keeps `composite: true`; the tsup `dts` build overrides composite/incremental so it can emit cleanly without fighting the solution build.
 
 ## Architecture conventions
 
 - **Atomic-design layering is enforced by dependency direction.** tokens → themes → atoms → molecules → organisms → react. Never import upward (an atom must not import a molecule), and never sideways across siblings without a real reason.
-- **`@touchstone/react` is the only package consumers should install.** It re-exports every other package; the leaf packages can still be installed individually but that is a deliberate choice, not a default. The umbrella's `src/index.ts` is the public surface — anything not re-exported from there is implementation detail.
+- **`@4lt7ab/touchstone` is the only package consumers can install.** Every leaf package (`@touchstone/atoms`, `@touchstone/themes`, …) is `private: true` and never reaches npm. The umbrella bundles all of them — JS and CSS — into a single tarball, so `bun add @4lt7ab/touchstone` plus `import '@4lt7ab/touchstone/styles.css'` is the entire integration. The umbrella's `src/index.ts` is the public surface; anything not re-exported from there is implementation detail.
 - **Theming flows through one place.** `@touchstone/themes` defines the `vars` contract via `createThemeContract`, plus `lightTheme` / `darkTheme` class-based presets. Everything visual reads from `vars.*` — components must not hardcode colors, spacing, font scales, radii, or z-indices.
 - **Styling is vanilla-extract recipes.** Variants, sizes, and stateful styles live in `*.css.ts` next to the component. Recipes (`@vanilla-extract/recipes`) handle variant props; raw `style`/`globalStyle` is reserved for things recipes can't express.
 - **Accessible primitives live in `@touchstone/hooks`.** Focus traps, focus return, click-outside, escape-key, scroll lock, disclosure state, roving focus, controllable state, compound contexts, and `asChild` composition (via the in-house `Slot` atom) are all owned in-house. New components compose those hooks; new behavior earns its way into the hooks package alongside a test. The library has no third-party UI dependencies.
@@ -135,7 +135,7 @@ When a retirement proposal surfaces, check the test first. Passing components me
 ## Things that are stubbed
 
 - **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions earn their place per the design tenets.
-- **Release tooling is local-only.** Publishing goes through `just release` (see `scripts/publish.ts`); there is no CI publish, no Changesets, and no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump`. Both levers are human-only — never the agent.
+- **Release tooling is local-only.** Publishing goes through `just release` (see `scripts/publish.ts`); there is no CI publish, no Changesets, and no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump` or `just set`. All three levers are human-only — never the agent.
 - **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
 - **Hooks package owns the in-house accessibility primitives** (focus trap, focus return, click-outside, escape-key, scroll lock, disclosure, roving focus, controllable state, compound contexts, anchored positioning); new behavior lands here alongside a test when a component needs it.
 
@@ -149,13 +149,13 @@ When a retirement proposal surfaces, check the test first. Passing components me
 
 ## Commit rules
 
-One commit per coherent change, in the workshop voice. Use `/commit` to wrap a session — it commits the working tree as a single change. It does **not** touch versions: workspace bumps are a human lever (`just bump`) and must be run before `/commit` if a release is intended. If a bump is in the working tree, it rides along; if not, no version moves.
+One commit per coherent change, in the workshop voice. Use `/commit` to wrap a session — it commits the working tree as a single change. It does **not** touch versions: workspace versions are human levers (`just bump`, `just set`) and must be run before `/commit` if a release is intended. If a version change is in the working tree, it rides along; if not, no version moves.
 
 **Voice.** Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable; blank line; a `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer. Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone. Speak to the substance of the staged diff, not the file list. Mention version bumps only when they are the principal change.
 
 **Structure.**
 - Stage explicit paths — never `git add -A` / `git add .`.
-- **Versioning is human-only.** The agent must never edit a `"version"` field in `package.json` (no `Edit`, no `Write`), never run `just bump`, and never run `npm version` / `bun version`. Workspace bumps go through `just bump <patch|minor|major>` (see `justfile` → `scripts/bump-versions.ts`), which a human invokes when a release is intended. The agent only carries the resulting diff into a commit alongside everything else.
+- **Versioning is human-only.** The agent must never edit a `"version"` field in `package.json` (no `Edit`, no `Write`), never run `just bump` or `just set`, and never run `npm version` / `bun version`. Workspace versions move through `just bump <patch|minor|major>` (incremental) or `just set <version>` (literal reset) — both wrap `scripts/bump-versions.ts` and both are invoked by a human. The agent only carries the resulting diff into a commit alongside everything else.
 - **Publishing is human-only.** The agent must never run `just release`, `bun publish`, or `npm publish` — not even with `--dry-run`. Releases go through `just release` (see `scripts/publish.ts`), which a human invokes after `just bump` and `/commit`. The npm registry is downstream of this repo; the agent never reaches it.
 - Never include secrets, build artifacts, editor / OS junk, or harness state under `.claude/` (other than checked-in `commands/`, `agents/`, `skills/`, and `settings.json`).
 - No `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. Never push as part of a commit.
