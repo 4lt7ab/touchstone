@@ -1,14 +1,11 @@
 ---
-description: Bump all workspace versions and commit every change in the repo, in the workshop voice.
-argument-hint: [major|minor|patch]
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git ls-files:*), Bash(git add:*), Bash(git commit:*), Bash(git rev-parse:*), Bash(git check-ignore:*), Bash(find:*), Bash(stat:*), Bash(wc:*), Bash(just bump:*), Read, Edit
+description: Commit every change in the repo as one coherent change, in the workshop voice.
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git ls-files:*), Bash(git add:*), Bash(git commit:*), Bash(git rev-parse:*), Bash(git check-ignore:*), Bash(find:*), Bash(stat:*), Bash(wc:*), Read, Edit
 ---
 
-Wrap the session: bump every workspace `package.json` and commit the working tree as one change, following the **Commit rules** in `CLAUDE.md`.
+Wrap the session: stage the working tree and commit it as one coherent change, following the **Commit rules** in `CLAUDE.md`.
 
-## Argument
-
-`$ARGUMENTS` is `major`, `minor`, or `patch`. **Default: `patch`** — if `$ARGUMENTS` is empty, treat it as `patch`. If it is anything else, stop and ask.
+This command does **not** touch versions. Workspace bumps are owned by `just bump` and run by a human before (or instead of) invoking `/commit`. If a bump landed in the working tree, it gets included in the commit like any other change. If no bump is staged, no version moves — that is the correct behavior.
 
 ## Step 1 — Survey
 
@@ -40,26 +37,15 @@ Read `CLAUDE.md` and make a small, surgical pass:
 
 Edit only what genuinely improves the file — if nothing needs changing, say so and move on. If you edit `CLAUDE.md`, stage it with the rest of the commit.
 
-## Step 4 — Bump versions
+## Step 4 — Stage and verify
 
-Run the workspace bump recipe with the chosen level:
-
-```
-just bump $ARGUMENTS    # or `just bump patch` if $ARGUMENTS is empty
-```
-
-This is the **only** sanctioned way to move versions. It walks every tracked + untracked workspace `package.json` (skipping any without a `version` field), confirms they share the same current value, and writes the bumped version back in lockstep. If the script reports divergence and bails, **stop and ask** the user how to reconcile — do not edit `"version"` fields by hand to fix it.
-
-Do **not** edit `"version"` fields with `Edit` / `Write`, and do not run `npm version` / `bun version` (those create tags; we want one combined commit). The recipe is the contract.
-
-## Step 5 — Stage and verify
-
-- Stage the explicit list of non-suspicious files plus the bumped `package.json`s and (if edited) `CLAUDE.md`. No `git add -A` / `git add .` — name the paths.
+- Stage the explicit list of non-suspicious files (and, if edited, `CLAUDE.md`). No `git add -A` / `git add .` — name the paths.
+- If the working tree contains `package.json` `"version"` changes, **leave them as-is** and stage them — but do not author or modify them yourself. The bump came from `just bump`; you are only carrying it through.
 - Show `git status` and `git diff --cached --stat` so the user can glance and see exactly what is about to land.
 
-## Step 6 — Compose and commit
+## Step 5 — Compose and commit
 
-Draft the title and verse from the **staged diff**, following the **Commit rules** section of `CLAUDE.md`. Speak to the substantive change; mention the version bump only if it is the principal change.
+Draft the title and verse from the **staged diff**, following the **Commit rules** section of `CLAUDE.md`. Speak to the substantive change; mention any version bump only if it is the principal change.
 
 Use a heredoc so indentation survives:
 
@@ -81,4 +67,4 @@ Then run `git status` and report whether the tree is clean (or, if suspicious fi
 
 ## Hard rules
 
-The **Commit rules** in `CLAUDE.md` are authoritative. In particular: no push, no `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. **Never edit a `"version"` field in `package.json` directly** — bumps go through `just bump` and only through `just bump`. If a pre-commit hook fails, fix the root cause and make a **new** commit. If anything is ambiguous (argument, version desync, a suspicious file, a CLAUDE.md edit you're unsure about), stop and ask before acting.
+The **Commit rules** in `CLAUDE.md` are authoritative. In particular: no push, no `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. **Never edit a `"version"` field in `package.json`, and never run `just bump` (or `npm version` / `bun version`) yourself** — workspace versioning is the human's lever, not the agent's. If a pre-commit hook fails, fix the root cause and make a **new** commit. If anything is ambiguous (a suspicious file, a CLAUDE.md edit you're unsure about, an unexpected version change in the working tree), stop and ask before acting.

@@ -2,15 +2,19 @@
 /**
  * Bump every workspace `package.json` version in lockstep.
  *
- * Owns the version-edit responsibility for the repo — the agent (or a human)
- * must never hand-edit a `"version"` field. Run via `just bump [level]`.
+ * **Humans only.** This script — and the `just bump` recipe that wraps it — is
+ * the only sanctioned way to move workspace versions, and it is invoked by a
+ * human. The agent must never edit a `"version"` field directly and must never
+ * run this script (or `just bump`) itself; if a release is intended, the human
+ * runs the recipe before invoking `/commit`, and the resulting diff rides along
+ * with whatever else is being committed.
  *
  * Rules:
  *   - All workspace packages with a `version` must share the same current value.
  *     If they have desynced, the script bails so the divergence can be resolved
  *     deliberately rather than papered over.
  *   - Packages without a `version` field (e.g. tooling stubs) are skipped silently.
- *   - The script edits files only — staging and commit happen in `/commit`.
+ *   - The script edits files only — staging and commit happen separately.
  */
 
 import { execSync } from 'node:child_process';

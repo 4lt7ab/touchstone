@@ -65,7 +65,7 @@ bun run clean            # rm dist + node_modules everywhere
 
 `bun run --filter '*' <task>` walks the workspace dependency graph topologically, so layers build in order (tokens → themes → atoms → molecules → react). There is no Turbo-style cross-run cache — every invocation re-runs from scratch. Run a single package's task with `bun run --filter @touchstone/atoms test`.
 
-Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the one to know is `just bump [patch|minor|major]`, which is the only sanctioned way to move workspace versions (see **Commit rules** below).
+Repo-level chores that are not part of any single package live in the `justfile`. `just --list` enumerates them; the one to know is `just bump [patch|minor|major]`, which is the only sanctioned way to move workspace versions. **`just bump` is a human lever** — run it yourself before invoking `/commit` if a release is intended. The agent never runs it (see **Commit rules** below).
 
 ## Build flow
 
@@ -135,7 +135,7 @@ When a retirement proposal surfaces, check the test first. Passing components me
 ## Things that are stubbed
 
 - **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions earn their place per the design tenets.
-- **No release tooling.** No Changesets, no CI publish, no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `/commit`.
+- **No release tooling.** No Changesets, no CI publish, no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump`, run by a human (never the agent).
 - **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
 - **Hooks package owns the in-house accessibility primitives** (focus trap, focus return, click-outside, escape-key, scroll lock, disclosure, roving focus, controllable state, compound contexts, anchored positioning); new behavior lands here alongside a test when a component needs it.
 
@@ -149,13 +149,13 @@ When a retirement proposal surfaces, check the test first. Passing components me
 
 ## Commit rules
 
-One commit per coherent change, in the workshop voice. Use `/commit` to wrap a session — it runs `just bump <level>` to move every workspace `package.json` in lockstep (patch by default) and commits the tree as a single change.
+One commit per coherent change, in the workshop voice. Use `/commit` to wrap a session — it commits the working tree as a single change. It does **not** touch versions: workspace bumps are a human lever (`just bump`) and must be run before `/commit` if a release is intended. If a bump is in the working tree, it rides along; if not, no version moves.
 
 **Voice.** Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable; blank line; a `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer. Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone. Speak to the substance of the staged diff, not the file list. Mention version bumps only when they are the principal change.
 
 **Structure.**
 - Stage explicit paths — never `git add -A` / `git add .`.
-- **Never edit a `"version"` field in `package.json` by hand or via `Edit` / `Write`.** Workspace versions are owned by `just bump <patch|minor|major>` (see `justfile` → `scripts/bump-versions.ts`), which moves every package in lockstep and bails on divergence. The agent runs the recipe; it does not author the bump. Likewise no `npm version` / `bun version` — those create tags and we want one combined commit.
+- **Versioning is human-only.** The agent must never edit a `"version"` field in `package.json` (no `Edit`, no `Write`), never run `just bump`, and never run `npm version` / `bun version`. Workspace bumps go through `just bump <patch|minor|major>` (see `justfile` → `scripts/bump-versions.ts`), which a human invokes when a release is intended. The agent only carries the resulting diff into a commit alongside everything else.
 - Never include secrets, build artifacts, editor / OS junk, or harness state under `.claude/` (other than checked-in `commands/`, `agents/`, `skills/`, and `settings.json`).
 - No `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. Never push as part of a commit.
 - If a pre-commit hook fails, fix the root cause and make a **new** commit.
