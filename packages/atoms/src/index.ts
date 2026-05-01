@@ -1,5 +1,11 @@
 export { Surface, type SurfaceProps } from './Surface/Surface.js';
 export { Stack, type StackProps } from './Stack/Stack.js';
+export {
+  Grid,
+  type GridProps,
+  type GridColumns,
+  type GridMin,
+} from './Grid/Grid.js';
 export { Slot, type SlotProps } from './Slot/Slot.js';
 export { Text, type TextProps } from './Text/Text.js';
 export { Button, type ButtonProps } from './Button/Button.js';

@@ -90,31 +90,38 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 
 ## Design tenets
 
-Two tenets, paired. The first decides what doesn't belong in the library; the second decides what happens when two things that *do* belong overlap. Apply both before any retirement or consolidation proposal.
+Two tenets, paired. The first decides what the library aims to be; the second decides what happens when two in-scope components overlap. Apply both when proposing additions, merges, or retirements.
 
-### 1. Keep consumer chrome to an absolute minimum
+### 1. Sane defaults that quickstart a real app
 
-This is the load-bearing tenet the rest of the library answers to. "Chrome" is everything a consumer has to see, configure, or reason about that isn't the thing they came here to build. Every new component, prop, or API surface has to justify the attention it takes from the consumer.
+A consumer without strong design opinions should install `@4lt7ab/touchstone`, drop in the kit, and have a real-looking, accessible, well-themed application without tuning anything. The zero-config render *is* the demo. Touchstone is the workshop the apprentice walks into and starts striking — not the bench they have to assemble first.
 
 In practice:
 
-- **Prefer fewer components over more.** A component earns its place by carrying non-trivial behavior (accessibility, focus management, async lifecycles, theme rhythm) that a consumer would otherwise rebuild. Thin wrappers that only arrange layout are documented compositions, not components.
-- **Prefer tighter props over more props.** A new prop competes for the consumer's attention every time they read an API table. Before adding one, check whether composition already expresses the same thing. Before keeping a prop, check whether it's still earning the documentation real estate.
-- **Defaults do the work.** Opt-in flags default to off, and the zero-config call site renders correctly. Opt-outs are a last resort — if a behavior is opt-out by default, it's chrome the consumer never asked for.
-- **No chrome in the consumer's app shell.** The library renders inside the consumer's app, not around it. Page envelopes (AppShell, DataTablePage, DetailPage) are deliberately not in scope — let the consuming app own its layout.
-- **When a choice belongs to the consumer, return it to them.** A component that presets a layout the consumer would naturally compose themselves is chrome.
-
-This tenet is why the right move on a "we could fold these into one richer component" proposal is usually yes — and the right move on a "let's add another flag" proposal is usually no.
+- **Anticipate needs, ship the kit.** Every layer carries the components a typical app would otherwise build. Page envelopes (`AppBar`, `Sidebar`, `PageHeader`, dashboard / list / detail wrappers) and nav primitives (`NavItem`, `NavSection`, `NavGroup`) are explicitly in scope, alongside the atoms.
+- **Defaults render correctly.** The zero-config call site renders the way a tasteful default would. Opt-in flags default to off; opinionated visuals don't need configuration.
+- **Primitive-quality at every tier.** Envelopes carry the same accessibility, focus management, keyboard navigation, and theme-rhythm work as the atoms. Depth is not traded for breadth — a `Sidebar` is held to the same bar as `Dialog`.
+- **Composition stays cheap.** Even with envelopes in scope, components compose from the same primitives (`Surface`, `Stack`, `Text`, the hooks). Consumers can reach into the layers and remix without leaving the kit.
 
 ### 2. Merge before retire
 
-A component reused across projects earns its place — find the duplication, don't cut the utility. When two or more components pass the reuse-and-quality test (the component is reused across consumers *and* it's built to primitive-level quality) and they overlap in responsibility, the move is *merge*, not retire. Retiring destroys utility; merging preserves it while shrinking surface area. A merged component with one extra prop is almost always cheaper than two near-duplicate components.
+A component reused across consumers and built to primitive-level quality earns its place — find the duplication, don't cut the utility. When two or more components overlap in responsibility, the move is *merge*, not retire. Retiring destroys utility; merging preserves it while shrinking surface area. A merged component with one extra prop is almost always cheaper than two near-duplicate components.
 
-This tenet is the counterweight to tenet 1. Chrome still goes — but before a retirement proposal, run the two-clause test. If the component passes, the question isn't "retire or keep," it's "keep or merge."
+The atomic-design tier (atom / molecule / organism / envelope) is a taxonomy for reasoning about scope, not a retirement criterion. Demoting an envelope to an organism because it didn't earn its tier is a *merge* (with a smaller relative), not a retire.
 
-The atomic-design tier (atom / molecule / organism) is a taxonomy for reasoning about scope, not a retirement criterion. Demoting an organism to a molecule because it didn't earn its tier is a *merge* (with a smaller relative), not a retire.
+When a retirement proposal surfaces, check whether merging would preserve the value first. Prefer merge.
 
-When a retirement proposal surfaces, check the test first. Passing components merge; failing components retire.
+## Building a component family
+
+When a new envelope or compound surface lands — say `AppShell` with `AppBar`, `Sidebar`, `NavItem`, `NavSection`, and `PageHeader` underneath — build bottom-up: the smallest reusable piece first, then the compositions, then the envelope. A `NavItem` that gets reused in three places (a sidebar, a settings menu, a command palette) is built before the envelope that holds it.
+
+The reason isn't aesthetic discipline; it's that top-down hardcodes envelope-specific shapes into the parts. A `NavItem` defined inside `Sidebar` ends up with sidebar-only props baked in, then gets rewritten the first time you want a consistent nav row in a settings drawer. Bottom-up commits the API discipline (focus, selected state, slots, `asChild`) before the composition pulls on it.
+
+In practice:
+
+- **Build the molecule before the organism, the organism before the envelope.** New tiers earn their place by needing to compose finished smaller pieces, not by being scaffolded ahead.
+- **Pin the API on each piece in isolation.** Stories, tests, and accessibility work happen at each tier before the next is started.
+- **Rough demos stay rough until the parts ship.** It's tempting to scaffold the envelope and stub the parts to "fix" a rough composition page; resist. The composition page is honest signal that the parts are missing — repair it by shipping them, not by faking the envelope.
 
 ## Adding a new package
 
@@ -134,7 +141,7 @@ When a retirement proposal surfaces, check the test first. Passing components me
 
 ## Things that are stubbed
 
-- **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions earn their place per the design tenets.
+- **Thin vertical slice only.** Each layer ships a representative set, not the target catalogue — atoms covers the common primitives, molecules a handful of compositions, organisms ships Dialog and Popover. Future additions follow the design tenets — anticipate the consumer's needs, ship at primitive-level quality, merge when scope overlaps.
 - **Release tooling is local-only.** Publishing goes through `just release` (see `scripts/publish.ts`); there is no CI publish, no Changesets, and no visual regression yet. The repo root is `private: true` and workspace versions move in lockstep via `just bump` or `just set`. All three levers are human-only — never the agent.
 - **Icons package has two icons** (`CheckIcon`, `XIcon`) as proof-of-life.
 - **Hooks package owns the in-house accessibility primitives** (focus trap, focus return, click-outside, escape-key, scroll lock, disclosure, roving focus, controllable state, compound contexts, anchored positioning); new behavior lands here alongside a test when a component needs it.

@@ -15,6 +15,7 @@ import { ThemeRhythmProvider } from '@touchstone/hooks';
 import '@touchstone/themes/styles.css';
 import '@touchstone/atoms/styles.css';
 import '@touchstone/molecules/styles.css';
+import '@touchstone/organisms/styles.css';
 import { resolveStorybookTheme } from './themes';
 
 const ThemedDocsContainer = ({ children, context }: DocsContainerProps) => {

@@ -151,6 +151,5 @@ storybook-static/
 # Vanilla Extract emitted files
 *.css.ts.vanilla.css
 
-# Claude harness state — only checked-in commands cross the threshold
-.claude/*
-!.claude/commands/
+# Claude harness state — fully untracked
+.claude/
