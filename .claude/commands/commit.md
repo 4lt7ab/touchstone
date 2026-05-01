@@ -1,7 +1,7 @@
 ---
 description: Bump all workspace versions and commit every change in the repo, in the workshop voice.
 argument-hint: [major|minor|patch]
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git ls-files:*), Bash(git add:*), Bash(git commit:*), Bash(git rev-parse:*), Bash(git check-ignore:*), Bash(find:*), Bash(stat:*), Bash(wc:*), Read, Edit
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git ls-files:*), Bash(git add:*), Bash(git commit:*), Bash(git rev-parse:*), Bash(git check-ignore:*), Bash(find:*), Bash(stat:*), Bash(wc:*), Bash(just bump:*), Read, Edit
 ---
 
 Wrap the session: bump every workspace `package.json` and commit the working tree as one change, following the **Commit rules** in `CLAUDE.md`.
@@ -42,21 +42,15 @@ Edit only what genuinely improves the file — if nothing needs changing, say so
 
 ## Step 4 — Bump versions
 
-Find every workspace `package.json`:
+Run the workspace bump recipe with the chosen level:
 
 ```
-git ls-files '*package.json'
+just bump $ARGUMENTS    # or `just bump patch` if $ARGUMENTS is empty
 ```
 
-Plus any untracked `package.json` from `git status`. Read each and confirm they share the same current version — if they do not, **stop and ask** before desyncing the workspace.
+This is the **only** sanctioned way to move versions. It walks every tracked + untracked workspace `package.json` (skipping any without a `version` field), confirms they share the same current value, and writes the bumped version back in lockstep. If the script reports divergence and bails, **stop and ask** the user how to reconcile — do not edit `"version"` fields by hand to fix it.
 
-Bump each `"version"` field in lockstep with `Edit`:
-
-- `patch`: `x.y.z` → `x.y.(z+1)`
-- `minor`: `x.y.z` → `x.(y+1).0`, patch resets to `0`
-- `major`: `x.y.z` → `(x+1).0.0`, minor and patch reset to `0`
-
-Do **not** run `npm version` / `bun version` — those create tags and we want one combined commit. Skip any `package.json` without a `version` field.
+Do **not** edit `"version"` fields with `Edit` / `Write`, and do not run `npm version` / `bun version` (those create tags; we want one combined commit). The recipe is the contract.
 
 ## Step 5 — Stage and verify
 
@@ -87,4 +81,4 @@ Then run `git status` and report whether the tree is clean (or, if suspicious fi
 
 ## Hard rules
 
-The **Commit rules** in `CLAUDE.md` are authoritative. In particular: no push, no `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. If a pre-commit hook fails, fix the root cause and make a **new** commit. If anything is ambiguous (argument, version desync, a suspicious file, a CLAUDE.md edit you're unsure about), stop and ask before acting.
+The **Commit rules** in `CLAUDE.md` are authoritative. In particular: no push, no `--amend`, no `--no-verify`, no `--no-gpg-sign`, no tag creation, no `-i` flags. **Never edit a `"version"` field in `package.json` directly** — bumps go through `just bump` and only through `just bump`. If a pre-commit hook fails, fix the root cause and make a **new** commit. If anything is ambiguous (argument, version desync, a suspicious file, a CLAUDE.md edit you're unsure about), stop and ask before acting.

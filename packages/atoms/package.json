@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/atoms",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Atomic-design 'atoms' — the smallest composable building blocks (Box, Text, Button, Input).",
   "license": "MIT",
   "type": "module",
@@ -14,8 +14,13 @@
     },
     "./styles.css": "./dist/index.css"
   },
-  "files": ["dist"],
-  "sideEffects": ["**/*.css", "**/*.css.js"],
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/*.css.js"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

@@ -1,6 +1,9 @@
 {
   "name": "@touchstone/tsconfig",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
-  "files": ["base.json", "library.json"]
+  "files": [
+    "base.json",
+    "library.json"
+  ]
 }

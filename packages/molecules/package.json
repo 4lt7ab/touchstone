@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/molecules",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Atomic-design 'molecules' — small compositions of atoms (Field, ...).",
   "license": "MIT",
   "type": "module",
@@ -14,8 +14,13 @@
     },
     "./styles.css": "./dist/index.css"
   },
-  "files": ["dist"],
-  "sideEffects": ["**/*.css", "**/*.css.js"],
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/*.css.js"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

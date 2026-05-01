@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/hooks",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Shared React hooks for Touchstone components.",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
