@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Switch } from '@touchstone/atoms';
+import { Dropdown, Switch } from '@touchstone/atoms';
 import { Field } from './Field.js';
 import { SegmentedControl } from '../SegmentedControl/SegmentedControl.js';
 
@@ -54,5 +54,25 @@ describe('Field', () => {
     const group = screen.getByRole('radiogroup', { name: 'Mode' });
     const error = screen.getByRole('alert');
     expect(group.getAttribute('aria-describedby')).toBe(error.id);
+  });
+
+  it('propagates aria-invalid to wrapped child when error is set', () => {
+    render(
+      <Field label="Fruit" error="pick one">
+        <Dropdown options={[{ value: 'a', label: 'a' }]} />
+      </Field>,
+    );
+    const trigger = screen.getByRole('combobox', { name: 'Fruit' });
+    expect(trigger).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('does not propagate aria-invalid when there is no error', () => {
+    render(
+      <Field label="Fruit">
+        <Dropdown options={[{ value: 'a', label: 'a' }]} />
+      </Field>,
+    );
+    const trigger = screen.getByRole('combobox', { name: 'Fruit' });
+    expect(trigger).not.toHaveAttribute('aria-invalid');
   });
 });

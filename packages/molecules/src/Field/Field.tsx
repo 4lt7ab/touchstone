@@ -45,11 +45,15 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
   const describedBy =
     [error ? errorId : null, hint && !error ? hintId : null].filter(Boolean).join(' ') || undefined;
 
+  const childInvalidProps: Record<string, unknown> = isInvalid
+    ? { invalid: true, 'aria-invalid': 'true' }
+    : {};
   const control = isValidElement(children) ? (
     cloneElement(children as ReactElement<Record<string, unknown>>, {
       id,
       'aria-labelledby': labelId,
       'aria-describedby': describedBy,
+      ...childInvalidProps,
     })
   ) : (
     <Input ref={ref} id={id} invalid={isInvalid} aria-describedby={describedBy} {...rest} />
