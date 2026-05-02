@@ -23,4 +23,13 @@ export {
 export { Switch, type SwitchProps } from './Switch/Switch.js';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio/Radio.js';
+export { Dropdown, type DropdownProps } from './Dropdown/Dropdown.js';
+export type {
+  DropdownOption,
+  DropdownOptionGroup,
+  DropdownOptionList,
+  DropdownShape,
+  DropdownSize,
+  DropdownTone,
+} from './Dropdown/internals.js';
 export type { BaseComponentProps } from './types.js';
