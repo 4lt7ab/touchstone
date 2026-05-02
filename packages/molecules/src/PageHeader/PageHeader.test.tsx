@@ -17,24 +17,12 @@ describe('PageHeader', () => {
   });
 
   it('renders description text when provided', () => {
-    render(
-      <PageHeader
-        title="orders"
-        description="every strike, in the order it was made."
-      />,
-    );
-    expect(
-      screen.getByText('every strike, in the order it was made.'),
-    ).toBeInTheDocument();
+    render(<PageHeader title="orders" description="every strike, in the order it was made." />);
+    expect(screen.getByText('every strike, in the order it was made.')).toBeInTheDocument();
   });
 
   it('renders the actions slot', () => {
-    render(
-      <PageHeader
-        title="orders"
-        actions={<Button intent="primary">strike</Button>}
-      />,
-    );
+    render(<PageHeader title="orders" actions={<Button intent="primary">strike</Button>} />);
     expect(screen.getByRole('button', { name: 'strike' })).toBeInTheDocument();
   });
 
@@ -54,9 +42,7 @@ describe('PageHeader', () => {
         }
       />,
     );
-    expect(
-      screen.getByRole('navigation', { name: 'breadcrumb' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument();
   });
 
   it('wraps the heading in a <header> element', () => {

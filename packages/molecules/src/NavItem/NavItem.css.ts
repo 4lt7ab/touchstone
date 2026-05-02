@@ -58,10 +58,32 @@ export const navItem = recipe({
       },
       false: {},
     },
+    tone: {
+      default: {},
+      danger: {
+        color: vars.color.danger,
+        selectors: {
+          '&:hover:not(:disabled):not([aria-disabled="true"])': {
+            background: vars.color.dangerBg,
+            color: vars.color.danger,
+          },
+        },
+      },
+    },
   },
+  compoundVariants: [
+    {
+      variants: { selected: true, tone: 'danger' },
+      style: {
+        background: vars.color.dangerBg,
+        color: vars.color.danger,
+      },
+    },
+  ],
   defaultVariants: {
     size: 'md',
     selected: false,
+    tone: 'default',
   },
 });
 

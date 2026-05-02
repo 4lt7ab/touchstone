@@ -49,12 +49,7 @@ export function useAnchoredPosition(
   floatingRef: RefObject<HTMLElement | null>,
   options: UseAnchoredPositionOptions = {},
 ): UseAnchoredPositionReturn {
-  const {
-    side: requestedSide = 'bottom',
-    align = 'start',
-    offset = 8,
-    enabled = true,
-  } = options;
+  const { side: requestedSide = 'bottom', align = 'start', offset = 8, enabled = true } = options;
 
   const [pos, setPos] = useState<Position>(FALLBACK);
 
@@ -70,11 +65,7 @@ export function useAnchoredPosition(
       offset,
     );
     setPos((prev) =>
-      prev.top === next.top &&
-      prev.left === next.left &&
-      prev.side === next.side
-        ? prev
-        : next,
+      prev.top === next.top && prev.left === next.left && prev.side === next.side ? prev : next,
     );
   }, [anchorRef, floatingRef, requestedSide, align, offset]);
 
@@ -115,10 +106,8 @@ function solve(
   align: AnchoredPositionAlign,
   offset: number,
 ): Position {
-  const viewportWidth =
-    typeof window !== 'undefined' ? window.innerWidth : Infinity;
-  const viewportHeight =
-    typeof window !== 'undefined' ? window.innerHeight : Infinity;
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : Infinity;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : Infinity;
 
   const tryWith = (candidate: AnchoredPositionSide): Position => {
     let top = 0;
@@ -151,21 +140,13 @@ function solve(
   return tryWith(opposite(side));
 }
 
-function horizontalAlign(
-  anchor: DOMRect,
-  floating: DOMRect,
-  align: AnchoredPositionAlign,
-): number {
+function horizontalAlign(anchor: DOMRect, floating: DOMRect, align: AnchoredPositionAlign): number {
   if (align === 'center') return anchor.left + anchor.width / 2 - floating.width / 2;
   if (align === 'end') return anchor.right - floating.width;
   return anchor.left;
 }
 
-function verticalAlign(
-  anchor: DOMRect,
-  floating: DOMRect,
-  align: AnchoredPositionAlign,
-): number {
+function verticalAlign(anchor: DOMRect, floating: DOMRect, align: AnchoredPositionAlign): number {
   if (align === 'center') return anchor.top + anchor.height / 2 - floating.height / 2;
   if (align === 'end') return anchor.bottom - floating.height;
   return anchor.top;

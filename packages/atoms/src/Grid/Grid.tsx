@@ -67,9 +67,7 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
 ) {
   const recipeClass = grid({ gap, align, justify });
   const template = resolveTemplate(columns);
-  const style: CSSProperties | undefined = template
-    ? { gridTemplateColumns: template }
-    : undefined;
+  const style: CSSProperties | undefined = template ? { gridTemplateColumns: template } : undefined;
   return (
     <Component
       ref={ref as Ref<HTMLElement>}

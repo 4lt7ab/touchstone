@@ -6,17 +6,17 @@ Touchstone is an opinionated, atomic-design component library delivered as a pnp
 
 ## Stack
 
-| Concern              | Choice                                              |
-| -------------------- | --------------------------------------------------- |
-| Package manager      | Bun (workspaces)                                    |
-| Task runner          | `bun run --filter` (topological, no cross-run cache)|
-| Language             | TypeScript (strict, project references)             |
-| Styling / theming    | Vanilla Extract + recipes, type-safe theme contract |
-| Accessible primitives| Radix UI                                            |
-| Bundler              | tsup (esbuild) + `@vanilla-extract/esbuild-plugin`  |
-| Tests                | Vitest + Testing Library + jsdom                    |
-| Lint / format        | ESLint flat config + Prettier                       |
-| Docs / QA            | Storybook 8 (Vite framework) + autodocs + a11y      |
+| Concern               | Choice                                               |
+| --------------------- | ---------------------------------------------------- |
+| Package manager       | Bun (workspaces)                                     |
+| Task runner           | `bun run --filter` (topological, no cross-run cache) |
+| Language              | TypeScript (strict, project references)              |
+| Styling / theming     | Vanilla Extract + recipes, type-safe theme contract  |
+| Accessible primitives | Radix UI                                             |
+| Bundler               | tsup (esbuild) + `@vanilla-extract/esbuild-plugin`   |
+| Tests                 | Vitest + Testing Library + jsdom                     |
+| Lint / format         | ESLint flat config + Prettier                        |
+| Docs / QA             | Storybook 8 (Vite framework) + autodocs + a11y       |
 
 ## Layout
 

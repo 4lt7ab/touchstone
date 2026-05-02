@@ -44,16 +44,7 @@ export interface SurfaceProps extends BaseComponentProps, SurfaceVariants {
 }
 
 export const Surface = forwardRef<HTMLElement, SurfaceProps>(function Surface(
-  {
-    as: Component = 'div',
-    padding,
-    radius,
-    level,
-    glow,
-    className,
-    children,
-    ...rest
-  },
+  { as: Component = 'div', padding, radius, level, glow, className, children, ...rest },
   ref,
 ) {
   const internalRef = useRef<HTMLElement>(null);

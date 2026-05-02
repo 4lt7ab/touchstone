@@ -20,10 +20,7 @@ describe('NavItem', () => {
 
   it('sets aria-current="page" when selected', () => {
     render(<NavItem selected>orders</NavItem>);
-    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('lets an explicit aria-current override the selected default', () => {
@@ -53,20 +50,14 @@ describe('NavItem', () => {
   });
 
   it('renders the icon slot with aria-hidden so the label remains the accessible name', () => {
-    render(
-      <NavItem icon={<svg data-testid="leading-icon" />}>orders</NavItem>,
-    );
-    expect(
-      screen.getByRole('button', { name: 'orders' }),
-    ).toBeInTheDocument();
+    render(<NavItem icon={<svg data-testid="leading-icon" />}>orders</NavItem>);
+    expect(screen.getByRole('button', { name: 'orders' })).toBeInTheDocument();
     const icon = screen.getByTestId('leading-icon');
     expect(icon.parentElement).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders the trailing slot', () => {
-    render(
-      <NavItem trailing={<span data-testid="count">3</span>}>orders</NavItem>,
-    );
+    render(<NavItem trailing={<span data-testid="count">3</span>}>orders</NavItem>);
     expect(screen.getByTestId('count')).toHaveTextContent('3');
   });
 
@@ -95,5 +86,16 @@ describe('NavItem', () => {
     expect(link).toHaveAttribute('href', '/sealed');
     expect(screen.getByTestId('leading-icon')).toBeInTheDocument();
     expect(screen.getByTestId('count')).toHaveTextContent('7');
+  });
+
+  it('forwards a custom role onto the rendered element', () => {
+    render(<NavItem role="menuitem">leave the bench</NavItem>);
+    expect(screen.getByRole('menuitem', { name: 'leave the bench' })).toBeInTheDocument();
+  });
+
+  it('renders the danger tone variant', () => {
+    render(<NavItem tone="danger">leave the bench</NavItem>);
+    const btn = screen.getByRole('button', { name: 'leave the bench' });
+    expect(btn.className).toMatch(/tone_danger|toneDanger|tone-danger/);
   });
 });

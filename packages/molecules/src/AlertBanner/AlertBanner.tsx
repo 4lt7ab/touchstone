@@ -51,46 +51,43 @@ function DismissGlyph(): React.JSX.Element {
   );
 }
 
-export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
-  function AlertBanner(
-    {
-      tone = 'info',
-      title,
-      children,
-      onDismiss,
-      dismissLabel = 'dismiss',
-      role,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ): React.JSX.Element {
-    const resolvedRole =
-      role ?? (tone === 'danger' || tone === 'warning' ? 'alert' : 'status');
-    return (
-      <div
-        ref={ref}
-        role={resolvedRole}
-        id={id}
-        data-testid={dataTestId}
-        className={styles.root({ tone })}
-      >
-        <div className={styles.body}>
-          {title ? <span className={styles.title}>{title}</span> : null}
-          {children ? <span>{children}</span> : null}
-        </div>
-        {onDismiss ? (
-          <Button
-            intent="ghost"
-            shape="square"
-            size="sm"
-            aria-label={dismissLabel}
-            onClick={onDismiss}
-          >
-            <DismissGlyph />
-          </Button>
-        ) : null}
-      </div>
-    );
+export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(function AlertBanner(
+  {
+    tone = 'info',
+    title,
+    children,
+    onDismiss,
+    dismissLabel = 'dismiss',
+    role,
+    id,
+    'data-testid': dataTestId,
   },
-);
+  ref,
+): React.JSX.Element {
+  const resolvedRole = role ?? (tone === 'danger' || tone === 'warning' ? 'alert' : 'status');
+  return (
+    <div
+      ref={ref}
+      role={resolvedRole}
+      id={id}
+      data-testid={dataTestId}
+      className={styles.root({ tone })}
+    >
+      <div className={styles.body}>
+        {title ? <span className={styles.title}>{title}</span> : null}
+        {children ? <span>{children}</span> : null}
+      </div>
+      {onDismiss ? (
+        <Button
+          intent="ghost"
+          shape="square"
+          size="sm"
+          aria-label={dismissLabel}
+          onClick={onDismiss}
+        >
+          <DismissGlyph />
+        </Button>
+      ) : null}
+    </div>
+  );
+});

@@ -22,9 +22,7 @@ describe('NavSection', () => {
         <NavItem>orders</NavItem>
       </NavSection>,
     );
-    expect(
-      screen.getByRole('group', { name: 'quick actions' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'quick actions' })).toBeInTheDocument();
   });
 
   it('makes the selected child the tab entry point', () => {
@@ -35,18 +33,9 @@ describe('NavSection', () => {
         <NavItem>recipes</NavItem>
       </NavSection>,
     );
-    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute(
-      'tabindex',
-      '-1',
-    );
-    expect(screen.getByRole('button', { name: 'moulds' })).toHaveAttribute(
-      'tabindex',
-      '0',
-    );
-    expect(screen.getByRole('button', { name: 'recipes' })).toHaveAttribute(
-      'tabindex',
-      '-1',
-    );
+    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByRole('button', { name: 'moulds' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('button', { name: 'recipes' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('makes the first child the tab entry point when none is selected', () => {
@@ -56,14 +45,8 @@ describe('NavSection', () => {
         <NavItem>moulds</NavItem>
       </NavSection>,
     );
-    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute(
-      'tabindex',
-      '0',
-    );
-    expect(screen.getByRole('button', { name: 'moulds' })).toHaveAttribute(
-      'tabindex',
-      '-1',
-    );
+    expect(screen.getByRole('button', { name: 'orders' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('button', { name: 'moulds' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('moves focus on ArrowDown / ArrowUp', async () => {

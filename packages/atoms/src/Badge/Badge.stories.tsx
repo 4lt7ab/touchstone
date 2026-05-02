@@ -28,9 +28,7 @@ export const Default: Story = {};
 export const AllTones: Story = {
   parameters: { layout: 'centered' },
   render: () => (
-    <Surface
-      style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}
-    >
+    <Surface style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
       <Badge tone="neutral">apprentice</Badge>
       <Badge tone="success">tempered</Badge>
       <Badge tone="warning">cooling</Badge>

@@ -157,16 +157,8 @@ export const SidebarList: Story = {
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '100vh', padding: '1.5rem' }}
-    >
-      <Surface
-        level="solid"
-        radius="lg"
-        padding="md"
-        style={{ width: '16rem' }}
-      >
+    <Surface level="page" style={{ minHeight: '100vh', padding: '1.5rem' }}>
+      <Surface level="solid" radius="lg" padding="md" style={{ width: '16rem' }}>
         <Stack gap="xs">
           <Text size="xs" tone="muted" weight="medium">
             bench

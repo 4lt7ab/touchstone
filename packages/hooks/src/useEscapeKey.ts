@@ -5,10 +5,7 @@ import { useEffect } from 'react';
  * listener is attached on `document` so it works regardless of which element
  * holds focus inside the trapped surface.
  */
-export function useEscapeKey(
-  handler: (event: KeyboardEvent) => void,
-  enabled: boolean,
-): void {
+export function useEscapeKey(handler: (event: KeyboardEvent) => void, enabled: boolean): void {
   useEffect(() => {
     if (!enabled) return;
     function onKeyDown(event: KeyboardEvent): void {

@@ -1,0 +1,25 @@
+{
+  "name": "touchstone",
+  "description": "Plugins published alongside the Touchstone component library — scaffolding, codemods, and integration helpers for consumers of @4lt7ab/touchstone.",
+  "owner": {
+    "name": "Touchstone",
+    "url": "https://github.com/4lt7ab/touchstone"
+  },
+  "version": "0.1.0",
+  "metadata": {
+    "pluginRoot": "./plugin"
+  },
+  "plugins": [
+    {
+      "name": "scaffold-touchstone-app",
+      "source": "scaffold-touchstone-app",
+      "description": "Scaffold a Touchstone-shaped React application — Vite + React + @4lt7ab/touchstone, the full AppShell envelope, twelve themes, five real pages, mocked data. The workshop walks the apprentice in.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Touchstone"
+      },
+      "license": "MIT",
+      "keywords": ["scaffolding", "react", "vite", "design-system", "atomic-design", "components"]
+    }
+  ]
+}

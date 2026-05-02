@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Badge, Button, Input, Stack, Surface, Text } from '@touchstone/atoms';
-import {
-  NavItem,
-  NavSection,
-  PageHeader,
-} from '@touchstone/molecules';
+import { NavItem, NavSection, PageHeader } from '@touchstone/molecules';
 import { AppBar, AppShell, Sidebar } from '@touchstone/organisms';
 
 function HammerGlyph(): React.JSX.Element {
@@ -78,7 +74,7 @@ const meta = {
           '`Sidebar` into `sidebar`, and your page content as children — the ' +
           'shell pins to the viewport, the main column owns the scroll, the ' +
           'sidebar header and footer stay put.\n\nThis is the zero-config ' +
-          'starting point Touchstone\'s consumers without strong design ' +
+          "starting point Touchstone's consumers without strong design " +
           'opinions can drop into a project and have a working app.',
       },
     },
@@ -151,17 +147,32 @@ export const Full: Story = {
 
       <Stack gap="md">
         {[
-          { title: 'a copper hinge for the lid', when: 'this morning', tone: 'accent' as const, label: 'open' },
-          { title: 'three nails of the smaller mould', when: 'yesterday', tone: 'warning' as const, label: 'in-progress' },
-          { title: 'the dye-pot, refilled', when: 'two days past', tone: 'success' as const, label: 'sealed' },
-          { title: 'a new handle for the apprentice', when: 'a week past', tone: 'neutral' as const, label: 'shelved' },
+          {
+            title: 'a copper hinge for the lid',
+            when: 'this morning',
+            tone: 'accent' as const,
+            label: 'open',
+          },
+          {
+            title: 'three nails of the smaller mould',
+            when: 'yesterday',
+            tone: 'warning' as const,
+            label: 'in-progress',
+          },
+          {
+            title: 'the dye-pot, refilled',
+            when: 'two days past',
+            tone: 'success' as const,
+            label: 'sealed',
+          },
+          {
+            title: 'a new handle for the apprentice',
+            when: 'a week past',
+            tone: 'neutral' as const,
+            label: 'shelved',
+          },
         ].map((row) => (
-          <Surface
-            key={row.title}
-            level="raised"
-            radius="lg"
-            padding="md"
-          >
+          <Surface key={row.title} level="raised" radius="lg" padding="md">
             <Stack direction="row" align="center" justify="between" gap="md">
               <Stack gap="xs">
                 <Text weight="semibold">{row.title}</Text>
@@ -230,7 +241,10 @@ export const NoHeader: Story = {
     >
       <PageHeader title="orders" description="for layouts where the sidebar carries the brand." />
       <Surface level="raised" radius="lg" padding="lg">
-        <Text>some apps prefer the brand in the rail rather than at the top. drop the AppBar; the sidebar handles it.</Text>
+        <Text>
+          some apps prefer the brand in the rail rather than at the top. drop the AppBar; the
+          sidebar handles it.
+        </Text>
       </Surface>
     </AppShell>
   ),

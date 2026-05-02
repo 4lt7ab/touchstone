@@ -26,12 +26,8 @@ describe('useInjectStyles', () => {
 
   it('updates content when css changes for the same id', () => {
     const { rerender } = render(<Probe id="ts-test-b" css=".x { color: red }" />);
-    expect(document.getElementById('ts-test-b')?.textContent).toBe(
-      '.x { color: red }',
-    );
+    expect(document.getElementById('ts-test-b')?.textContent).toBe('.x { color: red }');
     rerender(<Probe id="ts-test-b" css=".x { color: blue }" />);
-    expect(document.getElementById('ts-test-b')?.textContent).toBe(
-      '.x { color: blue }',
-    );
+    expect(document.getElementById('ts-test-b')?.textContent).toBe('.x { color: blue }');
   });
 });

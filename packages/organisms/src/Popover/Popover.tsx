@@ -23,8 +23,7 @@ interface PopoverContextValue {
   anchorRef: React.MutableRefObject<HTMLElement | null>;
 }
 
-const [PopoverProvider, usePopoverScope] =
-  createCompoundContext<PopoverContextValue>('Popover');
+const [PopoverProvider, usePopoverScope] = createCompoundContext<PopoverContextValue>('Popover');
 
 export interface PopoverProps extends BaseComponentProps {
   /** Controlled open state. */
@@ -145,11 +144,11 @@ function PopoverPanel({
   const ctx = usePopoverScope('Popover.Content');
   const panelRef = useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(panelRef, forwardedRef);
-  const { style: positionStyle } = useAnchoredPosition(
-    ctx.anchorRef,
-    panelRef,
-    { side, align, offset },
-  );
+  const { style: positionStyle } = useAnchoredPosition(ctx.anchorRef, panelRef, {
+    side,
+    align,
+    offset,
+  });
 
   useFocusReturn(true);
   useEscapeKey(() => {

@@ -22,9 +22,7 @@ describe('Grid', () => {
   it('renders { min } as auto-fit responsive grid', () => {
     render(<Grid columns={{ min: 'md' }} data-testid="g" />);
     const el = screen.getByTestId('g');
-    expect(el.style.gridTemplateColumns).toBe(
-      'repeat(auto-fit, minmax(16rem, 1fr))',
-    );
+    expect(el.style.gridTemplateColumns).toBe('repeat(auto-fit, minmax(16rem, 1fr))');
   });
 
   it('omits gridTemplateColumns style when columns is unset', () => {

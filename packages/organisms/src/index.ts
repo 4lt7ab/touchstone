@@ -23,9 +23,33 @@ export {
   type MenuSeparatorProps,
 } from './Menu/Menu.js';
 export {
+  ThemeSwitcher,
+  type ThemeSwitcherProps,
+  type ThemeSwitcherOption,
+} from './ThemeSwitcher/ThemeSwitcher.js';
+export {
   Tabs,
   type TabsProps,
   type TabsListProps,
   type TabsTriggerProps,
   type TabsPanelProps,
 } from './Tabs/Tabs.js';
+export {
+  DetailPage,
+  type DetailPageProps,
+  type DetailPageHeaderProps,
+  type DetailPageMetaProps,
+  type DetailPageMetaItemProps,
+  type DetailPageBodyProps,
+  type DetailPageActionsProps,
+  type DetailPageRightPanelProps,
+} from './DetailPage/DetailPage.js';
+export {
+  DataTablePage,
+  type DataTablePageProps,
+  type DataTablePageHeaderProps,
+  type DataTablePageFilterBarProps,
+  type DataTablePageTableProps,
+  type DataTablePagePaginationProps,
+  type DataTablePageEmptyProps,
+} from './DataTablePage/DataTablePage.js';

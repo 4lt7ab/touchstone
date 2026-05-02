@@ -17,10 +17,7 @@ function Host() {
       </button>
       <button data-testid="other">other</button>
       {open ? (
-        <button
-          data-testid="close"
-          onClick={() => setOpen(false)}
-        >
+        <button data-testid="close" onClick={() => setOpen(false)}>
           close
         </button>
       ) : null}

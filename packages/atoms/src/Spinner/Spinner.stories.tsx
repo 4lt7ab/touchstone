@@ -26,9 +26,7 @@ export const Default: Story = {};
 export const Sizes: Story = {
   parameters: { layout: 'centered' },
   render: () => (
-    <Surface
-      style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}
-    >
+    <Surface style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
       <Spinner size="sm" aria-label="kindling the embers" />
       <Spinner size="md" aria-label="tempering the metal" />
       <Spinner size="lg" aria-label="cooling the casting" />
@@ -40,9 +38,7 @@ export const Sizes: Story = {
 export const WithLabel: Story = {
   parameters: { layout: 'centered' },
   render: () => (
-    <Surface
-      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-    >
+    <Surface style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
       <Spinner aria-hidden />
       <Text tone="muted">the bellows are working — wait for the steady glow.</Text>
     </Surface>

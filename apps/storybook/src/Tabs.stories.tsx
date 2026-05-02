@@ -113,10 +113,7 @@ export const UnderPageHeader: Story = {
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '40rem', padding: '1.5rem' }}
-    >
+    <Surface level="page" style={{ minHeight: '40rem', padding: '1.5rem' }}>
       <Stack gap="md">
         <PageHeader
           title="account"

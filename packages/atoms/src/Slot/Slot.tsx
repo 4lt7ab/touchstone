@@ -55,10 +55,7 @@ export const Slot = forwardRef<unknown, SlotProps & AnyProps>(function Slot(
   return cloneElement(child, merged);
 });
 
-function mergeRefs<T>(
-  a: Ref<T> | undefined,
-  b: Ref<T> | undefined,
-): Ref<T> | undefined {
+function mergeRefs<T>(a: Ref<T> | undefined, b: Ref<T> | undefined): Ref<T> | undefined {
   if (!a) return b;
   if (!b) return a;
   return (instance: T | null) => {

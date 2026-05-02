@@ -75,9 +75,7 @@ export const WithSearch: Story = {
         <span>workshop</span>
       </>
     ),
-    children: (
-      <Input placeholder="search the ledger" style={{ maxWidth: '24rem' }} />
-    ),
+    children: <Input placeholder="search the ledger" style={{ maxWidth: '24rem' }} />,
     actions: (
       <>
         <Button intent="ghost">apprentice</Button>

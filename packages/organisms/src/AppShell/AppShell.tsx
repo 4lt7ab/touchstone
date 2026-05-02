@@ -24,32 +24,17 @@ export interface AppShellProps extends BaseComponentProps {
   children?: ReactNode;
 }
 
-export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(
-  function AppShell(
-    {
-      header,
-      sidebar,
-      children,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ) {
-    return (
-      <div
-        ref={ref as Ref<HTMLDivElement>}
-        id={id}
-        data-testid={dataTestId}
-        className={styles.root}
-      >
-        {header ? <div className={styles.headerSlot}>{header}</div> : null}
-        <div className={styles.bodyRow}>
-          {sidebar ? (
-            <div className={styles.sidebarSlot}>{sidebar}</div>
-          ) : null}
-          <main className={styles.main}>{children}</main>
-        </div>
+export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppShell(
+  { header, sidebar, children, id, 'data-testid': dataTestId },
+  ref,
+) {
+  return (
+    <div ref={ref as Ref<HTMLDivElement>} id={id} data-testid={dataTestId} className={styles.root}>
+      {header ? <div className={styles.headerSlot}>{header}</div> : null}
+      <div className={styles.bodyRow}>
+        {sidebar ? <div className={styles.sidebarSlot}>{sidebar}</div> : null}
+        <main className={styles.main}>{children}</main>
       </div>
-    );
-  },
-);
+    </div>
+  );
+});

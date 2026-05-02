@@ -2,6 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Stack, Surface, Text } from '@touchstone/atoms';
 import { Menu } from '@touchstone/organisms';
 
+function Hint({ children }: { children: React.ReactNode }): React.JSX.Element {
+  return (
+    <Text size="xs" tone="muted">
+      {children}
+    </Text>
+  );
+}
+
 function HingeGlyph(): React.JSX.Element {
   return (
     <svg
@@ -127,22 +135,13 @@ export const WithTrailingHints: Story = {
         <Button intent="ghost">file</Button>
       </Menu.Trigger>
       <Menu.Content aria-label="file actions">
-        <Menu.Item
-          onSelect={() => {}}
-          trailing={<span>⌘N</span>}
-        >
+        <Menu.Item onSelect={() => {}} trailing={<Hint>⌘N</Hint>}>
           new entry
         </Menu.Item>
-        <Menu.Item
-          onSelect={() => {}}
-          trailing={<span>⌘S</span>}
-        >
+        <Menu.Item onSelect={() => {}} trailing={<Hint>⌘S</Hint>}>
           seal
         </Menu.Item>
-        <Menu.Item
-          onSelect={() => {}}
-          trailing={<span>⌘O</span>}
-        >
+        <Menu.Item onSelect={() => {}} trailing={<Hint>⌘O</Hint>}>
           open
         </Menu.Item>
       </Menu.Content>

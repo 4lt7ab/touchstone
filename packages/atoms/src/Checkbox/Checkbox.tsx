@@ -42,101 +42,95 @@ export interface CheckboxProps extends BaseComponentProps {
   required?: boolean;
 }
 
-export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
-  function Checkbox(
-    {
-      checked: controlledChecked,
-      defaultChecked = false,
-      indeterminate = false,
-      onCheckedChange,
-      disabled,
-      name,
-      value = 'on',
-      form,
-      required,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      'aria-describedby': ariaDescribedBy,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ) {
-    const [checked, setChecked] = useControllableState({
-      value: controlledChecked,
-      defaultValue: defaultChecked,
-      onChange: onCheckedChange,
-    });
-
-    const inputRef = useRef<HTMLInputElement>(null);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    const mergedRef = useMergedRefs<HTMLButtonElement>(buttonRef, ref);
-
-    useEffect(() => {
-      if (inputRef.current) inputRef.current.indeterminate = indeterminate;
-    }, [indeterminate]);
-
-    const ariaChecked: 'true' | 'false' | 'mixed' = indeterminate
-      ? 'mixed'
-      : checked
-        ? 'true'
-        : 'false';
-
-    return (
-      <>
-        <button
-          ref={mergedRef}
-          type="button"
-          role="checkbox"
-          aria-checked={ariaChecked}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          aria-describedby={ariaDescribedBy}
-          aria-required={required || undefined}
-          disabled={disabled}
-          id={id}
-          data-testid={dataTestId}
-          className={styles.root({})}
-          onClick={() => {
-            if (disabled) return;
-            setChecked(!checked);
-          }}
-        >
-          {indeterminate ? (
-            <IndeterminateGlyph />
-          ) : checked ? (
-            <CheckGlyph />
-          ) : null}
-        </button>
-        {name ? (
-          <input
-            ref={inputRef}
-            type="checkbox"
-            aria-hidden="true"
-            tabIndex={-1}
-            name={name}
-            value={value}
-            form={form}
-            checked={checked}
-            required={required}
-            onChange={() => {}}
-            style={{
-              position: 'absolute',
-              width: 1,
-              height: 1,
-              padding: 0,
-              margin: -1,
-              overflow: 'hidden',
-              clip: 'rect(0,0,0,0)',
-              whiteSpace: 'nowrap',
-              border: 0,
-            }}
-          />
-        ) : null}
-      </>
-    );
+export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
+  {
+    checked: controlledChecked,
+    defaultChecked = false,
+    indeterminate = false,
+    onCheckedChange,
+    disabled,
+    name,
+    value = 'on',
+    form,
+    required,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    id,
+    'data-testid': dataTestId,
   },
-);
+  ref,
+) {
+  const [checked, setChecked] = useControllableState({
+    value: controlledChecked,
+    defaultValue: defaultChecked,
+    onChange: onCheckedChange,
+  });
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const mergedRef = useMergedRefs<HTMLButtonElement>(buttonRef, ref);
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+
+  const ariaChecked: 'true' | 'false' | 'mixed' = indeterminate
+    ? 'mixed'
+    : checked
+      ? 'true'
+      : 'false';
+
+  return (
+    <>
+      <button
+        ref={mergedRef}
+        type="button"
+        role="checkbox"
+        aria-checked={ariaChecked}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        aria-required={required || undefined}
+        disabled={disabled}
+        id={id}
+        data-testid={dataTestId}
+        className={styles.root({})}
+        onClick={() => {
+          if (disabled) return;
+          setChecked(!checked);
+        }}
+      >
+        {indeterminate ? <IndeterminateGlyph /> : checked ? <CheckGlyph /> : null}
+      </button>
+      {name ? (
+        <input
+          ref={inputRef}
+          type="checkbox"
+          aria-hidden="true"
+          tabIndex={-1}
+          name={name}
+          value={value}
+          form={form}
+          checked={checked}
+          required={required}
+          onChange={() => {}}
+          style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            padding: 0,
+            margin: -1,
+            overflow: 'hidden',
+            clip: 'rect(0,0,0,0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        />
+      ) : null}
+    </>
+  );
+});
 
 function CheckGlyph(): React.JSX.Element {
   return (

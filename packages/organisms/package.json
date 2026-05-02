@@ -37,6 +37,8 @@
   "dependencies": {
     "@touchstone/atoms": "workspace:*",
     "@touchstone/hooks": "workspace:*",
+    "@touchstone/icons": "workspace:*",
+    "@touchstone/molecules": "workspace:*",
     "@touchstone/themes": "workspace:*",
     "@vanilla-extract/css": "^1.15.3",
     "@vanilla-extract/recipes": "^0.5.3"

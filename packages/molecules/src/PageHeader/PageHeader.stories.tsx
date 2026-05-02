@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Badge, Button, Surface } from '@touchstone/atoms';
+import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs.js';
 import { PageHeader } from './PageHeader.js';
 
 const meta = {
@@ -71,13 +72,15 @@ export const WithBreadcrumbs: Story = {
   args: {
     description: 'every strike, in the order it was made.',
     breadcrumbs: (
-      <nav aria-label="breadcrumb">
-        <a href="/" style={{ color: 'inherit' }}>workshop</a>
-        <span aria-hidden="true"> / </span>
-        <a href="/ledger" style={{ color: 'inherit' }}>ledger</a>
-        <span aria-hidden="true"> / </span>
-        <span>orders</span>
-      </nav>
+      <Breadcrumbs>
+        <Breadcrumbs.Item asChild>
+          <a href="/">workshop</a>
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item asChild>
+          <a href="/ledger">ledger</a>
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item current>orders</Breadcrumbs.Item>
+      </Breadcrumbs>
     ),
   },
 };
@@ -88,13 +91,15 @@ export const Full: Story = {
     description:
       'every strike of the day, in the order it was made. the master reads top to bottom; the apprentice strikes bottom to top.',
     breadcrumbs: (
-      <nav aria-label="breadcrumb">
-        <a href="/" style={{ color: 'inherit' }}>workshop</a>
-        <span aria-hidden="true"> / </span>
-        <a href="/ledger" style={{ color: 'inherit' }}>ledger</a>
-        <span aria-hidden="true"> / </span>
-        <span>orders</span>
-      </nav>
+      <Breadcrumbs>
+        <Breadcrumbs.Item asChild>
+          <a href="/">workshop</a>
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item asChild>
+          <a href="/ledger">ledger</a>
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item current>orders</Breadcrumbs.Item>
+      </Breadcrumbs>
     ),
     meta: (
       <>

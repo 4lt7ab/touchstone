@@ -8,7 +8,9 @@
   "include": ["src"],
   "references": [
     { "path": "../atoms" },
+    { "path": "../molecules" },
     { "path": "../hooks" },
+    { "path": "../icons" },
     { "path": "../themes" }
   ]
 }

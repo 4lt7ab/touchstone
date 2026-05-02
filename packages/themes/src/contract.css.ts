@@ -11,9 +11,7 @@ import {
   zIndex,
 } from '@touchstone/tokens';
 
-const mapToNull = <T extends Record<string, unknown>>(
-  obj: T,
-): { [K in keyof T]: null } => {
+const mapToNull = <T extends Record<string, unknown>>(obj: T): { [K in keyof T]: null } => {
   const out = {} as { [K in keyof T]: null };
   for (const key of Object.keys(obj) as (keyof T)[]) {
     out[key] = null;

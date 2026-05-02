@@ -31,8 +31,7 @@ export const Showcase: Story = {
           the dye-cabinet
         </Text>
         <Text tone="muted">
-          each drawer holds a different fire. choose the one whose pulse keeps
-          your tools warm.
+          each drawer holds a different fire. choose the one whose pulse keeps your tools warm.
         </Text>
       </Surface>
 
@@ -47,20 +46,13 @@ export const Showcase: Story = {
         <Input placeholder="what would the apprentice carry to your bench?" />
       </Surface>
 
-      <Surface
-        glow="pulse"
-        level="raised"
-        radius="lg"
-        padding="lg"
-        style={{ maxWidth: '32rem' }}
-      >
+      <Surface glow="pulse" level="raised" radius="lg" padding="lg" style={{ maxWidth: '32rem' }}>
         <Text size="lg" weight="semibold" as="h2">
           the breathing rim
         </Text>
         <Text tone="muted">
-          on synthwave the rim breathes pink in long sines. on terminal it
-          flickers green in squares. on the still themes the rim sleeps. one
-          recipe, four heartbeats.
+          on synthwave the rim breathes pink in long sines. on terminal it flickers green in
+          squares. on the still themes the rim sleeps. one recipe, four heartbeats.
         </Text>
       </Surface>
     </Surface>

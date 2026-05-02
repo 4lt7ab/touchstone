@@ -24,6 +24,10 @@ type NavItemVariants = NonNullable<RecipeVariants<typeof navItem>>;
  * page navigation. Pair with `asChild` to forward the row onto an `<a>` or
  * a router `<Link>`; when `asChild` is set, the child element's children
  * become the label, and `icon` / `trailing` still render in their slots.
+ *
+ * `tone="danger"` paints destructive options (used inside menus). `role`
+ * lets parent surfaces apply menu / option / tab semantics — `Menu.Item`
+ * sets `role="menuitem"`, for example.
  */
 export interface NavItemProps extends BaseComponentProps, NavItemVariants {
   /** Visible label content. Becomes the row's accessible name. */
@@ -43,6 +47,12 @@ export interface NavItemProps extends BaseComponentProps, NavItemVariants {
   /** Tab order — typically managed by a parent's roving focus. */
   tabIndex?: number;
   /**
+   * ARIA role override. Default semantics is a navigation button. Set to
+   * `'menuitem'` inside a `Menu.Content` (Menu.Item handles this for you),
+   * `'option'` inside a listbox, etc.
+   */
+  role?: string;
+  /**
    * Render as the immediate child element instead of `<button>`. Use to
    * forward NavItem styling onto an `<a>` or a router `<Link>`. The child's
    * `children` become the label slot; `icon` / `trailing` still render.
@@ -60,6 +70,7 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
   {
     size,
     selected = false,
+    tone,
     disabled = false,
     asChild = false,
     icon,
@@ -70,7 +81,7 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
   },
   ref,
 ) {
-  const recipeClass = navItem({ size, selected });
+  const recipeClass = navItem({ size, selected, tone });
   const resolvedAriaCurrent = ariaCurrent ?? (selected ? 'page' : undefined);
   const ariaDisabled = disabled || undefined;
 

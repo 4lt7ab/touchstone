@@ -1,6 +1,5 @@
 import { recipe } from '@vanilla-extract/recipes';
 import { keyframes, style } from '@vanilla-extract/css';
-import { vars } from '@touchstone/themes';
 
 const spin = keyframes({
   to: { transform: 'rotate(360deg)' },

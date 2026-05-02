@@ -75,14 +75,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       >
         <span className={styles.thumb({})} />
       </button>
-      {name ? (
-        <input
-          type="hidden"
-          name={name}
-          value={checked ? value : ''}
-          form={form}
-        />
-      ) : null}
+      {name ? <input type="hidden" name={name} value={checked ? value : ''} form={form} /> : null}
     </>
   );
 });

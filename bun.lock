@@ -23,9 +23,75 @@
         "typescript-eslint": "^8.0.0",
       },
     },
+    "apps/analytics": {
+      "name": "@touchstone/analytics-app",
+      "version": "0.0.1",
+      "dependencies": {
+        "@touchstone/atoms": "workspace:*",
+        "@touchstone/hooks": "workspace:*",
+        "@touchstone/icons": "workspace:*",
+        "@touchstone/molecules": "workspace:*",
+        "@touchstone/organisms": "workspace:*",
+        "@touchstone/themes": "workspace:*",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+      },
+      "devDependencies": {
+        "@touchstone/tsconfig": "workspace:*",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vanilla-extract/vite-plugin": "^4.0.13",
+        "typescript": "^5.5.3",
+        "vite": "^5.3.4",
+      },
+    },
+    "apps/kb": {
+      "name": "@touchstone/kb-app",
+      "version": "0.0.1",
+      "dependencies": {
+        "@touchstone/atoms": "workspace:*",
+        "@touchstone/hooks": "workspace:*",
+        "@touchstone/icons": "workspace:*",
+        "@touchstone/molecules": "workspace:*",
+        "@touchstone/organisms": "workspace:*",
+        "@touchstone/themes": "workspace:*",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+      },
+      "devDependencies": {
+        "@touchstone/tsconfig": "workspace:*",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vanilla-extract/vite-plugin": "^4.0.13",
+        "typescript": "^5.5.3",
+        "vite": "^5.3.4",
+      },
+    },
+    "apps/pm": {
+      "name": "@touchstone/pm-app",
+      "version": "0.0.1",
+      "dependencies": {
+        "@touchstone/atoms": "workspace:*",
+        "@touchstone/hooks": "workspace:*",
+        "@touchstone/icons": "workspace:*",
+        "@touchstone/molecules": "workspace:*",
+        "@touchstone/organisms": "workspace:*",
+        "@touchstone/themes": "workspace:*",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+      },
+      "devDependencies": {
+        "@touchstone/tsconfig": "workspace:*",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vanilla-extract/vite-plugin": "^4.0.13",
+        "typescript": "^5.5.3",
+        "vite": "^5.3.4",
+      },
+    },
     "apps/storybook": {
       "name": "@touchstone/storybook",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@touchstone/atoms": "workspace:*",
         "@touchstone/hooks": "workspace:*",
@@ -54,7 +120,7 @@
     },
     "packages/atoms": {
       "name": "@touchstone/atoms",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@touchstone/hooks": "workspace:*",
         "@touchstone/themes": "workspace:*",
@@ -84,7 +150,7 @@
     },
     "packages/hooks": {
       "name": "@touchstone/hooks",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "devDependencies": {
         "@testing-library/react": "^16.0.0",
         "@touchstone/tsconfig": "workspace:*",
@@ -103,7 +169,7 @@
     },
     "packages/icons": {
       "name": "@touchstone/icons",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "devDependencies": {
         "@touchstone/tsconfig": "workspace:*",
         "@touchstone/tsup-config": "workspace:*",
@@ -118,7 +184,7 @@
     },
     "packages/molecules": {
       "name": "@touchstone/molecules",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@touchstone/atoms": "workspace:*",
         "@touchstone/hooks": "workspace:*",
@@ -149,10 +215,11 @@
     },
     "packages/organisms": {
       "name": "@touchstone/organisms",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@touchstone/atoms": "workspace:*",
         "@touchstone/hooks": "workspace:*",
+        "@touchstone/molecules": "workspace:*",
         "@touchstone/themes": "workspace:*",
         "@vanilla-extract/css": "^1.15.3",
         "@vanilla-extract/recipes": "^0.5.3",
@@ -180,7 +247,7 @@
     },
     "packages/react": {
       "name": "@4lt7ab/touchstone",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@vanilla-extract/css": "^1.15.3",
         "@vanilla-extract/recipes": "^0.5.3",
@@ -208,7 +275,7 @@
     },
     "packages/themes": {
       "name": "@touchstone/themes",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@touchstone/tokens": "workspace:*",
         "@vanilla-extract/css": "^1.15.3",
@@ -222,7 +289,7 @@
     },
     "packages/tokens": {
       "name": "@touchstone/tokens",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "devDependencies": {
         "@touchstone/tsconfig": "workspace:*",
         "@touchstone/tsup-config": "workspace:*",
@@ -232,7 +299,7 @@
     },
     "tooling/eslint-config": {
       "name": "@touchstone/eslint-config",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@eslint/js": "^9.8.0",
         "@typescript-eslint/eslint-plugin": "^8.0.0",
@@ -249,11 +316,11 @@
     },
     "tooling/tsconfig": {
       "name": "@touchstone/tsconfig",
-      "version": "0.0.5",
+      "version": "0.0.1",
     },
     "tooling/tsup-config": {
       "name": "@touchstone/tsup-config",
-      "version": "0.0.5",
+      "version": "0.0.1",
       "dependencies": {
         "@vanilla-extract/esbuild-plugin": "^2.3.13",
         "tsup": "^8.2.4",
@@ -533,6 +600,8 @@
 
     "@testing-library/user-event": ["@testing-library/user-event@14.6.1", "", { "peerDependencies": { "@testing-library/dom": ">=7.21.4" } }, "sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw=="],
 
+    "@touchstone/analytics-app": ["@touchstone/analytics-app@workspace:apps/analytics"],
+
     "@touchstone/atoms": ["@touchstone/atoms@workspace:packages/atoms"],
 
     "@touchstone/eslint-config": ["@touchstone/eslint-config@workspace:tooling/eslint-config"],
@@ -541,9 +610,13 @@
 
     "@touchstone/icons": ["@touchstone/icons@workspace:packages/icons"],
 
+    "@touchstone/kb-app": ["@touchstone/kb-app@workspace:apps/kb"],
+
     "@touchstone/molecules": ["@touchstone/molecules@workspace:packages/molecules"],
 
     "@touchstone/organisms": ["@touchstone/organisms@workspace:packages/organisms"],
+
+    "@touchstone/pm-app": ["@touchstone/pm-app@workspace:apps/pm"],
 
     "@touchstone/storybook": ["@touchstone/storybook@workspace:apps/storybook"],
 

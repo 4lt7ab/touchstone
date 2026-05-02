@@ -16,14 +16,7 @@ interface ProbeProps {
   onResolved: (style: { top: number; left: number }, side: AnchoredPositionSide) => void;
 }
 
-function Probe({
-  side,
-  align,
-  offset,
-  anchorRect,
-  floatingRect,
-  onResolved,
-}: ProbeProps) {
+function Probe({ side, align, offset, anchorRect, floatingRect, onResolved }: ProbeProps) {
   const anchorRef = useRef<HTMLDivElement>(null);
   const floatingRef = useRef<HTMLDivElement>(null);
   const result = useAnchoredPosition(anchorRef, floatingRef, {
@@ -42,10 +35,7 @@ function Probe({
   };
 
   useEffect(() => {
-    onResolved(
-      { top: result.style.top, left: result.style.left },
-      result.side,
-    );
+    onResolved({ top: result.style.top, left: result.style.left }, result.side);
   }, [onResolved, result.style.top, result.style.left, result.side]);
 
   return (

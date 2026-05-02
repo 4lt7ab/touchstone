@@ -13,6 +13,7 @@
     { "path": "../hooks" },
     { "path": "../atoms" },
     { "path": "../molecules" },
-    { "path": "../organisms" }
+    { "path": "../organisms" },
+    { "path": "../charts" }
   ]
 }

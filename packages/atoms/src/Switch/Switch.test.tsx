@@ -20,9 +20,7 @@ describe('Switch', () => {
 
   it('toggles on click and fires onCheckedChange', async () => {
     const onChange = vi.fn();
-    render(
-      <Switch aria-label="bellows on" onCheckedChange={onChange} />,
-    );
+    render(<Switch aria-label="bellows on" onCheckedChange={onChange} />);
     const sw = screen.getByRole('switch', { name: 'bellows on' });
     await userEvent.click(sw);
     expect(onChange).toHaveBeenCalledWith(true);
@@ -43,22 +41,14 @@ describe('Switch', () => {
 
   it('does not toggle when disabled', async () => {
     const onChange = vi.fn();
-    render(
-      <Switch aria-label="bellows on" disabled onCheckedChange={onChange} />,
-    );
+    render(<Switch aria-label="bellows on" disabled onCheckedChange={onChange} />);
     await userEvent.click(screen.getByRole('switch', { name: 'bellows on' }));
     expect(onChange).not.toHaveBeenCalled();
   });
 
   it('respects controlled value (does not flip on internal click)', async () => {
     const onChange = vi.fn();
-    render(
-      <Switch
-        aria-label="bellows on"
-        checked={false}
-        onCheckedChange={onChange}
-      />,
-    );
+    render(<Switch aria-label="bellows on" checked={false} onCheckedChange={onChange} />);
     const sw = screen.getByRole('switch', { name: 'bellows on' });
     await userEvent.click(sw);
     expect(onChange).toHaveBeenCalledWith(true);

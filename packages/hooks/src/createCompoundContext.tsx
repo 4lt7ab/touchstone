@@ -18,9 +18,7 @@ export function createCompoundContext<T>(
   function useScope(consumerName: string): T {
     const value = useContext(Ctx);
     if (value === null) {
-      throw new Error(
-        `<${consumerName}> must be rendered inside <${parentName}>.`,
-      );
+      throw new Error(`<${consumerName}> must be rendered inside <${parentName}>.`);
     }
     return value;
   }

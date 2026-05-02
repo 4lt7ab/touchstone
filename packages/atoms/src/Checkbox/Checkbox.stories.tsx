@@ -44,15 +44,9 @@ export const WithLabel: Story = {
             gap: '0.75rem',
           }}
         >
-          <Checkbox
-            checked={agreed}
-            onCheckedChange={setAgreed}
-            aria-labelledby={labelId}
-          />
+          <Checkbox checked={agreed} onCheckedChange={setAgreed} aria-labelledby={labelId} />
           <Text as="label" id={labelId}>
-            {agreed
-              ? 'the maker’s mark is set on the seal.'
-              : 'set the maker’s mark on the seal.'}
+            {agreed ? 'the maker’s mark is set on the seal.' : 'set the maker’s mark on the seal.'}
           </Text>
         </Surface>
       );

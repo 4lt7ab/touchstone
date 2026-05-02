@@ -37,28 +37,36 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-const SIZE_LINES: ReadonlyArray<{ size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'; line: string }> = [
-  { size: 'xs', line: 'xs — the smallest mark, barely a breath on the page.' },
-  { size: 'sm', line: 'sm — a margin note: see also the chapter on cooling oils.' },
-  { size: 'md', line: 'md — the body of the entry, plain and unhurried.' },
-  { size: 'lg', line: 'lg — a section called out for the apprentice who read in haste.' },
-  { size: 'xl', line: 'xl — a chapter heading, struck in the larger die.' },
-  { size: '2xl', line: "2xl — the ledger's first words: this is a workshop." },
-];
+const SIZE_LINES: ReadonlyArray<{ size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'; line: string }> =
+  [
+    { size: 'xs', line: 'xs — the smallest mark, barely a breath on the page.' },
+    { size: 'sm', line: 'sm — a margin note: see also the chapter on cooling oils.' },
+    { size: 'md', line: 'md — the body of the entry, plain and unhurried.' },
+    { size: 'lg', line: 'lg — a section called out for the apprentice who read in haste.' },
+    { size: 'xl', line: 'xl — a chapter heading, struck in the larger die.' },
+    { size: '2xl', line: "2xl — the ledger's first words: this is a workshop." },
+  ];
 
-const WEIGHT_LINES: ReadonlyArray<{ weight: 'regular' | 'medium' | 'semibold' | 'bold'; line: string }> = [
+const WEIGHT_LINES: ReadonlyArray<{
+  weight: 'regular' | 'medium' | 'semibold' | 'bold';
+  line: string;
+}> = [
   { weight: 'regular', line: 'regular — the daily script, set down without ornament.' },
   { weight: 'medium', line: 'medium — given a small extra weight where the hand pressed harder.' },
   { weight: 'semibold', line: 'semibold — the kind of line a master underlines twice.' },
   { weight: 'bold', line: 'bold — etched deep, so the apprentice will not miss it.' },
 ];
 
-const TONE_LINES: ReadonlyArray<{ tone: 'default' | 'muted' | 'accent' | 'danger'; line: string }> = [
-  { tone: 'default', line: 'tone=default — ink in its true colour, neither louder nor quieter than the page.' },
-  { tone: 'muted', line: 'tone=muted — set in pale grey, for words that wait their turn.' },
-  { tone: 'accent', line: "tone=accent — in the dye reserved for the maker's mark." },
-  { tone: 'danger', line: 'tone=danger — in the red used only when the work must be stopped.' },
-];
+const TONE_LINES: ReadonlyArray<{ tone: 'default' | 'muted' | 'accent' | 'danger'; line: string }> =
+  [
+    {
+      tone: 'default',
+      line: 'tone=default — ink in its true colour, neither louder nor quieter than the page.',
+    },
+    { tone: 'muted', line: 'tone=muted — set in pale grey, for words that wait their turn.' },
+    { tone: 'accent', line: "tone=accent — in the dye reserved for the maker's mark." },
+    { tone: 'danger', line: 'tone=danger — in the red used only when the work must be stopped.' },
+  ];
 
 /** Every size at the default weight + tone. */
 export const Sizes: Story = {

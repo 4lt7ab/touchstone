@@ -19,9 +19,7 @@ export const Closed: Story = {
       <Disclosure>
         <Disclosure.Trigger>what is touchstone?</Disclosure.Trigger>
         <Disclosure.Content>
-          <Text>
-            a reference component library — the team&apos;s measure of quality.
-          </Text>
+          <Text>a reference component library — the team&apos;s measure of quality.</Text>
         </Disclosure.Content>
       </Disclosure>
     </Surface>
@@ -34,9 +32,7 @@ export const Open: Story = {
       <Disclosure defaultOpen>
         <Disclosure.Trigger>what is touchstone?</Disclosure.Trigger>
         <Disclosure.Content>
-          <Text>
-            a reference component library — the team&apos;s measure of quality.
-          </Text>
+          <Text>a reference component library — the team&apos;s measure of quality.</Text>
         </Disclosure.Content>
       </Disclosure>
     </Surface>
@@ -61,27 +57,21 @@ export const Stack: Story = {
           <Disclosure.Trigger>the recipe of the dye</Disclosure.Trigger>
           <Disclosure.Content>
             <Text>
-              every drawer has a name in the ledger; switch the cabinet to see
-              how the same name fetches a different fire.
+              every drawer has a name in the ledger; switch the cabinet to see how the same name
+              fetches a different fire.
             </Text>
           </Disclosure.Content>
         </Disclosure>
         <Disclosure>
           <Disclosure.Trigger>the rhythm of the rim</Disclosure.Trigger>
           <Disclosure.Content>
-            <Text>
-              still themes sleep; rhythmic themes breathe. one recipe, four
-              heartbeats.
-            </Text>
+            <Text>still themes sleep; rhythmic themes breathe. one recipe, four heartbeats.</Text>
           </Disclosure.Content>
         </Disclosure>
         <Disclosure>
           <Disclosure.Trigger>the laws of the bench</Disclosure.Trigger>
           <Disclosure.Content>
-            <Text>
-              tokens → themes → atoms → molecules → organisms. nothing leans
-              upward.
-            </Text>
+            <Text>tokens → themes → atoms → molecules → organisms. nothing leans upward.</Text>
           </Disclosure.Content>
         </Disclosure>
       </Surface>

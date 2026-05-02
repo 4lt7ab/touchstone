@@ -8,6 +8,7 @@
     { "path": "./packages/atoms" },
     { "path": "./packages/molecules" },
     { "path": "./packages/organisms" },
+    { "path": "./packages/charts" },
     { "path": "./packages/react" }
   ]
 }

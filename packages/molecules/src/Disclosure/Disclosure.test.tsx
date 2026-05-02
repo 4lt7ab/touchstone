@@ -61,9 +61,9 @@ describe('Disclosure', () => {
 
   it('throws when subcomponents are used outside Disclosure', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() =>
-      render(<Disclosure.Trigger>orphan</Disclosure.Trigger>),
-    ).toThrow(/<Disclosure\.Trigger> must be rendered inside <Disclosure>/);
+    expect(() => render(<Disclosure.Trigger>orphan</Disclosure.Trigger>)).toThrow(
+      /<Disclosure\.Trigger> must be rendered inside <Disclosure>/,
+    );
     spy.mockRestore();
   });
 });

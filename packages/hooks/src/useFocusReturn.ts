@@ -16,9 +16,7 @@ export function useFocusReturn(active: boolean): void {
   useEffect(() => {
     if (!active) return;
     previous.current =
-      typeof document !== 'undefined'
-        ? (document.activeElement as HTMLElement | null)
-        : null;
+      typeof document !== 'undefined' ? (document.activeElement as HTMLElement | null) : null;
     return () => {
       const el = previous.current;
       previous.current = null;

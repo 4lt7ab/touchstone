@@ -82,13 +82,7 @@ export const AllLevels: Story = {
           'page',
         ] as const
       ).map((level) => (
-        <Surface
-          key={level}
-          level={level}
-          padding="md"
-          radius="md"
-          style={{ minWidth: '10rem' }}
-        >
+        <Surface key={level} level={level} padding="md" radius="md" style={{ minWidth: '10rem' }}>
           <Text size="sm" weight="medium">
             level={level}
           </Text>
@@ -108,9 +102,7 @@ export const GlowPulse: Story = {
     padding: 'lg',
     radius: 'lg',
     glow: 'pulse',
-    children: (
-      <Text size="md">the rim breathes when the theme has a heartbeat.</Text>
-    ),
+    children: <Text size="md">the rim breathes when the theme has a heartbeat.</Text>,
   },
 };
 
@@ -125,8 +117,6 @@ export const AsSection: Story = {
     level: 'raised',
     padding: 'lg',
     radius: 'lg',
-    children: (
-      <Text>rendered as a chapter in the ledger, not a loose leaf.</Text>
-    ),
+    children: <Text>rendered as a chapter in the ledger, not a loose leaf.</Text>,
   },
 };

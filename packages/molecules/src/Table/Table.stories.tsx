@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Surface } from '@touchstone/atoms';
+import { useMemo } from 'react';
+import { Stack, Surface, Text } from '@touchstone/atoms';
+import { useTableSelection, useTableSort } from '@touchstone/hooks';
 import { Table } from './Table.js';
 
 const meta = {
@@ -130,6 +132,115 @@ export const WithFooter: Story = {
       </Table>
     </Surface>
   ),
+};
+
+export const Sortable: Story = {
+  render: () => {
+    const Demo = () => {
+      const sort = useTableSort<keyof LedgerRow>({
+        defaultSort: { key: 'forged', direction: 'desc' },
+      });
+      const sorted = useMemo(() => {
+        if (!sort.sort) return ledger;
+        const { key, direction } = sort.sort;
+        const sign = direction === 'asc' ? 1 : -1;
+        return [...ledger].sort((a, b) => {
+          const av = a[key];
+          const bv = b[key];
+          if (typeof av === 'number' && typeof bv === 'number') {
+            return (av - bv) * sign;
+          }
+          return String(av).localeCompare(String(bv)) * sign;
+        });
+      }, [sort.sort]);
+
+      return (
+        <Stack gap={3}>
+          <Text tone="muted" size="sm">
+            sorted by {sort.sort ? `${String(sort.sort.key)} ${sort.sort.direction}` : 'nothing'}
+          </Text>
+          <Surface level="raised" radius="md" style={{ width: '36rem' }}>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell {...sort.getColumnProps('item')}>item</Table.HeaderCell>
+                  <Table.HeaderCell {...sort.getColumnProps('forged')} align="numeric">
+                    forged
+                  </Table.HeaderCell>
+                  <Table.HeaderCell {...sort.getColumnProps('status')}>status</Table.HeaderCell>
+                  <Table.HeaderCell {...sort.getColumnProps('price')} align="numeric">
+                    price
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {sorted.map((row) => (
+                  <Table.Row key={row.item}>
+                    <Table.Cell>{row.item}</Table.Cell>
+                    <Table.Cell align="numeric">{row.forged}</Table.Cell>
+                    <Table.Cell>{row.status}</Table.Cell>
+                    <Table.Cell align="numeric">{row.price}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </Surface>
+        </Stack>
+      );
+    };
+    return <Demo />;
+  },
+};
+
+export const Selectable: Story = {
+  render: () => {
+    const Demo = () => {
+      const rowIds = ledger.map((r) => r.item);
+      const sel = useTableSelection<string>({ rowIds });
+      return (
+        <Stack gap={3}>
+          <Text tone="muted" size="sm">
+            {sel.selectedIds.length === 0
+              ? 'no rows selected'
+              : `${sel.selectedIds.length} of ${rowIds.length} selected`}
+          </Text>
+          <Surface level="raised" radius="md" style={{ width: '36rem' }}>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.SelectAllCell
+                    checked={sel.allSelected}
+                    indeterminate={sel.someSelected}
+                    onCheckedChange={sel.toggleAll}
+                  />
+                  <Table.HeaderCell>item</Table.HeaderCell>
+                  <Table.HeaderCell align="numeric">forged</Table.HeaderCell>
+                  <Table.HeaderCell>status</Table.HeaderCell>
+                  <Table.HeaderCell align="numeric">price</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {ledger.map((row) => (
+                  <Table.Row key={row.item} selected={sel.isSelected(row.item)}>
+                    <Table.SelectCell
+                      checked={sel.isSelected(row.item)}
+                      onCheckedChange={() => sel.toggle(row.item)}
+                      aria-label={`select ${row.item}`}
+                    />
+                    <Table.Cell>{row.item}</Table.Cell>
+                    <Table.Cell align="numeric">{row.forged}</Table.Cell>
+                    <Table.Cell>{row.status}</Table.Cell>
+                    <Table.Cell align="numeric">{row.price}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </Surface>
+        </Stack>
+      );
+    };
+    return <Demo />;
+  },
 };
 
 export const StickyHeader: Story = {

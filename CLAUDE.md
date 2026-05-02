@@ -82,7 +82,7 @@ Each library package is built with `tsup` using the shared preset at `tooling/ts
 
 - **Atomic-design layering is enforced by dependency direction.** tokens → themes → atoms → molecules → organisms → react. Never import upward (an atom must not import a molecule), and never sideways across siblings without a real reason.
 - **`@4lt7ab/touchstone` is the only package consumers can install.** Every leaf package (`@touchstone/atoms`, `@touchstone/themes`, …) is `private: true` and never reaches npm. The umbrella bundles all of them — JS and CSS — into a single tarball, so `bun add @4lt7ab/touchstone` plus `import '@4lt7ab/touchstone/styles.css'` is the entire integration. The umbrella's `src/index.ts` is the public surface; anything not re-exported from there is implementation detail.
-- **Theming flows through one place.** `@touchstone/themes` defines the `vars` contract via `createThemeContract`, plus `lightTheme` / `darkTheme` class-based presets. Everything visual reads from `vars.*` — components must not hardcode colors, spacing, font scales, radii, or z-indices.
+- **Theming flows through one place.** `@touchstone/themes` defines the `vars` contract via `createThemeContract`, plus a gallery of class-based presets — `warmSandTheme` is the sane default; `slateTheme`, `mossTheme`, `coralTheme`, `synthwaveTheme`, `terminalTheme`, `pipboyTheme`, `neuralTheme`, `blackholeTheme`, and `pacmanTheme` round out the catalogue. Everything visual reads from `vars.*` — components must not hardcode colors, spacing, font scales, radii, or z-indices.
 - **Styling is vanilla-extract recipes.** Variants, sizes, and stateful styles live in `*.css.ts` next to the component. Recipes (`@vanilla-extract/recipes`) handle variant props; raw `style`/`globalStyle` is reserved for things recipes can't express.
 - **Accessible primitives live in `@touchstone/hooks`.** Focus traps, focus return, click-outside, escape-key, scroll lock, disclosure state, roving focus, controllable state, compound contexts, and `asChild` composition (via the in-house `Slot` atom) are all owned in-house. New components compose those hooks; new behavior earns its way into the hooks package alongside a test. The library has no third-party UI dependencies.
 - **Storybook is the QA surface.** Every component should have a story under `apps/storybook` covering its variants and a11y states. `addon-a11y` and `addon-themes` are wired up in `.storybook/main.ts` — use them.
@@ -94,7 +94,7 @@ Two tenets, paired. The first decides what the library aims to be; the second de
 
 ### 1. Sane defaults that quickstart a real app
 
-A consumer without strong design opinions should install `@4lt7ab/touchstone`, drop in the kit, and have a real-looking, accessible, well-themed application without tuning anything. The zero-config render *is* the demo. Touchstone is the workshop the apprentice walks into and starts striking — not the bench they have to assemble first.
+A consumer without strong design opinions should install `@4lt7ab/touchstone`, drop in the kit, and have a real-looking, accessible, well-themed application without tuning anything. The zero-config render _is_ the demo. Touchstone is the workshop the apprentice walks into and starts striking — not the bench they have to assemble first.
 
 In practice:
 
@@ -105,9 +105,9 @@ In practice:
 
 ### 2. Merge before retire
 
-A component reused across consumers and built to primitive-level quality earns its place — find the duplication, don't cut the utility. When two or more components overlap in responsibility, the move is *merge*, not retire. Retiring destroys utility; merging preserves it while shrinking surface area. A merged component with one extra prop is almost always cheaper than two near-duplicate components.
+A component reused across consumers and built to primitive-level quality earns its place — find the duplication, don't cut the utility. When two or more components overlap in responsibility, the move is _merge_, not retire. Retiring destroys utility; merging preserves it while shrinking surface area. A merged component with one extra prop is almost always cheaper than two near-duplicate components.
 
-The atomic-design tier (atom / molecule / organism / envelope) is a taxonomy for reasoning about scope, not a retirement criterion. Demoting an envelope to an organism because it didn't earn its tier is a *merge* (with a smaller relative), not a retire.
+The atomic-design tier (atom / molecule / organism / envelope) is a taxonomy for reasoning about scope, not a retirement criterion. Demoting an envelope to an organism because it didn't earn its tier is a _merge_ (with a smaller relative), not a retire.
 
 When a retirement proposal surfaces, check whether merging would preserve the value first. Prefer merge.
 
@@ -152,7 +152,7 @@ In practice:
 - React: function components and hooks, no class components. `forwardRef` where a ref is part of the public surface.
 - Lint/format: ESLint flat config (typescript-eslint, react, react-hooks, jsx-a11y) + Prettier. Run `bun run format` before committing.
 - Tests: Vitest + Testing Library + jsdom. Co-locate tests next to source as `*.test.ts(x)`.
-- No comments unless the *why* is non-obvious.
+- No comments unless the _why_ is non-obvious.
 
 ## Commit rules
 
@@ -161,6 +161,7 @@ One commit per coherent change, in the workshop voice. Use `/commit` to wrap a s
 **Voice.** Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable; blank line; a `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer. Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone. Speak to the substance of the staged diff, not the file list. Mention version bumps only when they are the principal change.
 
 **Structure.**
+
 - Stage explicit paths — never `git add -A` / `git add .`.
 - **Versioning is human-only.** The agent must never edit a `"version"` field in `package.json` (no `Edit`, no `Write`), never run `just bump` or `just set`, and never run `npm version` / `bun version`. Workspace versions move through `just bump <patch|minor|major>` (incremental) or `just set <version>` (literal reset) — both wrap `scripts/bump-versions.ts` and both are invoked by a human. The agent only carries the resulting diff into a commit alongside everything else.
 - **Publishing is human-only.** The agent must never run `just release`, `bun publish`, or `npm publish` — not even with `--dry-run`. Releases go through `just release` (see `scripts/publish.ts`), which a human invokes after `just bump` and `/commit`. The npm registry is downstream of this repo; the agent never reaches it.

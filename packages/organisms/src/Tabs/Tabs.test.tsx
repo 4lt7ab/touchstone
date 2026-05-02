@@ -51,10 +51,7 @@ describe('Tabs', () => {
       </Tabs>,
     );
     await userEvent.click(screen.getByRole('tab', { name: 'Security' }));
-    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
+    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tabpanel')).toHaveTextContent('security body');
   });
 
@@ -121,9 +118,9 @@ describe('Tabs', () => {
 
   it('throws when subcomponents are used outside Tabs', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() =>
-      render(<Tabs.Trigger value="x">x</Tabs.Trigger>),
-    ).toThrow(/<Tabs\.Trigger> must be rendered inside <Tabs>/);
+    expect(() => render(<Tabs.Trigger value="x">x</Tabs.Trigger>)).toThrow(
+      /<Tabs\.Trigger> must be rendered inside <Tabs>/,
+    );
     spy.mockRestore();
   });
 });

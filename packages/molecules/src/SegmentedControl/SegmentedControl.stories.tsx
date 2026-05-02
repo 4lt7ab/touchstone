@@ -41,13 +41,15 @@ export const Small: Story = {
   args: { size: 'sm' },
 };
 
+function ControlledDemo(
+  args: React.ComponentProps<typeof SegmentedControl<ForgePhase>>,
+): React.JSX.Element {
+  const [value, setValue] = useState<ForgePhase>('hammer');
+  return <SegmentedControl {...args} value={value} onValueChange={setValue} />;
+}
+
 export const Controlled: Story = {
-  render: (args) => {
-    const [value, setValue] = useState<ForgePhase>('hammer');
-    return (
-      <SegmentedControl {...args} value={value} onValueChange={setValue} />
-    );
-  },
+  render: (args) => <ControlledDemo {...args} />,
 };
 
 export const WithDisabledOption: Story = {

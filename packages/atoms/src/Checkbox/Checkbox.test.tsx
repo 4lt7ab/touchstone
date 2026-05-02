@@ -12,10 +12,7 @@ describe('Checkbox', () => {
 
   it('honors defaultChecked', () => {
     render(<Checkbox aria-label="agree" defaultChecked />);
-    expect(screen.getByRole('checkbox', { name: 'agree' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    expect(screen.getByRole('checkbox', { name: 'agree' })).toHaveAttribute('aria-checked', 'true');
   });
 
   it('toggles on click and fires onCheckedChange', async () => {
@@ -56,9 +53,7 @@ describe('Checkbox', () => {
 
   it('respects controlled value (does not flip on internal click)', async () => {
     const onChange = vi.fn();
-    render(
-      <Checkbox aria-label="agree" checked={false} onCheckedChange={onChange} />,
-    );
+    render(<Checkbox aria-label="agree" checked={false} onCheckedChange={onChange} />);
     const cb = screen.getByRole('checkbox', { name: 'agree' });
     await userEvent.click(cb);
     expect(onChange).toHaveBeenCalledWith(true);

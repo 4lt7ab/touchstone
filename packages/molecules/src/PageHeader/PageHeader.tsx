@@ -31,45 +31,39 @@ export interface PageHeaderProps extends BaseComponentProps, PageHeaderVariants 
   as?: 'h1' | 'h2' | 'h3' | 'h4';
 }
 
-export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
-  function PageHeader(
-    {
-      title,
-      description,
-      meta,
-      actions,
-      breadcrumbs,
-      as = 'h1',
-      divider,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ) {
-    const Heading = as as ElementType;
-    return (
-      <header
-        ref={ref as Ref<HTMLElement>}
-        id={id}
-        data-testid={dataTestId}
-        className={styles.pageHeader({ divider })}
-      >
-        {breadcrumbs ? (
-          <div className={styles.breadcrumbs}>{breadcrumbs}</div>
-        ) : null}
-        <div className={styles.headingRow}>
-          <div className={styles.titleBlock}>
-            <div className={styles.titleRow}>
-              <Heading className={styles.title}>{title}</Heading>
-              {meta ? <span className={styles.meta}>{meta}</span> : null}
-            </div>
-            {description ? (
-              <p className={styles.description}>{description}</p>
-            ) : null}
-          </div>
-          {actions ? <div className={styles.actions}>{actions}</div> : null}
-        </div>
-      </header>
-    );
+export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function PageHeader(
+  {
+    title,
+    description,
+    meta,
+    actions,
+    breadcrumbs,
+    as = 'h1',
+    divider,
+    id,
+    'data-testid': dataTestId,
   },
-);
+  ref,
+) {
+  const Heading = as as ElementType;
+  return (
+    <header
+      ref={ref as Ref<HTMLElement>}
+      id={id}
+      data-testid={dataTestId}
+      className={styles.pageHeader({ divider })}
+    >
+      {breadcrumbs ? <div className={styles.breadcrumbs}>{breadcrumbs}</div> : null}
+      <div className={styles.headingRow}>
+        <div className={styles.titleBlock}>
+          <div className={styles.titleRow}>
+            <Heading className={styles.title}>{title}</Heading>
+            {meta ? <span className={styles.meta}>{meta}</span> : null}
+          </div>
+          {description ? <p className={styles.description}>{description}</p> : null}
+        </div>
+        {actions ? <div className={styles.actions}>{actions}</div> : null}
+      </div>
+    </header>
+  );
+});

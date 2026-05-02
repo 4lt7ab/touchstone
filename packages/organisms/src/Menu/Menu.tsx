@@ -1,18 +1,5 @@
-import {
-  Children,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useEffect,
-  useRef,
-} from 'react';
-import type {
-  AriaAttributes,
-  KeyboardEvent,
-  ReactElement,
-  ReactNode,
-  Ref,
-} from 'react';
+import { Children, cloneElement, forwardRef, isValidElement, useEffect, useRef } from 'react';
+import type { AriaAttributes, KeyboardEvent, ReactElement, ReactNode, Ref } from 'react';
 import { createPortal } from 'react-dom';
 import {
   createCompoundContext,
@@ -27,6 +14,7 @@ import {
 } from '@touchstone/hooks';
 import { Slot } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
+import { NavItem } from '@touchstone/molecules';
 import * as styles from './Menu.css.js';
 
 interface MenuContextValue {
@@ -37,8 +25,7 @@ interface MenuContextValue {
   anchorRef: React.MutableRefObject<HTMLElement | null>;
 }
 
-const [MenuProvider, useMenuScope] =
-  createCompoundContext<MenuContextValue>('Menu');
+const [MenuProvider, useMenuScope] = createCompoundContext<MenuContextValue>('Menu');
 
 export interface MenuProps extends BaseComponentProps {
   /** Controlled open state. */
@@ -126,14 +113,12 @@ export interface MenuContentProps extends BaseComponentProps {
   children?: ReactNode;
 }
 
-const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
-  function MenuContent(props, ref) {
-    const ctx = useMenuScope('Menu.Content');
-    if (!ctx.open) return null;
-    if (typeof document === 'undefined') return null;
-    return <MenuPanel {...props} forwardedRef={ref} />;
-  },
-);
+const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function MenuContent(props, ref) {
+  const ctx = useMenuScope('Menu.Content');
+  if (!ctx.open) return null;
+  if (typeof document === 'undefined') return null;
+  return <MenuPanel {...props} forwardedRef={ref} />;
+});
 
 interface MenuPanelProps extends MenuContentProps {
   forwardedRef: Ref<HTMLDivElement>;
@@ -153,11 +138,11 @@ function MenuPanel({
   const ctx = useMenuScope('Menu.Content');
   const panelRef = useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(panelRef, forwardedRef);
-  const { style: positionStyle } = useAnchoredPosition(
-    ctx.anchorRef,
-    panelRef,
-    { side, align, offset },
-  );
+  const { style: positionStyle } = useAnchoredPosition(ctx.anchorRef, panelRef, {
+    side,
+    align,
+    offset,
+  });
 
   useFocusReturn(true);
   useEscapeKey(() => ctx.onClose(), true);
@@ -178,9 +163,7 @@ function MenuPanel({
   }, [ctx]);
 
   const childArray = Children.toArray(children);
-  const itemCount = childArray.filter(
-    (c) => isValidElement(c) && isMenuItemElement(c),
-  ).length;
+  const itemCount = childArray.filter((c) => isValidElement(c) && isMenuItemElement(c)).length;
 
   const { itemRef, onKeyDown, getTabIndex } = useRovingFocus({
     count: itemCount,
@@ -234,7 +217,7 @@ function MenuPanel({
 }
 
 function isMenuItemElement(child: ReactElement): boolean {
-  return (child.type as { $$touchstone?: string })?.$$touchstone === 'MenuItem';
+  return child.type === MenuItem;
 }
 
 interface MenuItemFocusableProps {
@@ -265,12 +248,12 @@ export interface MenuItemProps extends BaseComponentProps {
   tabIndex?: number;
 }
 
-const MenuItem = forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
+const MenuItem = forwardRef<HTMLElement, MenuItemProps>(function MenuItem(
   {
     children,
     icon,
     trailing,
-    tone = 'default',
+    tone,
     disabled,
     onSelect,
     onKeyDown,
@@ -282,15 +265,15 @@ const MenuItem = forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
 ) {
   const ctx = useMenuScope('Menu.Item');
   return (
-    <button
+    <NavItem
       ref={ref}
-      type="button"
       role="menuitem"
       id={id}
       data-testid={dataTestId}
-      className={styles.item({ tone })}
+      icon={icon}
+      trailing={trailing}
+      tone={tone}
       disabled={disabled}
-      aria-disabled={disabled || undefined}
       tabIndex={tabIndex ?? -1}
       onClick={() => {
         if (disabled) return;
@@ -299,18 +282,10 @@ const MenuItem = forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
       }}
       onKeyDown={onKeyDown}
     >
-      {icon ? (
-        <span className={styles.iconSlot} aria-hidden="true">
-          {icon}
-        </span>
-      ) : null}
-      <span className={styles.labelSlot}>{children}</span>
-      {trailing ? <span className={styles.trailingSlot}>{trailing}</span> : null}
-    </button>
+      {children}
+    </NavItem>
   );
 });
-
-(MenuItem as unknown as { $$touchstone: string }).$$touchstone = 'MenuItem';
 
 export interface MenuSeparatorProps extends BaseComponentProps {
   /** Optional accessible label for the separator. */

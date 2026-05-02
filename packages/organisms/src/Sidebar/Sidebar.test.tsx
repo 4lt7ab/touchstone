@@ -5,9 +5,7 @@ import { Sidebar } from './Sidebar.js';
 describe('Sidebar', () => {
   it('renders a primary navigation landmark', () => {
     render(<Sidebar>nav</Sidebar>);
-    expect(
-      screen.getByRole('navigation', { name: 'primary' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'primary' })).toBeInTheDocument();
   });
 
   it('honors a custom aria-label', () => {
@@ -17,10 +15,7 @@ describe('Sidebar', () => {
 
   it('renders header, children, and footer slots', () => {
     render(
-      <Sidebar
-        header={<span>workshop</span>}
-        footer={<span>apprentice</span>}
-      >
+      <Sidebar header={<span>workshop</span>} footer={<span>apprentice</span>}>
         <span>orders</span>
       </Sidebar>,
     );

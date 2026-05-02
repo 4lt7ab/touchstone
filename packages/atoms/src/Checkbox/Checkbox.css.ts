@@ -9,6 +9,7 @@ export const root = recipe({
     width: vars.space[5],
     height: vars.space[5],
     flexShrink: 0,
+    verticalAlign: 'middle',
     border: `1px solid ${vars.color.border}`,
     borderRadius: vars.radius.sm,
     background: vars.color.bgInput,

@@ -21,45 +21,21 @@ describe('SegmentedControl', () => {
   });
 
   it('honors defaultValue', () => {
-    render(
-      <SegmentedControl
-        options={OPTIONS}
-        defaultValue="week"
-        aria-label="View"
-      />,
-    );
-    expect(screen.getByRole('radio', { name: 'Week' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    render(<SegmentedControl options={OPTIONS} defaultValue="week" aria-label="View" />);
+    expect(screen.getByRole('radio', { name: 'Week' })).toHaveAttribute('aria-checked', 'true');
   });
 
   it('selects on click and fires onValueChange', async () => {
     const onValueChange = vi.fn();
-    render(
-      <SegmentedControl
-        options={OPTIONS}
-        onValueChange={onValueChange}
-        aria-label="View"
-      />,
-    );
+    render(<SegmentedControl options={OPTIONS} onValueChange={onValueChange} aria-label="View" />);
     await userEvent.click(screen.getByRole('radio', { name: 'Month' }));
     expect(onValueChange).toHaveBeenCalledWith('month');
-    expect(screen.getByRole('radio', { name: 'Month' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    expect(screen.getByRole('radio', { name: 'Month' })).toHaveAttribute('aria-checked', 'true');
   });
 
   it('arrow keys move selection in radiogroup style (focus + select)', async () => {
     const onValueChange = vi.fn();
-    render(
-      <SegmentedControl
-        options={OPTIONS}
-        onValueChange={onValueChange}
-        aria-label="View"
-      />,
-    );
+    render(<SegmentedControl options={OPTIONS} onValueChange={onValueChange} aria-label="View" />);
     const first = screen.getByRole('radio', { name: 'Day' });
     first.focus();
     await userEvent.keyboard('{ArrowRight}');

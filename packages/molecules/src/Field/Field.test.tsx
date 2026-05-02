@@ -20,9 +20,7 @@ describe('Field', () => {
   });
 
   it('shows an error, marks the input invalid, and hides the hint', () => {
-    render(
-      <Field label="Email" hint="Helper text" error="Email is required" />,
-    );
+    render(<Field label="Email" hint="Helper text" error="Email is required" />);
     const input = screen.getByLabelText('Email');
     const error = screen.getByRole('alert');
     expect(error).toHaveTextContent('Email is required');

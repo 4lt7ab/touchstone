@@ -6,14 +6,21 @@ import '@touchstone/organisms/styles.css';
 export * from '@touchstone/atoms';
 export * from '@touchstone/molecules';
 export * from '@touchstone/organisms';
+export * from '@touchstone/charts';
 export * from '@touchstone/hooks';
 export * from '@touchstone/icons';
 export {
   vars,
-  lightTheme,
-  darkTheme,
   synthwaveTheme,
   terminalTheme,
+  slateTheme,
+  warmSandTheme,
+  mossTheme,
+  coralTheme,
+  pipboyTheme,
+  neuralTheme,
+  blackholeTheme,
+  pacmanTheme,
   rhythms,
   type ThemeVars,
   type ThemeRhythm,

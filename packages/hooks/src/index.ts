@@ -21,6 +21,7 @@ export { useClickOutside } from './useClickOutside.js';
 export { useEscapeKey } from './useEscapeKey.js';
 export { useScrollLock } from './useScrollLock.js';
 export { useInjectStyles } from './useInjectStyles.js';
+export { usePageBackground, type UsePageBackgroundOptions } from './usePageBackground.js';
 export {
   useRovingFocus,
   type UseRovingFocusOptions,
@@ -33,4 +34,17 @@ export {
   type UseAnchoredPositionOptions,
   type UseAnchoredPositionReturn,
 } from './useAnchoredPosition.js';
+export {
+  useTableSelection,
+  type UseTableSelectionOptions,
+  type UseTableSelectionReturn,
+} from './useTableSelection.js';
+export {
+  useTableSort,
+  type UseTableSortOptions,
+  type UseTableSortReturn,
+  type UseTableSortColumnProps,
+  type TableSortState,
+  type TableSortDirection,
+} from './useTableSort.js';
 export { createCompoundContext } from './createCompoundContext.js';

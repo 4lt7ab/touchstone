@@ -1,12 +1,12 @@
 # @touchstone/themes
 
-The type-safe theme contract that every Touchstone component reads from, plus the `lightTheme` and `darkTheme` presets.
+The type-safe theme contract that every Touchstone component reads from, plus a gallery of presets (`warmSandTheme`, `slateTheme`, `mossTheme`, `coralTheme`, `synthwaveTheme`, `terminalTheme`, `pipboyTheme`, `neuralTheme`, `blackholeTheme`, `pacmanTheme`). `warmSandTheme` is the sane default.
 
 ```tsx
-import { vars, lightTheme, darkTheme } from '@touchstone/themes';
+import { vars, warmSandTheme } from '@touchstone/themes';
 
 // Apply a theme
-<body className={lightTheme}>...</body>
+<body className={warmSandTheme}>...</body>;
 
 // Read a token from a component's vanilla-extract style
 import { style } from '@vanilla-extract/css';

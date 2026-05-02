@@ -3,13 +3,7 @@ import { useRef } from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { useClickOutside } from './useClickOutside.js';
 
-function Probe({
-  onOutside,
-  enabled,
-}: {
-  onOutside: (e: MouseEvent) => void;
-  enabled: boolean;
-}) {
+function Probe({ onOutside, enabled }: { onOutside: (e: MouseEvent) => void; enabled: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   useClickOutside(ref, onOutside, enabled);
   return (

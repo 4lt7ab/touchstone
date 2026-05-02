@@ -46,17 +46,18 @@ export const Danger: Story = {
   args: {
     tone: 'danger',
     title: 'the strike would unmake what was forged',
-    children:
-      'the ledger entry cannot be erased once the seal has been struck.',
+    children: 'the ledger entry cannot be erased once the seal has been struck.',
   },
 };
 
+function DismissibleDemo(args: React.ComponentProps<typeof AlertBanner>): React.JSX.Element {
+  const [open, setOpen] = useState(true);
+  if (!open) return <span>(the entry was sealed.)</span>;
+  return <AlertBanner {...args} onDismiss={() => setOpen(false)} />;
+}
+
 export const Dismissible: Story = {
-  render: (args) => {
-    const [open, setOpen] = useState(true);
-    if (!open) return <span>(the entry was sealed.)</span>;
-    return <AlertBanner {...args} onDismiss={() => setOpen(false)} />;
-  },
+  render: (args) => <DismissibleDemo {...args} />,
   args: {
     tone: 'info',
     title: 'the apprentice is asking',

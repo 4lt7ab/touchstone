@@ -50,9 +50,7 @@ describe('useDisclosure', () => {
 
   it('respects defaultOpen', () => {
     const onOpenChange = vi.fn();
-    const { getByTestId } = render(
-      <Probe defaultOpen={true} onOpenChange={onOpenChange} />,
-    );
+    const { getByTestId } = render(<Probe defaultOpen={true} onOpenChange={onOpenChange} />);
     expect(getByTestId('trigger').getAttribute('aria-expanded')).toBe('true');
     act(() => {
       fireEvent.click(getByTestId('trigger'));

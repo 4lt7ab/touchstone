@@ -52,15 +52,7 @@ export interface InputProps extends BaseComponentProps {
   /** Tab order. */
   tabIndex?: number;
   /** Soft keyboard hint on mobile. */
-  inputMode?:
-    | 'none'
-    | 'text'
-    | 'decimal'
-    | 'numeric'
-    | 'tel'
-    | 'search'
-    | 'email'
-    | 'url';
+  inputMode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
   /** Max length in characters. */
   maxLength?: number;
   /** Min length in characters. */

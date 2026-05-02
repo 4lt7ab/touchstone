@@ -5,7 +5,7 @@ React icon components. All icons share the same `IconProps` shape and are access
 ```tsx
 import { CheckIcon } from '@touchstone/icons';
 
-<CheckIcon size={20} title="Saved" />
+<CheckIcon size={20} title="Saved" />;
 ```
 
 The starter set is intentionally tiny. Add new icons as `<Name>Icon.tsx` next to the existing ones, then export them from `src/index.ts`.

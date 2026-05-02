@@ -97,9 +97,6 @@ globalStyle(`.${terminalTheme}::after`, {
 });
 
 // Phosphor heading glow.
-globalStyle(
-  `.${terminalTheme} h1, .${terminalTheme} h2, .${terminalTheme} h3`,
-  {
-    textShadow: '0 0 12px rgba(51, 255, 51, 0.6)',
-  },
-);
+globalStyle(`.${terminalTheme} h1, .${terminalTheme} h2, .${terminalTheme} h3`, {
+  textShadow: '0 0 12px rgba(51, 255, 51, 0.6)',
+});

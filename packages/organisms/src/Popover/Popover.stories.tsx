@@ -61,9 +61,7 @@ export const TopCenter: Story = {
                 <Text size="sm" weight="semibold">
                   the recipe
                 </Text>
-                <Text size="sm">
-                  one stone, two parts ash, three turns at the anvil.
-                </Text>
+                <Text size="sm">one stone, two parts ash, three turns at the anvil.</Text>
               </Stack>
             </Popover.Content>
           </Popover>
@@ -83,10 +81,7 @@ export const ForcedChoice: Story = {
           <Popover.Trigger>
             <Button intent="danger">unmake</Button>
           </Popover.Trigger>
-          <Popover.Content
-            dismissible={false}
-            aria-label="confirm the unmaking"
-          >
+          <Popover.Content dismissible={false} aria-label="confirm the unmaking">
             <Stack gap="sm" style={{ minWidth: '16rem' }}>
               <Text size="sm" weight="semibold">
                 this cannot be rejoined.

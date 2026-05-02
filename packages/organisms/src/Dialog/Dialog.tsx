@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useId, useRef } from 'react';
 import type { ReactNode, Ref } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -29,8 +23,7 @@ interface DialogContextValue {
   descriptionId: string;
 }
 
-const [DialogProvider, useDialogScope] =
-  createCompoundContext<DialogContextValue>('Dialog');
+const [DialogProvider, useDialogScope] = createCompoundContext<DialogContextValue>('Dialog');
 
 export interface DialogProps extends BaseComponentProps {
   /** Controlled open state. */

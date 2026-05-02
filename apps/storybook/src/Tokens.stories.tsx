@@ -166,8 +166,8 @@ export const Tokens: Story = {
             color: vars.color.fgMuted,
           }}
         >
-          every dye, every space, every weight has a name in the ledger. switch
-          the cabinet to see how the same name fetches a different fire.
+          every dye, every space, every weight has a name in the ledger. switch the cabinet to see
+          how the same name fetches a different fire.
         </p>
       </header>
 
@@ -214,36 +214,12 @@ export const Tokens: Story = {
         description="the inks in their orders — first hand, second hand, the marginalia, the placeholders, the silenced words."
       >
         <Swatch label="fg" value={vars.color.fg} textColor={vars.color.bg} />
-        <Swatch
-          label="fgSecondary"
-          value={vars.color.fgSecondary}
-          textColor={vars.color.bg}
-        />
-        <Swatch
-          label="fgMuted"
-          value={vars.color.fgMuted}
-          textColor={vars.color.bg}
-        />
-        <Swatch
-          label="fgPlaceholder"
-          value={vars.color.fgPlaceholder}
-          textColor={vars.color.bg}
-        />
-        <Swatch
-          label="fgDisabled"
-          value={vars.color.fgDisabled}
-          textColor={vars.color.bg}
-        />
-        <Swatch
-          label="fgInverse"
-          value={vars.color.fgInverse}
-          textColor={vars.color.fg}
-        />
-        <Swatch
-          label="fgLink"
-          value={vars.color.fgLink}
-          textColor={vars.color.bg}
-        />
+        <Swatch label="fgSecondary" value={vars.color.fgSecondary} textColor={vars.color.bg} />
+        <Swatch label="fgMuted" value={vars.color.fgMuted} textColor={vars.color.bg} />
+        <Swatch label="fgPlaceholder" value={vars.color.fgPlaceholder} textColor={vars.color.bg} />
+        <Swatch label="fgDisabled" value={vars.color.fgDisabled} textColor={vars.color.bg} />
+        <Swatch label="fgInverse" value={vars.color.fgInverse} textColor={vars.color.fg} />
+        <Swatch label="fgLink" value={vars.color.fgLink} textColor={vars.color.bg} />
       </Section>
 
       <Section
@@ -296,11 +272,7 @@ export const Tokens: Story = {
           value={vars.color.actionSecondaryHover}
           textColor={vars.color.fg}
         />
-        <Swatch
-          label="danger"
-          value={vars.color.danger}
-          textColor={vars.color.dangerFg}
-        />
+        <Swatch label="danger" value={vars.color.danger} textColor={vars.color.dangerFg} />
         <Swatch
           label="dangerHover"
           value={vars.color.dangerHover}
@@ -338,16 +310,8 @@ export const Tokens: Story = {
         title="Glow"
         description="the rim that knows the rhythm. silent on still themes; alive on the rhythmic ones."
       >
-        <Swatch
-          label="glow"
-          value={vars.color.glow}
-          textColor={vars.color.glowFg}
-        />
-        <Swatch
-          label="glowFg"
-          value={vars.color.glowFg}
-          textColor={vars.color.glow}
-        />
+        <Swatch label="glow" value={vars.color.glow} textColor={vars.color.glowFg} />
+        <Swatch label="glowFg" value={vars.color.glowFg} textColor={vars.color.glow} />
       </Section>
     </div>
   ),

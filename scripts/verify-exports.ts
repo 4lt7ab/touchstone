@@ -37,9 +37,7 @@ function extractNamedExports(source: string): Set<string> {
   const names = new Set<string>();
 
   // Strip block comments and line comments so they don't leak `export` keywords.
-  const stripped = source
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 
   // Form 1: re-export lists — `export { A, type B, C as D } from '...'` and bare `export { A, B }`.
   const reExportListRe = /export\s+(?:type\s+)?\{([^}]+)\}/g;

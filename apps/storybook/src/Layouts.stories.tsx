@@ -1,14 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  Badge,
-  Button,
-  Divider,
-  Grid,
-  Input,
-  Stack,
-  Surface,
-  Text,
-} from '@touchstone/atoms';
+import { Badge, Button, Divider, Grid, Input, Stack, Surface, Text } from '@touchstone/atoms';
 import { Field } from '@touchstone/molecules';
 
 const meta = {
@@ -21,7 +12,7 @@ const meta = {
           'Page-level layout recipes built from primitives. For full app ' +
           'shells (sidebar + header + main), reach for `AppShell` / `AppBar` / ' +
           '`Sidebar` under Organisms — those carry the focus, accessibility, ' +
-          'and theming work. The recipes here cover the cases that *aren\'t* ' +
+          "and theming work. The recipes here cover the cases that *aren't* " +
           'app shells: a centered card for auth, a master/detail split, a ' +
           'hero + body for marketing, a toolbar over a list, a card grid ' +
           'dashboard.\n\n' +
@@ -74,9 +65,7 @@ export const CenteredCard: Story = {
             <Text size="xl" weight="bold" as="h1">
               return to the bench
             </Text>
-            <Text tone="muted">
-              your tools are warm where you left them.
-            </Text>
+            <Text tone="muted">your tools are warm where you left them.</Text>
           </Stack>
 
           <Stack gap="md" as="form">
@@ -111,15 +100,12 @@ export const TwoColumn: Story = {
         story:
           'A list on the left, a detail panel on the right. `Stack` row with ' +
           'two children whose widths come from `flex` on `style` — the recipe ' +
-          'doesn\'t need a `width` prop.',
+          "doesn't need a `width` prop.",
       },
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '100vh', padding: '1.5rem' }}
-    >
+    <Surface level="page" style={{ minHeight: '100vh', padding: '1.5rem' }}>
       <Stack direction="row" gap="md" style={{ height: 'calc(100vh - 3rem)' }}>
         <Surface
           level="solid"
@@ -153,12 +139,7 @@ export const TwoColumn: Story = {
           </Stack>
         </Surface>
 
-        <Surface
-          level="raised"
-          radius="lg"
-          padding="lg"
-          style={{ flex: 1, overflow: 'auto' }}
-        >
+        <Surface level="raised" radius="lg" padding="lg" style={{ flex: 1, overflow: 'auto' }}>
           <Stack gap="md">
             <Stack gap="xs">
               <Text size="xl" weight="bold" as="h2">
@@ -173,8 +154,8 @@ export const TwoColumn: Story = {
             </Stack>
             <Divider decorative />
             <Text>
-              the lid will not sit flush until the hinge is recast — the old one
-              kept the door honest for a year and a half before the pin gave.
+              the lid will not sit flush until the hinge is recast — the old one kept the door
+              honest for a year and a half before the pin gave.
             </Text>
             <Stack direction="row" gap="sm">
               <Button intent="primary">strike</Button>
@@ -200,10 +181,7 @@ export const HeroBody: Story = {
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '100vh' }}
-    >
+    <Surface level="page" style={{ minHeight: '100vh' }}>
       <Surface level="solid" padding="lg" style={{ padding: '4rem 1.5rem' }}>
         <Stack
           gap="md"
@@ -215,8 +193,8 @@ export const HeroBody: Story = {
             the workshop opens its doors
           </Text>
           <Text tone="muted">
-            an atomic-design kit for teams who want the rhythm of a well-kept
-            bench without inheriting anyone else's app shell.
+            an atomic-design kit for teams who want the rhythm of a well-kept bench without
+            inheriting anyone else's app shell.
           </Text>
           <Stack direction="row" gap="sm">
             <Button intent="primary">install</Button>
@@ -239,9 +217,9 @@ export const HeroBody: Story = {
             two primitives, six layouts
           </Text>
           <Text>
-            the library ships `Surface` for the page and `Stack` for the
-            arrangement. everything else — the shell, the centered card, the
-            split, the grid — is a composition you copy and own.
+            the library ships `Surface` for the page and `Stack` for the arrangement. everything
+            else — the shell, the centered card, the split, the grid — is a composition you copy and
+            own.
           </Text>
         </Stack>
         <Stack gap="sm">
@@ -249,9 +227,8 @@ export const HeroBody: Story = {
             the consumer keeps the chrome
           </Text>
           <Text>
-            page envelopes are deliberately not in scope. the library renders
-            inside your app, not around it; what your app looks like at its
-            edges is your decision, not ours.
+            page envelopes are deliberately not in scope. the library renders inside your app, not
+            around it; what your app looks like at its edges is your decision, not ours.
           </Text>
         </Stack>
       </Stack>
@@ -272,10 +249,7 @@ export const Toolbar: Story = {
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '100vh', padding: '1.5rem' }}
-    >
+    <Surface level="page" style={{ minHeight: '100vh', padding: '1.5rem' }}>
       <Stack gap="md">
         <Stack direction="row" align="center" justify="between" gap="md" wrap>
           <Stack gap="xs">
@@ -296,11 +270,36 @@ export const Toolbar: Story = {
         <Surface level="solid" radius="lg" padding="none">
           <Stack gap="none">
             {[
-              { mark: 'the copper hinge', when: 'this morning', tone: 'success' as const, label: 'sealed' },
-              { mark: 'the third nail', when: 'yesterday', tone: 'warning' as const, label: 'in-progress' },
-              { mark: 'the dye-pot refill', when: 'two days past', tone: 'success' as const, label: 'sealed' },
-              { mark: 'the smaller mould', when: 'three days past', tone: 'danger' as const, label: 'unmade' },
-              { mark: 'the apprentice\'s handle', when: 'a week past', tone: 'neutral' as const, label: 'shelved' },
+              {
+                mark: 'the copper hinge',
+                when: 'this morning',
+                tone: 'success' as const,
+                label: 'sealed',
+              },
+              {
+                mark: 'the third nail',
+                when: 'yesterday',
+                tone: 'warning' as const,
+                label: 'in-progress',
+              },
+              {
+                mark: 'the dye-pot refill',
+                when: 'two days past',
+                tone: 'success' as const,
+                label: 'sealed',
+              },
+              {
+                mark: 'the smaller mould',
+                when: 'three days past',
+                tone: 'danger' as const,
+                label: 'unmade',
+              },
+              {
+                mark: "the apprentice's handle",
+                when: 'a week past',
+                tone: 'neutral' as const,
+                label: 'shelved',
+              },
             ].map((row, i, all) => (
               <div key={row.mark}>
                 <Stack
@@ -335,42 +334,48 @@ export const CardGrid: Story = {
       description: {
         story:
           '`Stack` is flex-only; reach for `Grid` when you need a real CSS-Grid ' +
-          'layout. `columns={{ min: \'md\' }}` is auto-fit responsive — the cards ' +
+          "layout. `columns={{ min: 'md' }}` is auto-fit responsive — the cards " +
           'reflow as the page narrows without a media query in sight.',
       },
     },
   },
   render: () => (
-    <Surface
-      level="page"
-      style={{ minHeight: '100vh', padding: '1.5rem' }}
-    >
+    <Surface level="page" style={{ minHeight: '100vh', padding: '1.5rem' }}>
       <Stack gap="lg">
         <Stack gap="xs">
           <Text size="2xl" weight="bold" as="h1">
             the dashboard
           </Text>
           <Text tone="muted">
-            the master's first glance — every fire, every shelf, every drawer,
-            in one held breath.
+            the master's first glance — every fire, every shelf, every drawer, in one held breath.
           </Text>
         </Stack>
 
         <Grid columns={{ min: 'md' }} gap="md">
           {[
-            { title: 'orders open', value: '14', tone: 'accent' as const, note: 'three since dawn' },
+            {
+              title: 'orders open',
+              value: '14',
+              tone: 'accent' as const,
+              note: 'three since dawn',
+            },
             { title: 'sealed today', value: '7', tone: 'success' as const, note: 'on pace' },
             { title: 'in error', value: '1', tone: 'danger' as const, note: 'the smaller mould' },
             { title: 'on the shelf', value: '42', tone: 'neutral' as const, note: 'awaiting hand' },
-            { title: 'apprentices at work', value: '3', tone: 'accent' as const, note: 'all benches lit' },
-            { title: 'dye remaining', value: '68%', tone: 'warning' as const, note: 'order before the week\'s end' },
+            {
+              title: 'apprentices at work',
+              value: '3',
+              tone: 'accent' as const,
+              note: 'all benches lit',
+            },
+            {
+              title: 'dye remaining',
+              value: '68%',
+              tone: 'warning' as const,
+              note: "order before the week's end",
+            },
           ].map((card) => (
-            <Surface
-              key={card.title}
-              level="raised"
-              radius="lg"
-              padding="lg"
-            >
+            <Surface key={card.title} level="raised" radius="lg" padding="lg">
               <Stack gap="sm">
                 <Stack direction="row" align="center" justify="between" gap="sm">
                   <Text size="sm" tone="muted" weight="medium">

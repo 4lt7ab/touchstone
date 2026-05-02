@@ -33,9 +33,7 @@ export interface UseDisclosureReturn {
  * for uncontrolled. The returned `triggerProps` / `contentProps` share an
  * auto-generated id so the consumer doesn't have to mint one.
  */
-export function useDisclosure(
-  options: UseDisclosureOptions = {},
-): UseDisclosureReturn {
+export function useDisclosure(options: UseDisclosureOptions = {}): UseDisclosureReturn {
   const { defaultOpen = false, open: controlledOpen, onOpenChange } = options;
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);

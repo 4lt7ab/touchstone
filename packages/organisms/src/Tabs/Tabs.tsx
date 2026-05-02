@@ -1,22 +1,6 @@
-import {
-  Children,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useId,
-} from 'react';
-import type {
-  AriaAttributes,
-  KeyboardEvent,
-  ReactElement,
-  ReactNode,
-  Ref,
-} from 'react';
-import {
-  createCompoundContext,
-  useControllableState,
-  useRovingFocus,
-} from '@touchstone/hooks';
+import { Children, cloneElement, forwardRef, isValidElement, useId } from 'react';
+import type { AriaAttributes, KeyboardEvent, ReactElement, ReactNode, Ref } from 'react';
+import { createCompoundContext, useControllableState, useRovingFocus } from '@touchstone/hooks';
 import type { BaseComponentProps } from '@touchstone/atoms';
 import * as styles from './Tabs.css.js';
 
@@ -27,8 +11,7 @@ interface TabsContextValue {
   panelId: (value: string) => string;
 }
 
-const [TabsProvider, useTabsScope] =
-  createCompoundContext<TabsContextValue>('Tabs');
+const [TabsProvider, useTabsScope] = createCompoundContext<TabsContextValue>('Tabs');
 
 export interface TabsProps extends BaseComponentProps {
   /** Controlled selected value. */
@@ -107,9 +90,7 @@ const TabsList = forwardRef<HTMLDivElement, TabsListProps>(function TabsList(
   const triggers = childArray.filter(
     (c) => isValidElement(c) && isTabsTriggerElement(c),
   ) as ReactElement<TabsTriggerProps & TabsTriggerFocusableProps>[];
-  const activeIndex = triggers.findIndex(
-    (t) => t.props.value === ctx.value && !t.props.disabled,
-  );
+  const activeIndex = triggers.findIndex((t) => t.props.value === ctx.value && !t.props.disabled);
 
   const { itemRef, onKeyDown, getTabIndex } = useRovingFocus({
     count: triggers.length,
@@ -121,9 +102,7 @@ const TabsList = forwardRef<HTMLDivElement, TabsListProps>(function TabsList(
   const cloned = childArray.map((child) => {
     if (!isValidElement(child) || !isTabsTriggerElement(child)) return child;
     const i = triggerIdx++;
-    const focusable = child as ReactElement<
-      TabsTriggerProps & TabsTriggerFocusableProps
-    >;
+    const focusable = child as ReactElement<TabsTriggerProps & TabsTriggerFocusableProps>;
     const existing = focusable.props;
     return cloneElement(focusable, {
       ref: itemRef(i) as Ref<HTMLButtonElement>,
@@ -171,53 +150,39 @@ export interface TabsTriggerProps extends BaseComponentProps {
   tabIndex?: number;
 }
 
-const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
-  function TabsTrigger(
-    {
-      value,
-      children,
-      disabled,
-      size = 'md',
-      onKeyDown,
-      tabIndex,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ) {
-    const ctx = useTabsScope('Tabs.Trigger');
-    const selected = ctx.value === value;
-    return (
-      <button
-        ref={ref}
-        type="button"
-        role="tab"
-        id={id ?? ctx.triggerId(value)}
-        data-testid={dataTestId}
-        className={styles.trigger({ size })}
-        disabled={disabled}
-        aria-selected={selected}
-        aria-controls={ctx.panelId(value)}
-        tabIndex={tabIndex ?? (selected ? 0 : -1)}
-        onClick={() => {
-          if (disabled) return;
-          ctx.setValue(value);
-        }}
-        onKeyDown={onKeyDown}
-      >
-        {children}
-      </button>
-    );
-  },
-);
+const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(function TabsTrigger(
+  { value, children, disabled, size = 'md', onKeyDown, tabIndex, id, 'data-testid': dataTestId },
+  ref,
+) {
+  const ctx = useTabsScope('Tabs.Trigger');
+  const selected = ctx.value === value;
+  return (
+    <button
+      ref={ref}
+      type="button"
+      role="tab"
+      id={id ?? ctx.triggerId(value)}
+      data-testid={dataTestId}
+      className={styles.trigger({ size })}
+      disabled={disabled}
+      aria-selected={selected}
+      aria-controls={ctx.panelId(value)}
+      tabIndex={tabIndex ?? (selected ? 0 : -1)}
+      onClick={() => {
+        if (disabled) return;
+        ctx.setValue(value);
+      }}
+      onKeyDown={onKeyDown}
+    >
+      {children}
+    </button>
+  );
+});
 
-(TabsTrigger as unknown as { $$touchstone: string }).$$touchstone =
-  'TabsTrigger';
+(TabsTrigger as unknown as { $$touchstone: string }).$$touchstone = 'TabsTrigger';
 
 function isTabsTriggerElement(child: ReactElement): boolean {
-  return (
-    (child.type as { $$touchstone?: string })?.$$touchstone === 'TabsTrigger'
-  );
+  return (child.type as { $$touchstone?: string })?.$$touchstone === 'TabsTrigger';
 }
 
 export interface TabsPanelProps extends BaseComponentProps {

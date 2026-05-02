@@ -30,9 +30,7 @@ describe('Dialog', () => {
     expect(screen.getByText('confirm strike')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'close' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('Escape closes when dismissible (default)', async () => {

@@ -1,10 +1,4 @@
-import {
-  Children,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useId,
-} from 'react';
+import { Children, cloneElement, forwardRef, isValidElement, useId } from 'react';
 import type {
   AriaAttributes,
   ElementType,
@@ -52,63 +46,61 @@ export interface NavSectionProps extends BaseComponentProps {
   'aria-labelledby'?: AriaAttributes['aria-labelledby'];
 }
 
-export const NavSection = forwardRef<HTMLElement, NavSectionProps>(
-  function NavSection(
-    {
-      label,
-      children,
-      as: Component = 'div',
-      id,
-      'data-testid': dataTestId,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-    },
-    ref,
-  ) {
-    const generatedLabelId = useId();
-    const labelId = label ? generatedLabelId : undefined;
-    const resolvedLabelledBy = ariaLabelledBy ?? labelId;
-    const resolvedAriaLabel = label ? undefined : ariaLabel;
-
-    const items = Children.toArray(children).filter(
-      (c): c is ReactElement<FocusableChildProps> => isValidElement(c),
-    );
-    const activeIndex = items.findIndex((c) => c.props.selected === true);
-    const { itemRef, onKeyDown, getTabIndex } = useRovingFocus({
-      count: items.length,
-      activeIndex: activeIndex === -1 ? null : activeIndex,
-      orientation: 'vertical',
-    });
-
-    const cloned = items.map((child, i) => {
-      const existingOnKeyDown = child.props.onKeyDown;
-      return cloneElement(child, {
-        ref: itemRef(i) as Ref<HTMLElement>,
-        tabIndex: getTabIndex(i),
-        onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => {
-          existingOnKeyDown?.(e);
-          if (!e.defaultPrevented) onKeyDown(i)(e);
-        },
-      });
-    });
-
-    return (
-      <Component
-        ref={ref as Ref<HTMLElement>}
-        id={id}
-        data-testid={dataTestId}
-        role="group"
-        aria-label={resolvedAriaLabel}
-        aria-labelledby={resolvedLabelledBy}
-        className={styles.root}
-      >
-        {label ? (
-          <div id={labelId} className={styles.label}>
-            {label}
-          </div>
-        ) : null}
-        <div className={styles.list}>{cloned}</div>
-      </Component>
-    );
+export const NavSection = forwardRef<HTMLElement, NavSectionProps>(function NavSection(
+  {
+    label,
+    children,
+    as: Component = 'div',
+    id,
+    'data-testid': dataTestId,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
   },
-);
+  ref,
+) {
+  const generatedLabelId = useId();
+  const labelId = label ? generatedLabelId : undefined;
+  const resolvedLabelledBy = ariaLabelledBy ?? labelId;
+  const resolvedAriaLabel = label ? undefined : ariaLabel;
+
+  const items = Children.toArray(children).filter((c): c is ReactElement<FocusableChildProps> =>
+    isValidElement(c),
+  );
+  const activeIndex = items.findIndex((c) => c.props.selected === true);
+  const { itemRef, onKeyDown, getTabIndex } = useRovingFocus({
+    count: items.length,
+    activeIndex: activeIndex === -1 ? null : activeIndex,
+    orientation: 'vertical',
+  });
+
+  const cloned = items.map((child, i) => {
+    const existingOnKeyDown = child.props.onKeyDown;
+    return cloneElement(child, {
+      ref: itemRef(i) as Ref<HTMLElement>,
+      tabIndex: getTabIndex(i),
+      onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => {
+        existingOnKeyDown?.(e);
+        if (!e.defaultPrevented) onKeyDown(i)(e);
+      },
+    });
+  });
+
+  return (
+    <Component
+      ref={ref as Ref<HTMLElement>}
+      id={id}
+      data-testid={dataTestId}
+      role="group"
+      aria-label={resolvedAriaLabel}
+      aria-labelledby={resolvedLabelledBy}
+      className={styles.root}
+    >
+      {label ? (
+        <div id={labelId} className={styles.label}>
+          {label}
+        </div>
+      ) : null}
+      <div className={styles.list}>{cloned}</div>
+    </Component>
+  );
+});

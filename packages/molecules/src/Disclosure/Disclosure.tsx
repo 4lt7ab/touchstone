@@ -1,10 +1,6 @@
 import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
-import {
-  createCompoundContext,
-  useDisclosure,
-  type UseDisclosureReturn,
-} from '@touchstone/hooks';
+import { createCompoundContext, useDisclosure, type UseDisclosureReturn } from '@touchstone/hooks';
 import type { BaseComponentProps } from '@touchstone/atoms';
 import * as styles from './Disclosure.css.js';
 
@@ -28,37 +24,23 @@ export interface DisclosureProps extends BaseComponentProps {
  * share auto-generated ids through compound context, so the consumer never
  * mints them.
  */
-const DisclosureRoot = forwardRef<HTMLDivElement, DisclosureProps>(
-  function Disclosure(
-    {
-      open,
-      defaultOpen,
-      onOpenChange,
-      children,
-      id,
-      'data-testid': dataTestId,
-    },
-    ref,
-  ) {
-    const ctx = useDisclosure({
-      ...(open !== undefined ? { open } : {}),
-      ...(defaultOpen !== undefined ? { defaultOpen } : {}),
-      ...(onOpenChange ? { onOpenChange } : {}),
-    });
-    return (
-      <DisclosureProvider value={ctx}>
-        <div
-          ref={ref}
-          id={id}
-          data-testid={dataTestId}
-          className={styles.root}
-        >
-          {children}
-        </div>
-      </DisclosureProvider>
-    );
-  },
-);
+const DisclosureRoot = forwardRef<HTMLDivElement, DisclosureProps>(function Disclosure(
+  { open, defaultOpen, onOpenChange, children, id, 'data-testid': dataTestId },
+  ref,
+) {
+  const ctx = useDisclosure({
+    ...(open !== undefined ? { open } : {}),
+    ...(defaultOpen !== undefined ? { defaultOpen } : {}),
+    ...(onOpenChange ? { onOpenChange } : {}),
+  });
+  return (
+    <DisclosureProvider value={ctx}>
+      <div ref={ref} id={id} data-testid={dataTestId} className={styles.root}>
+        {children}
+      </div>
+    </DisclosureProvider>
+  );
+});
 
 export interface DisclosureTriggerProps extends BaseComponentProps {
   /** Trigger label. The chevron and aria wiring are added automatically. */
@@ -68,10 +50,7 @@ export interface DisclosureTriggerProps extends BaseComponentProps {
 }
 
 const DisclosureTrigger = forwardRef<HTMLButtonElement, DisclosureTriggerProps>(
-  function DisclosureTrigger(
-    { children, disabled, id, 'data-testid': dataTestId },
-    ref,
-  ) {
+  function DisclosureTrigger({ children, disabled, id, 'data-testid': dataTestId }, ref) {
     const ctx = useDisclosureScope('Disclosure.Trigger');
     return (
       <button
@@ -86,11 +65,7 @@ const DisclosureTrigger = forwardRef<HTMLButtonElement, DisclosureTriggerProps>(
         onClick={ctx.triggerProps.onClick}
       >
         <span className={styles.triggerLabel}>{children}</span>
-        <span
-          className={styles.chevron}
-          aria-hidden="true"
-          data-open={ctx.open ? 'true' : 'false'}
-        >
+        <span className={styles.chevron} aria-hidden="true" data-open={ctx.open ? 'true' : 'false'}>
           <svg
             width="12"
             height="12"
@@ -109,8 +84,7 @@ const DisclosureTrigger = forwardRef<HTMLButtonElement, DisclosureTriggerProps>(
   },
 );
 
-export interface DisclosureContentProps
-  extends Omit<BaseComponentProps, 'id'> {
+export interface DisclosureContentProps extends Omit<BaseComponentProps, 'id'> {
   /** Region content. */
   children: ReactNode;
 }

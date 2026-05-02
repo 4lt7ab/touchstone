@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 export type ThemeRhythmEasing = 'sine' | 'triangle' | 'square';
@@ -40,10 +33,7 @@ export interface ThemeRhythmProviderProps {
   children: ReactNode;
 }
 
-export function ThemeRhythmProvider({
-  rhythm,
-  children,
-}: ThemeRhythmProviderProps) {
+export function ThemeRhythmProvider({ rhythm, children }: ThemeRhythmProviderProps) {
   const subscribersRef = useRef<Set<Subscriber>>(new Set());
 
   const subscribe = useCallback((cb: Subscriber) => {

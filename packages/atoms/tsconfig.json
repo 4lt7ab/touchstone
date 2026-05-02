@@ -6,8 +6,5 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../hooks" },
-    { "path": "../themes" }
-  ]
+  "references": [{ "path": "../hooks" }, { "path": "../themes" }]
 }

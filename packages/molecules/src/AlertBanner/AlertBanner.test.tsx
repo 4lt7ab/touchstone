@@ -41,12 +41,7 @@ describe('AlertBanner', () => {
 
   it('honors a custom dismissLabel', () => {
     render(
-      <AlertBanner
-        tone="info"
-        title="hello"
-        onDismiss={() => {}}
-        dismissLabel="seal the entry"
-      />,
+      <AlertBanner tone="info" title="hello" onDismiss={() => {}} dismissLabel="seal the entry" />,
     );
     expect(screen.getByRole('button', { name: 'seal the entry' })).toBeInTheDocument();
   });

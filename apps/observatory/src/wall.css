@@ -1,0 +1,32 @@
+.wall {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  min-height: 100vh;
+  max-width: 1680px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Allow long tables to scroll horizontally inside their panel rather than
+   pushing the layout wider than the viewport. */
+.wall__table-scroll {
+  overflow-x: auto;
+}
+
+@media (min-width: 1180px) {
+  .wall {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr) 340px;
+    grid-template-rows: auto auto auto auto auto;
+    grid-template-areas:
+      'header      header     header'
+      'kpis        trendline  crew'
+      'life        skychart   power'
+      'instruments skychart   power'
+      'console     console    console';
+    padding: 18px;
+  }
+}

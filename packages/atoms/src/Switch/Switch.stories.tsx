@@ -28,24 +28,20 @@ export const On: Story = { args: { defaultChecked: true } };
 
 export const Disabled: Story = { args: { disabled: true } };
 
+function WithLabelDemo(): React.JSX.Element {
+  const [on, setOn] = useState(false);
+  const labelId = 'bellows-label';
+  return (
+    <Surface style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+      <Switch checked={on} onCheckedChange={setOn} aria-labelledby={labelId} />
+      <Text as="label" id={labelId}>
+        {on ? 'the bellows are working.' : 'the bellows are at rest.'}
+      </Text>
+    </Surface>
+  );
+}
+
 export const WithLabel: Story = {
   parameters: { layout: 'centered' },
-  render: () => {
-    const [on, setOn] = useState(false);
-    const labelId = 'bellows-label';
-    return (
-      <Surface
-        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}
-      >
-        <Switch
-          checked={on}
-          onCheckedChange={setOn}
-          aria-labelledby={labelId}
-        />
-        <Text as="label" id={labelId}>
-          {on ? 'the bellows are working.' : 'the bellows are at rest.'}
-        </Text>
-      </Surface>
-    );
-  },
+  render: () => <WithLabelDemo />,
 };

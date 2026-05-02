@@ -6,9 +6,7 @@ import { AppBar } from './AppBar.js';
 describe('AppBar', () => {
   it('renders a banner landmark', () => {
     render(<AppBar />);
-    expect(
-      screen.getByRole('banner', { name: 'application' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('banner', { name: 'application' })).toBeInTheDocument();
   });
 
   it('honors a custom aria-label', () => {
@@ -18,10 +16,7 @@ describe('AppBar', () => {
 
   it('renders brand, children, and actions slots', () => {
     render(
-      <AppBar
-        brand={<span>workshop</span>}
-        actions={<Button intent="primary">strike</Button>}
-      >
+      <AppBar brand={<span>workshop</span>} actions={<Button intent="primary">strike</Button>}>
         <input aria-label="search" />
       </AppBar>,
     );

@@ -1,0 +1,34 @@
+{
+  "name": "@touchstone/analytics-app",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port ${PORT:-4174}",
+    "test": "echo 'no tests'",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@touchstone/atoms": "workspace:*",
+    "@touchstone/charts": "workspace:*",
+    "@touchstone/hooks": "workspace:*",
+    "@touchstone/icons": "workspace:*",
+    "@touchstone/molecules": "workspace:*",
+    "@touchstone/organisms": "workspace:*",
+    "@touchstone/themes": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@touchstone/tsconfig": "workspace:*",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vanilla-extract/vite-plugin": "^4.0.13",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4"
+  }
+}

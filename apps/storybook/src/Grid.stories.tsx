@@ -11,7 +11,7 @@ const meta = {
         component:
           'CSS-Grid layout primitive — sibling to `Stack`. Pass `columns` as ' +
           'a fixed integer for forms and dashboards (`columns={3}`), or ' +
-          '`{ min: \'md\' }` for an auto-fit responsive card grid. The ' +
+          "`{ min: 'md' }` for an auto-fit responsive card grid. The " +
           '`gap` / `align` / `justify` vocabulary mirrors `Stack`.',
       },
     },
@@ -63,7 +63,7 @@ export const Responsive: Story = {
     docs: {
       description: {
         story:
-          '`columns={{ min: \'md\' }}` (16rem) → auto-fit cards that reflow ' +
+          "`columns={{ min: 'md' }}` (16rem) → auto-fit cards that reflow " +
           'down to one column without a media query.',
       },
     },
@@ -123,13 +123,7 @@ export const TightAndDense: Story = {
     columns: { min: 'xs' },
     gap: 'sm',
     children: Array.from({ length: 12 }).map((_, i) => (
-      <Surface
-        key={i}
-        level="raised"
-        radius="sm"
-        padding="sm"
-        style={{ textAlign: 'center' }}
-      >
+      <Surface key={i} level="raised" radius="sm" padding="sm" style={{ textAlign: 'center' }}>
         <Text size="sm">{i + 1}</Text>
       </Surface>
     )),

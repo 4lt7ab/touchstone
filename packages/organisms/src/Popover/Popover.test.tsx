@@ -14,9 +14,7 @@ describe('Popover', () => {
           <Popover.Trigger>
             <Button>filters</Button>
           </Popover.Trigger>
-          <Popover.Content aria-label="filter options">
-            inside the panel
-          </Popover.Content>
+          <Popover.Content aria-label="filter options">inside the panel</Popover.Content>
         </Popover>
       );
     }
@@ -78,16 +76,12 @@ describe('Popover', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     // Click the trigger again — should toggle closed (single state change, no flicker reopen).
     await userEvent.click(screen.getByRole('button', { name: 'menu' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     // Open again, then click outside — should close.
     await userEvent.click(screen.getByRole('button', { name: 'menu' }));
     await screen.findByRole('dialog');
     await userEvent.click(screen.getByRole('button', { name: 'outside' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('throws when subcomponents are used outside Popover', () => {

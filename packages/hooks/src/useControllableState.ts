@@ -28,8 +28,7 @@ export function useControllableState<T>({
 
   const setValue = useCallback<Dispatch<SetStateAction<T>>>(
     (next) => {
-      const resolved =
-        typeof next === 'function' ? (next as (prev: T) => T)(current) : next;
+      const resolved = typeof next === 'function' ? (next as (prev: T) => T)(current) : next;
       if (!isControlled) setUncontrolled(resolved);
       onChangeRef.current?.(resolved);
     },

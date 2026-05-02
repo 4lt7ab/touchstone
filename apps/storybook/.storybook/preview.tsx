@@ -4,12 +4,18 @@ import { withThemeByClassName } from '@storybook/addon-themes';
 import { DocsContainer, type DocsContainerProps } from '@storybook/blocks';
 import { GLOBALS_UPDATED } from '@storybook/core-events';
 import {
-  darkTheme,
-  lightTheme,
+  blackholeTheme,
+  coralTheme,
+  mossTheme,
+  neuralTheme,
+  pacmanTheme,
+  pipboyTheme,
   rhythms,
+  slateTheme,
   synthwaveTheme,
   terminalTheme,
   vars,
+  warmSandTheme,
 } from '@touchstone/themes';
 import { ThemeRhythmProvider } from '@touchstone/hooks';
 import '@touchstone/themes/styles.css';
@@ -25,9 +31,7 @@ const ThemedDocsContainer = ({ children, context }: DocsContainerProps) => {
     return ctx?.globals?.theme as string | undefined;
   }, [context]);
 
-  const [themeName, setThemeName] = React.useState<string | undefined>(
-    readTheme,
-  );
+  const [themeName, setThemeName] = React.useState<string | undefined>(readTheme);
 
   React.useEffect(() => {
     const handler = () => setThemeName(readTheme());
@@ -61,12 +65,18 @@ const preview: Preview = {
   decorators: [
     withThemeByClassName({
       themes: {
-        light: lightTheme,
-        dark: darkTheme,
+        'warm-sand': warmSandTheme,
+        slate: slateTheme,
+        moss: mossTheme,
+        coral: coralTheme,
         synthwave: synthwaveTheme,
         terminal: terminalTheme,
+        pipboy: pipboyTheme,
+        neural: neuralTheme,
+        blackhole: blackholeTheme,
+        pacman: pacmanTheme,
       },
-      defaultTheme: 'light',
+      defaultTheme: 'warm-sand',
       parentSelector: 'body',
     }),
     (Story, ctx) => {
@@ -79,8 +89,7 @@ const preview: Preview = {
         body.style.fontFamily = vars.font.family.sans;
       });
       const themeName = ctx.globals.theme as keyof typeof rhythms | undefined;
-      const rhythm =
-        themeName && themeName in rhythms ? rhythms[themeName] : null;
+      const rhythm = themeName && themeName in rhythms ? rhythms[themeName] : null;
       return (
         <ThemeRhythmProvider rhythm={rhythm}>
           <Story />

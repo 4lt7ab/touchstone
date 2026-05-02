@@ -1,0 +1,22 @@
+{
+  "name": "scaffold-touchstone-app",
+  "description": "Scaffold a Touchstone-shaped React application end-to-end. Use Claude Code to lay down a Vite + React + @4lt7ab/touchstone project that renders five real pages — Dashboard, list views, detail views, team grids — across twelve themes, with the AppShell envelope, animated backgrounds, and accessible compound components already wired up. The kit is the workshop; this plugin walks the apprentice in.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Touchstone",
+    "url": "https://github.com/4lt7ab/touchstone"
+  },
+  "homepage": "https://github.com/4lt7ab/touchstone",
+  "repository": "https://github.com/4lt7ab/touchstone",
+  "license": "MIT",
+  "keywords": [
+    "touchstone",
+    "react",
+    "vite",
+    "scaffolding",
+    "design-system",
+    "atomic-design",
+    "vanilla-extract",
+    "components"
+  ]
+}

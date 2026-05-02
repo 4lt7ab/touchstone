@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@touchstone/atoms": "workspace:*",
+    "@touchstone/charts": "workspace:*",
     "@touchstone/hooks": "workspace:*",
     "@touchstone/icons": "workspace:*",
     "@touchstone/molecules": "workspace:*",

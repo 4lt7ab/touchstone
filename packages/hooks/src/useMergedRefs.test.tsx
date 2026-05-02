@@ -3,11 +3,7 @@ import { createRef, useRef } from 'react';
 import { render } from '@testing-library/react';
 import { useMergedRefs } from './useMergedRefs.js';
 
-function Probe({
-  outer,
-}: {
-  outer: ReturnType<typeof createRef<HTMLDivElement>>;
-}) {
+function Probe({ outer }: { outer: ReturnType<typeof createRef<HTMLDivElement>> }) {
   const inner = useRef<HTMLDivElement | null>(null);
   const merged = useMergedRefs(outer, inner);
   return <div ref={merged} data-testid="probe" data-inner={inner.current?.tagName ?? ''} />;

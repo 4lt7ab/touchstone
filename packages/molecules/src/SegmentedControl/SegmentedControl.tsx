@@ -12,8 +12,7 @@ export interface SegmentedControlOption<T extends string = string> {
   disabled?: boolean;
 }
 
-export interface SegmentedControlProps<T extends string = string>
-  extends BaseComponentProps {
+export interface SegmentedControlProps<T extends string = string> extends BaseComponentProps {
   /** Option set. The first option is the default selection when uncontrolled and no `defaultValue` is given. */
   options: ReadonlyArray<SegmentedControlOption<T>>;
   /** Controlled selected value. */
@@ -130,8 +129,6 @@ function SegmentedControlInner<T extends string>(
   );
 }
 
-export const SegmentedControl = forwardRef(SegmentedControlInner) as <
-  T extends string = string,
->(
+export const SegmentedControl = forwardRef(SegmentedControlInner) as <T extends string = string>(
   props: SegmentedControlProps<T> & { ref?: React.Ref<HTMLDivElement> },
 ) => React.JSX.Element;

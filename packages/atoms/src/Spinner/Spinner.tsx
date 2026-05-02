@@ -21,13 +21,7 @@ export interface SpinnerProps extends BaseComponentProps, RingVariants {
 }
 
 export const Spinner = forwardRef<HTMLSpanElement, SpinnerProps>(function Spinner(
-  {
-    size,
-    'aria-label': ariaLabel,
-    'aria-hidden': ariaHidden,
-    id,
-    'data-testid': dataTestId,
-  },
+  { size, 'aria-label': ariaLabel, 'aria-hidden': ariaHidden, id, 'data-testid': dataTestId },
   ref,
 ) {
   return (

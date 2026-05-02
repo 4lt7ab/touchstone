@@ -65,9 +65,7 @@ describe('Menu', () => {
     render(<Host />);
     await userEvent.click(screen.getByRole('menuitem', { name: 'profile' }));
     expect(onSelect).toHaveBeenCalledOnce();
-    await waitFor(() =>
-      expect(screen.queryByRole('menu')).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
 
   it('disabled items do not fire onSelect or close the menu', async () => {
