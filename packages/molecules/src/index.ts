@@ -41,3 +41,10 @@ export {
   type BreadcrumbsItemProps,
 } from './Breadcrumbs/Breadcrumbs.js';
 export { Toaster, toast, type ToasterProps, type ToastInput } from './Toast/Toast.js';
+export {
+  Prose,
+  type ProseProps,
+  type ProseDensity,
+  type ProseWidth,
+} from './Prose/Prose.js';
+export { Markdown, type MarkdownProps } from './Markdown/Markdown.js';

@@ -7,6 +7,7 @@ export { Text, type TextProps } from './Text/Text.js';
 export { Button, type ButtonProps } from './Button/Button.js';
 export { Input, type InputProps, type InputType } from './Input/Input.js';
 export { Textarea, type TextareaProps } from './Textarea/Textarea.js';
+export { Code, type CodeProps } from './Code/Code.js';
 export { Badge, type BadgeProps } from './Badge/Badge.js';
 export { Avatar, type AvatarProps } from './Avatar/Avatar.js';
 export { Divider, type DividerProps } from './Divider/Divider.js';

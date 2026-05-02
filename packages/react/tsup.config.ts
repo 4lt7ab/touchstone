@@ -29,6 +29,6 @@ export default defineConfig({
   treeshake: true,
   splitting: false,
   minify: false,
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'react-markdown', 'remark-gfm'],
   esbuildPlugins: [vanillaExtractPlugin()],
 });

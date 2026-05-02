@@ -32,7 +32,12 @@
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
-    "react-dom": "^18.2.0 || ^19.0.0"
+    "react-dom": "^18.2.0 || ^19.0.0",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "remark-gfm": { "optional": true }
   },
   "dependencies": {
     "@touchstone/atoms": "workspace:*",
@@ -53,6 +58,8 @@
     "jsdom": "^24.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
     "tsup": "^8.2.4",
     "typescript": "^5.5.3",
     "vitest": "^2.0.4"
