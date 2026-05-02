@@ -151,5 +151,12 @@ storybook-static/
 # Vanilla Extract emitted files
 *.css.ts.vanilla.css
 
-# Claude harness state — fully untracked
-.claude/
+# Claude harness state — most subpaths untracked, but the deliberately
+# checked-in pieces (commands, agents, skills, rules, settings.json) are
+# exempted below.
+.claude/*
+!.claude/agents/
+!.claude/commands/
+!.claude/rules/
+!.claude/skills/
+!.claude/settings.json

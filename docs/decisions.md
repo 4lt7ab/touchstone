@@ -6,9 +6,19 @@
 
 ---
 
+## 2026-05-02 — Slim CLAUDE.md to a thin index
+
+Slimmed `CLAUDE.md` from full project doctrine into a thin index pointing into `docs/` and `.claude/rules/`. Pattern-level material moved into `docs/` (`design-tenets.md`, `development.md`, plus expansions of `coding-conventions.md`); behavioral material moved into rules (`commit-rules.md`, `human-only-levers.md`).
+
+**Alternatives considered:** keep `CLAUDE.md` as the canonical doctrine; split into docs but leave `CLAUDE.md` thick.
+
+**Reason:** Behavior belongs in rules; structure belongs in docs. A thin `CLAUDE.md` is an index that survives drift, where a thick one drifts away from the docs underneath it.
+
+---
+
 ## 2026-05-02 — Adopt the opinionated docs + rules layout
 
-Adopted a fixed `docs/` and `.claude/rules/` scaffold so the repo's structure and behavior are discoverable in known locations. `CLAUDE.md` remains the canonical project doctrine for now; future entries may slim it into a thin index pointing into `docs/`.
+Adopted a fixed `docs/` and `.claude/rules/` scaffold so the repo's structure and behavior are discoverable in known locations. The `.gitignore` was reshaped from a blanket `.claude/` ignore into `.claude/*` plus exemptions for `agents/`, `commands/`, `rules/`, `skills/`, and `settings.json`, matching the stated intent that these subpaths are checked-in.
 
 **Alternatives considered:** keep all guidance in `CLAUDE.md`; split into many small docs without a fixed layout.
 

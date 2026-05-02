@@ -1,59 +1,39 @@
 # Touchstone
 
-A React component library that is the team's measure of quality.
+A themed, accessible React component library — the team's measure of quality. Atomic-design layers (tokens → themes → atoms → molecules → organisms) compose through one umbrella package, so consumers install one thing and get a real-looking, accessible app on first render.
 
-Touchstone is an opinionated, atomic-design component library delivered as a pnpm + Turborepo monorepo. Each layer (tokens → themes → atoms → molecules → organisms) is published as its own package and re-exported through the umbrella `@touchstone/react` package.
-
-## Stack
-
-| Concern               | Choice                                               |
-| --------------------- | ---------------------------------------------------- |
-| Package manager       | Bun (workspaces)                                     |
-| Task runner           | `bun run --filter` (topological, no cross-run cache) |
-| Language              | TypeScript (strict, project references)              |
-| Styling / theming     | Vanilla Extract + recipes, type-safe theme contract  |
-| Accessible primitives | Radix UI                                             |
-| Bundler               | tsup (esbuild) + `@vanilla-extract/esbuild-plugin`   |
-| Tests                 | Vitest + Testing Library + jsdom                     |
-| Lint / format         | ESLint flat config + Prettier                        |
-| Docs / QA             | Storybook 8 (Vite framework) + autodocs + a11y       |
-
-## Layout
-
-```
-touchstone/
-├─ apps/
-│  └─ storybook/                # docs and visual QA for every package
-├─ packages/
-│  ├─ tokens/                   # raw scales (color, space, font, radius)
-│  ├─ themes/                   # theme contract + light/dark presets
-│  ├─ icons/                    # icon components
-│  ├─ hooks/                    # shared hooks
-│  ├─ atoms/                    # Surface, Text, Button, Input
-│  ├─ molecules/                # Field
-│  ├─ organisms/                # placeholder for future organisms
-│  └─ react/                    # umbrella re-export — install this
-└─ tooling/
-   ├─ tsconfig/                 # base + library tsconfigs
-   ├─ eslint-config/            # shared ESLint flat config
-   └─ tsup-config/              # shared tsup preset (vanilla-extract aware)
-```
-
-## Common scripts
+## Install
 
 ```bash
-bun install             # install workspace deps
-bun run build           # build every package (`bun run --filter '*' build`)
-bun run test            # run Vitest in every package
-bun run typecheck       # tsc -b solution build
-bun run lint            # ESLint everywhere
-bun run storybook       # start Storybook dev server
+bun add @4lt7ab/touchstone
 ```
 
-`bun run --filter` honors the workspace dependency graph, so layers build in
-topological order (tokens → themes → atoms → molecules → react). There is no
-Turbo-style cross-run cache; everything re-runs from scratch each invocation.
+```ts
+import '@4lt7ab/touchstone/styles.css';
+import { Button, Stack, warmSandTheme } from '@4lt7ab/touchstone';
+```
 
-## Status
+The umbrella bundles every layer — JS and CSS — into a single tarball and a single stylesheet. No leaf-package resolution at the consumer's tree.
 
-Scaffold + thin vertical slice (Button → Field). The full component catalogue and release tooling (Changesets, CI publish, visual regression) are deferred.
+## Use cases
+
+- Quickstart a real-feeling, themed, accessible React app without designing the kit first.
+- Adopt opinionated atomic-design primitives and compose page envelopes (`Sidebar`, `PageHeader`, …) on top of them.
+- Switch theming through a single `vars.*` contract — pick a preset from the catalogue (`warmSand`, `slate`, `moss`, `coral`, `synthwave`, `terminal`, `pipboy`, `neural`, `blackhole`, `pacman`) or add your own.
+
+## Examples
+
+- [Storybook](apps/storybook) — every component, every variant, every a11y state. `bun run storybook`.
+- [Umbrella package source](packages/react) — the only package consumers install.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Feature set](docs/feature-set.md)
+- [Development](docs/development.md)
+- [Deployment strategy](docs/deployment-strategy.md)
+- [Testing](docs/testing.md)
+- [Coding conventions](docs/coding-conventions.md)
+- [Design tenets](docs/design-tenets.md)
+- [Decisions](docs/decisions.md)
+- [Glossary](docs/glossary.md)

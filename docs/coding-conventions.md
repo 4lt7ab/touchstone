@@ -37,3 +37,19 @@ ESLint flat config (typescript-eslint, react, react-hooks, jsx-a11y) + Prettier.
 ## Comments
 
 No comments unless the *why* is non-obvious. The code and types should carry the *what*.
+
+## Adding a new package
+
+1. `mkdir -p packages/<name>/src` and create `tsconfig.json`, `tsup.config.ts`, and a `package.json` mirroring an existing leaf package (e.g. `packages/atoms`).
+2. Set `"name": "@touchstone/<name>"`, `"type": "module"`, the same `exports` block, and `sideEffects` if the package ships CSS.
+3. Add it as a `workspace:*` dependency wherever it should be consumed; if it should be re-exported from the umbrella, add the export in `packages/react/src/index.ts`.
+4. Add a `{ "path": "./packages/<name>" }` reference in the root `tsconfig.json` so it joins the solution build.
+5. `bun install` to register it in the workspace.
+
+## Adding a new component
+
+1. Create a folder under the appropriate atomic-design layer (`packages/atoms/src/Foo/`, `packages/molecules/src/Foo/`, etc.).
+2. Component in `Foo.tsx`, recipe in `Foo.css.ts`, public surface re-exported from the package's `src/index.ts`.
+3. Read all visual values from `vars.*` (no hardcoded design tokens). Compose hooks from `@touchstone/hooks` (focus, dismiss, disclosure, roving focus, …) for accessible behavior — no third-party UI deps.
+4. Co-locate tests as `Foo.test.tsx` next to the component; vitest + jsdom + Testing Library are already configured at the package level.
+5. Add a story under `apps/storybook` covering the main variants and a11y states.
