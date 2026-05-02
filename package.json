@@ -1,6 +1,6 @@
 {
   "name": "touchstone",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "description": "Touchstone — a React component library that is the team's measure of quality.",
   "license": "MIT",
