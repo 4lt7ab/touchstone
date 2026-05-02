@@ -24,6 +24,7 @@ export { Switch, type SwitchProps } from './Switch/Switch.js';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio/Radio.js';
 export { Dropdown, type DropdownProps } from './Dropdown/Dropdown.js';
+export { Combobox, type ComboboxProps } from './Combobox/Combobox.js';
 export type {
   DropdownOption,
   DropdownOptionGroup,
