@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/tokens",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "Raw design tokens (color, space, font, radius, z-index) for Touchstone.",
   "license": "MIT",
