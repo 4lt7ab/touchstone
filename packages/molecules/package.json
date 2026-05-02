@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/molecules",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "description": "Atomic-design 'molecules' — small compositions of atoms (Field, ...).",
   "license": "MIT",
@@ -37,7 +37,9 @@
     "remark-gfm": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "remark-gfm": { "optional": true }
+    "remark-gfm": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@touchstone/atoms": "workspace:*",

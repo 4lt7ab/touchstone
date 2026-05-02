@@ -1,6 +1,6 @@
 {
   "name": "@4lt7ab/touchstone",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Touchstone — a React component library that is the team's measure of quality.",
   "license": "MIT",
   "repository": {
@@ -41,7 +41,9 @@
     "remark-gfm": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "remark-gfm": { "optional": true }
+    "remark-gfm": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@vanilla-extract/css": "^1.15.3",
