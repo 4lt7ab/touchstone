@@ -1,5 +1,16 @@
-import { style } from '@vanilla-extract/css';
+import { keyframes, style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 import { vars } from '@touchstone/themes';
+
+const backdropEnter = keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+});
+
+const panelEnter = keyframes({
+  from: { opacity: 0, transform: 'translateY(8px) scale(0.98)' },
+  to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+});
 
 export const backdrop = style({
   position: 'fixed',
@@ -10,30 +21,72 @@ export const backdrop = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: vars.space[4],
-});
-
-export const panel = style({
-  position: 'relative',
-  width: '100%',
-  maxWidth: '32rem',
-  maxHeight: 'calc(100vh - 2rem)',
-  overflowY: 'auto',
-  background: vars.color.bgRaised,
-  color: vars.color.fg,
-  borderRadius: vars.radius.lg,
-  boxShadow: vars.shadow.lg,
-  padding: vars.space[6],
-  fontFamily: vars.font.family.sans,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space[4],
-  outline: 'none',
-  selectors: {
-    '&:focus-visible': {
-      outline: `${vars.focus.ringWidth} solid ${vars.focus.ringColor}`,
-      outlineOffset: vars.focus.ringOffset,
+  animation: `${backdropEnter} ${vars.duration.base} ${vars.easing.standard}`,
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      animation: 'none',
     },
   },
+});
+
+export const panel = recipe({
+  base: {
+    position: 'relative',
+    width: '100%',
+    maxHeight: 'calc(100vh - 2rem)',
+    background: vars.color.bgRaised,
+    color: vars.color.fg,
+    borderRadius: vars.radius.lg,
+    boxShadow: vars.shadow.lg,
+    fontFamily: vars.font.family.sans,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    outline: 'none',
+    overflow: 'hidden',
+    animation: `${panelEnter} ${vars.duration.slow} ${vars.easing.emphasized}`,
+    '@media': {
+      '(prefers-reduced-motion: reduce)': {
+        animation: 'none',
+      },
+    },
+    selectors: {
+      '&:focus-visible': {
+        outline: `${vars.focus.ringWidth} solid ${vars.focus.ringColor}`,
+        outlineOffset: vars.focus.ringOffset,
+      },
+    },
+  },
+  variants: {
+    size: {
+      sm: { maxWidth: '24rem' },
+      md: { maxWidth: '32rem' },
+      lg: { maxWidth: '40rem' },
+      xl: { maxWidth: '52rem' },
+      full: {
+        maxWidth: 'calc(100vw - 2rem)',
+        maxHeight: 'calc(100vh - 2rem)',
+        height: '100%',
+      },
+    },
+    severity: {
+      default: {},
+      danger: {
+        boxShadow: `${vars.shadow.lg}, inset 4px 0 0 0 ${vars.color.danger}`,
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+    severity: 'default',
+  },
+});
+
+export const header = style({
+  padding: `${vars.space[6]} ${vars.space[6]} 0`,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: vars.space[2],
 });
 
 export const title = style({
@@ -42,6 +95,7 @@ export const title = style({
   fontWeight: vars.font.weight.semibold,
   lineHeight: vars.font.lineHeight.tight,
   color: vars.color.fg,
+  paddingRight: vars.space[8],
 });
 
 export const description = style({
@@ -52,9 +106,35 @@ export const description = style({
 });
 
 export const body = style({
+  padding: `${vars.space[4]} ${vars.space[6]}`,
   display: 'flex',
   flexDirection: 'column',
   gap: vars.space[4],
+  overflowY: 'auto',
+  flex: 1,
+  minHeight: 0,
+});
+
+export const footer = recipe({
+  base: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: vars.space[3],
+    padding: `${vars.space[4]} ${vars.space[6]}`,
+    borderTop: `${vars.borderWidth.thin} solid ${vars.color.border}`,
+    background: vars.color.bgRaised,
+    flexShrink: 0,
+  },
+  variants: {
+    align: {
+      start: { justifyContent: 'flex-start' },
+      end: { justifyContent: 'flex-end' },
+      between: { justifyContent: 'space-between' },
+    },
+  },
+  defaultVariants: {
+    align: 'end',
+  },
 });
 
 export const dismissSlot = style({

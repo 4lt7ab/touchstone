@@ -102,6 +102,47 @@ describe('Dialog', () => {
     await waitFor(() => expect(document.body.style.overflow).toBe('auto'));
   });
 
+  it('renders Dialog.Footer pinned outside the scrollable body', () => {
+    render(
+      <Dialog defaultOpen onOpenChange={() => {}}>
+        <Dialog.Trigger>
+          <Button>open</Button>
+        </Dialog.Trigger>
+        <Dialog.Content title="t">
+          <p>scrolling body</p>
+          <Dialog.Footer>
+            <Dialog.Close>
+              <Button>cancel</Button>
+            </Dialog.Close>
+            <Button intent="primary">confirm</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>,
+    );
+    expect(screen.getByText('scrolling body')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'confirm' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'cancel' })).toBeInTheDocument();
+  });
+
+  it('severity="danger" renders role="alertdialog"', () => {
+    render(
+      <Dialog defaultOpen onOpenChange={() => {}}>
+        <Dialog.Trigger>
+          <Button>open</Button>
+        </Dialog.Trigger>
+        <Dialog.Content title="confirm strike" severity="danger">
+          <Dialog.Footer>
+            <Dialog.Close>
+              <Button intent="danger">strike</Button>
+            </Dialog.Close>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>,
+    );
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('throws when subcomponents are used outside Dialog', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>

@@ -20,6 +20,15 @@ export { useFocusReturn } from './useFocusReturn.js';
 export { useClickOutside } from './useClickOutside.js';
 export { useEscapeKey } from './useEscapeKey.js';
 export { useScrollLock } from './useScrollLock.js';
+export {
+  useModalStackEntry,
+  type UseModalStackEntryReturn,
+} from './useModalStack.js';
+export {
+  useModalSurface,
+  type UseModalSurfaceOptions,
+  type UseModalSurfaceReturn,
+} from './useModalSurface.js';
 export { useInjectStyles } from './useInjectStyles.js';
 export { usePageBackground, type UsePageBackgroundOptions } from './usePageBackground.js';
 export {

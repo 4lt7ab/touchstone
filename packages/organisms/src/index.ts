@@ -4,7 +4,22 @@ export {
   type DialogTriggerProps,
   type DialogContentProps,
   type DialogCloseProps,
+  type DialogFooterProps,
+  type DialogSize,
+  type DialogSeverity,
+  type DialogFooterAlign,
 } from './Dialog/Dialog.js';
+export {
+  Drawer,
+  type DrawerProps,
+  type DrawerTriggerProps,
+  type DrawerContentProps,
+  type DrawerCloseProps,
+  type DrawerFooterProps,
+  type DrawerSide,
+  type DrawerSize,
+  type DrawerFooterAlign,
+} from './Drawer/Drawer.js';
 export {
   Popover,
   type PopoverProps,

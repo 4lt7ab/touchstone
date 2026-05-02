@@ -9,9 +9,9 @@ import {
 } from '@touchstone/hooks';
 import { Button, Slot } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
-import * as styles from './Dialog.css.js';
+import * as styles from './Drawer.css.js';
 
-interface DialogContextValue {
+interface DrawerContextValue {
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -19,40 +19,39 @@ interface DialogContextValue {
   descriptionId: string;
 }
 
-const [DialogProvider, useDialogScope] = createCompoundContext<DialogContextValue>('Dialog');
+const [DrawerProvider, useDrawerScope] = createCompoundContext<DrawerContextValue>('Drawer');
 
-export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
-export type DialogSeverity = 'default' | 'danger';
-export type DialogFooterAlign = 'start' | 'end' | 'between';
+export type DrawerSide = 'left' | 'right' | 'top' | 'bottom';
+export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
+export type DrawerFooterAlign = 'start' | 'end' | 'between';
 
-export interface DialogProps extends BaseComponentProps {
+export interface DrawerProps extends BaseComponentProps {
   /** Controlled open state. */
   open?: boolean;
   /** Uncontrolled initial open state. @default false */
   defaultOpen?: boolean;
-  /** Called when the dialog wants to open or close. */
+  /** Called when the drawer wants to open or close. */
   onOpenChange?: (open: boolean) => void;
-  /** A `Dialog.Trigger`, a `Dialog.Content`, and any `Dialog.Close` inside. */
+  /** A `Drawer.Trigger`, a `Drawer.Content`, and any `Drawer.Close` inside. */
   children: ReactNode;
 }
 
 /**
- * Modal dialog. Behavior is composed by `useModalSurface` — focus trap,
- * focus return, scroll lock, click-outside dismiss, Escape dismiss, and
- * stack registration so a Dialog opened on top of a Drawer dismisses in
- * the right order.
+ * Edge-anchored modal. Same surface contract as `Dialog` — focus trap,
+ * focus return, scroll lock, click-outside dismiss, Escape dismiss, stack
+ * registration via `useModalSurface` — but the panel is anchored to a
+ * viewport edge and slides in. Use `side` to pick the edge and `size` to
+ * pick the cross-axis dimension.
  *
- * Visual treatment is owned here through `vars.color.bgOverlay`,
- * `vars.color.bgRaised`, `vars.shadow.lg`, and `vars.zIndex.modal`. Pass
- * `severity="danger"` for confirm-destroy patterns — the panel uses
- * `role="alertdialog"` and gains a danger accent rail.
+ * Common shapes: `side="left"` for a settings drawer, `side="right"` for
+ * a detail panel, `side="bottom"` for a mobile filter sheet.
  */
-function DialogRoot({
+function DrawerRoot({
   open: controlledOpen,
   defaultOpen,
   onOpenChange,
   children,
-}: DialogProps): React.JSX.Element {
+}: DrawerProps): React.JSX.Element {
   const { open, onOpen, onClose } = useDisclosure({
     ...(controlledOpen !== undefined ? { open: controlledOpen } : {}),
     ...(defaultOpen !== undefined ? { defaultOpen } : {}),
@@ -62,77 +61,72 @@ function DialogRoot({
   const descriptionId = useId();
 
   return (
-    <DialogProvider value={{ open, onOpen, onClose, titleId, descriptionId }}>
+    <DrawerProvider value={{ open, onOpen, onClose, titleId, descriptionId }}>
       {children}
-    </DialogProvider>
+    </DrawerProvider>
   );
 }
 
-export interface DialogTriggerProps {
+export interface DrawerTriggerProps {
   /** A single element to use as the trigger; receives an `onClick` handler. */
   children: ReactNode;
 }
 
-function DialogTrigger({ children }: DialogTriggerProps): React.JSX.Element {
-  const ctx = useDialogScope('Dialog.Trigger');
+function DrawerTrigger({ children }: DrawerTriggerProps): React.JSX.Element {
+  const ctx = useDrawerScope('Drawer.Trigger');
   return <Slot onClick={ctx.onOpen}>{children}</Slot>;
 }
 
-export interface DialogCloseProps {
+export interface DrawerCloseProps {
   /** A single element to use as a close affordance; receives an `onClick` handler. */
   children: ReactNode;
 }
 
-function DialogClose({ children }: DialogCloseProps): React.JSX.Element {
-  const ctx = useDialogScope('Dialog.Close');
+function DrawerClose({ children }: DrawerCloseProps): React.JSX.Element {
+  const ctx = useDrawerScope('Drawer.Close');
   return <Slot onClick={ctx.onClose}>{children}</Slot>;
 }
 
-export interface DialogFooterProps {
-  /** Footer content, typically `Dialog.Close` wrappers around `Button`. */
+export interface DrawerFooterProps {
+  /** Footer content, typically `Drawer.Close` wrappers around `Button`. */
   children?: ReactNode;
   /** Alignment of footer items along the main axis. @default 'end' */
-  align?: DialogFooterAlign;
+  align?: DrawerFooterAlign;
 }
 
-function DialogFooter({ children, align = 'end' }: DialogFooterProps): React.JSX.Element {
+function DrawerFooter({ children, align = 'end' }: DrawerFooterProps): React.JSX.Element {
   return <div className={styles.footer({ align })}>{children}</div>;
 }
 
-export interface DialogContentProps extends BaseComponentProps {
+export interface DrawerContentProps extends BaseComponentProps {
   /** Required heading. Renders as `<h2>` and is wired up via `aria-labelledby`. */
   title: string;
   /** Optional sub-text. When present, wired up via `aria-describedby`. */
   description?: string;
-  /** Visual size of the panel. @default 'md' */
-  size?: DialogSize;
-  /**
-   * `'danger'` switches the panel to `role="alertdialog"` and applies a
-   * danger accent rail — pair with destructive footer actions. @default 'default'
-   */
-  severity?: DialogSeverity;
+  /** Edge to anchor against. @default 'right' */
+  side?: DrawerSide;
+  /** Cross-axis size. @default 'md' */
+  size?: DrawerSize;
   /**
    * Allow Escape and backdrop click to close. @default true
-   * Set to false for forced-choice dialogs (the consumer must wire a
-   * `Dialog.Close` button somewhere visible).
    */
   dismissible?: boolean;
   /** Accessible label for the built-in close button. @default 'close' */
   dismissLabel?: string;
-  /** Body content. A `Dialog.Footer` child is sliced off and pinned to the panel base. */
+  /** Body content. A `Drawer.Footer` child is sliced off and pinned to the panel base. */
   children?: ReactNode;
 }
 
-const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
-  function DialogContent(props, ref) {
-    const ctx = useDialogScope('Dialog.Content');
+const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(
+  function DrawerContent(props, ref) {
+    const ctx = useDrawerScope('Drawer.Content');
     if (!ctx.open) return null;
     if (typeof document === 'undefined') return null;
-    return <DialogPanel {...props} forwardedRef={ref} />;
+    return <DrawerPanel {...props} forwardedRef={ref} />;
   },
 );
 
-interface DialogPanelProps extends DialogContentProps {
+interface DrawerPanelProps extends DrawerContentProps {
   forwardedRef: Ref<HTMLDivElement>;
 }
 
@@ -141,7 +135,7 @@ function partitionFooter(children: ReactNode): { body: ReactNode[]; footer: Reac
   let footer: ReactNode | null = null;
   const body: ReactNode[] = [];
   for (const child of arr) {
-    if (isValidElement(child) && child.type === DialogFooter) {
+    if (isValidElement(child) && child.type === DrawerFooter) {
       footer = child;
     } else {
       body.push(child);
@@ -150,19 +144,19 @@ function partitionFooter(children: ReactNode): { body: ReactNode[]; footer: Reac
   return { body, footer };
 }
 
-function DialogPanel({
+function DrawerPanel({
   title,
   description,
+  side = 'right',
   size = 'md',
-  severity = 'default',
   dismissible = true,
   dismissLabel = 'close',
   children,
   id,
   'data-testid': dataTestId,
   forwardedRef,
-}: DialogPanelProps): React.ReactPortal {
-  const ctx = useDialogScope('Dialog.Content');
+}: DrawerPanelProps): React.ReactPortal {
+  const ctx = useDrawerScope('Drawer.Content');
   const panelRef = useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(panelRef, forwardedRef);
 
@@ -172,20 +166,19 @@ function DialogPanel({
   });
 
   const { body, footer } = partitionFooter(children);
-  const role = severity === 'danger' ? 'alertdialog' : 'dialog';
 
   return createPortal(
-    <div className={styles.backdrop}>
+    <div className={styles.backdrop({ side })}>
       <div
         ref={mergedRef}
-        role={role}
+        role="dialog"
         aria-modal="true"
         aria-labelledby={ctx.titleId}
         aria-describedby={description ? ctx.descriptionId : undefined}
         tabIndex={-1}
         id={id}
         data-testid={dataTestId}
-        className={styles.panel({ size, severity })}
+        className={styles.panel({ side, size })}
       >
         <div className={styles.header}>
           <h2 id={ctx.titleId} className={styles.title}>
@@ -236,9 +229,9 @@ function DismissGlyph(): React.JSX.Element {
   );
 }
 
-export const Dialog = Object.assign(DialogRoot, {
-  Trigger: DialogTrigger,
-  Content: DialogContent,
-  Close: DialogClose,
-  Footer: DialogFooter,
+export const Drawer = Object.assign(DrawerRoot, {
+  Trigger: DrawerTrigger,
+  Content: DrawerContent,
+  Close: DrawerClose,
+  Footer: DrawerFooter,
 });

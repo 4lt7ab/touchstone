@@ -55,8 +55,8 @@ function TabsRoot({
       value={{
         value,
         setValue,
-        triggerId: (v) => `${baseId}-tab-${v}`,
-        panelId: (v) => `${baseId}-panel-${v}`,
+        triggerId: (v: string) => `${baseId}-tab-${v}`,
+        panelId: (v: string) => `${baseId}-panel-${v}`,
       }}
     >
       <div id={id} data-testid={dataTestId} className={styles.root}>
