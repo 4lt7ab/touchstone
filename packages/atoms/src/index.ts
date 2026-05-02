@@ -25,6 +25,7 @@ export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio/Radio.js';
 export { Dropdown, type DropdownProps } from './Dropdown/Dropdown.js';
 export { Combobox, type ComboboxProps } from './Combobox/Combobox.js';
+export { MultiSelect, type MultiSelectProps } from './MultiSelect/MultiSelect.js';
 export type {
   DropdownOption,
   DropdownOptionGroup,
