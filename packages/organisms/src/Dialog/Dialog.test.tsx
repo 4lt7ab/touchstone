@@ -143,6 +143,34 @@ describe('Dialog', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('mode="reader" accepts a ReactNode description and wires aria-describedby', () => {
+    render(
+      <Dialog defaultOpen onOpenChange={() => {}}>
+        <Dialog.Trigger>
+          <Button>open</Button>
+        </Dialog.Trigger>
+        <Dialog.Content
+          mode="reader"
+          title="the recipe of the dye"
+          description={
+            <>
+              <span data-testid="byline">marked by the journeyman</span>
+              <span>vat IV</span>
+            </>
+          }
+        >
+          <p>body of the scroll</p>
+        </Dialog.Content>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole('dialog');
+    const describedBy = dialog.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    const desc = document.getElementById(describedBy ?? '');
+    expect(desc).not.toBeNull();
+    expect(desc?.contains(screen.getByTestId('byline'))).toBe(true);
+  });
+
   it('throws when subcomponents are used outside Dialog', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>

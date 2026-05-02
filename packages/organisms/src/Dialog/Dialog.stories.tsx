@@ -182,6 +182,59 @@ export const Scrollable: Story = {
   ),
 };
 
+export const Reader: Story = {
+  name: 'mode — reader',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`mode="reader"` reframes the panel for long-form reading — wider default ' +
+          'size (`lg`), more generous header / body padding, relaxed line-height, and a ' +
+          '`~65ch` reading measure capped on body content. `description` accepts a ' +
+          '`ReactNode` so authors can pin a byline or dateline alongside the title.',
+      },
+    },
+  },
+  render: () => (
+    <Dialog>
+      <Dialog.Trigger>
+        <Button>open the long scroll</Button>
+      </Dialog.Trigger>
+      <Dialog.Content
+        mode="reader"
+        title="the recipe of the dye"
+        description={
+          <Stack direction="column" gap="xs">
+            <Text size="sm" tone="muted">marked by the journeyman, on the night of the longest fire.</Text>
+            <Text size="sm" tone="muted">vat IV — third reading</Text>
+          </Stack>
+        }
+      >
+        <Text>
+          every drawer has a name in the ledger. switch the cabinet, and the same name
+          fetches a different fire — the same ink, struck across a different anvil. the
+          mark is constant; the chamber that holds it is not.
+        </Text>
+        <Text>
+          a dye is not the colour you see; it is the agreement between the cloth, the
+          mordant, the heat, and the hand. break any of these, and the page does not lie
+          — it simply names a different thing.
+        </Text>
+        <Text>
+          the apprentice who first reads this entry should know: the recipe is not a
+          formula. it is a rhythm. the ledger keeps the rhythm; the bench keeps the
+          ledger; the workshop keeps the bench.
+        </Text>
+        <Dialog.Footer>
+          <Dialog.Close>
+            <Button intent="primary">close the scroll</Button>
+          </Dialog.Close>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
+  ),
+};
+
 export const Forced: Story = {
   name: 'dismissible=false (forced choice)',
   parameters: {

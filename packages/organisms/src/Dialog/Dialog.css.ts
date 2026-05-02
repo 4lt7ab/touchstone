@@ -82,11 +82,25 @@ export const panel = recipe({
   },
 });
 
-export const header = style({
-  padding: `${vars.space[6]} ${vars.space[6]} 0`,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space[2],
+export const header = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: vars.space[2],
+  },
+  variants: {
+    mode: {
+      default: {
+        padding: `${vars.space[6]} ${vars.space[6]} 0`,
+      },
+      reader: {
+        padding: `${vars.space[8]} ${vars.space[8]} 0`,
+      },
+    },
+  },
+  defaultVariants: {
+    mode: 'default',
+  },
 });
 
 export const title = style({
@@ -105,14 +119,49 @@ export const description = style({
   lineHeight: vars.font.lineHeight.normal,
 });
 
-export const body = style({
-  padding: `${vars.space[4]} ${vars.space[6]}`,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space[4],
-  overflowY: 'auto',
-  flex: 1,
-  minHeight: 0,
+export const body = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    overflowY: 'auto',
+    flex: 1,
+    minHeight: 0,
+  },
+  variants: {
+    mode: {
+      default: {
+        padding: `${vars.space[4]} ${vars.space[6]}`,
+      },
+      reader: {
+        padding: `${vars.space[6]} ${vars.space[8]}`,
+        lineHeight: vars.font.lineHeight.relaxed,
+        alignItems: 'center',
+      },
+    },
+  },
+  defaultVariants: {
+    mode: 'default',
+  },
+});
+
+export const bodyInner = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: vars.space[4],
+    width: '100%',
+  },
+  variants: {
+    mode: {
+      default: {},
+      reader: {
+        maxWidth: '65ch',
+      },
+    },
+  },
+  defaultVariants: {
+    mode: 'default',
+  },
 });
 
 export const footer = recipe({

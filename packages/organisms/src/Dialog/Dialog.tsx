@@ -23,6 +23,7 @@ const [DialogProvider, useDialogScope] = createCompoundContext<DialogContextValu
 
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 export type DialogSeverity = 'default' | 'danger';
+export type DialogMode = 'default' | 'reader';
 export type DialogFooterAlign = 'start' | 'end' | 'between';
 
 export interface DialogProps extends BaseComponentProps {
@@ -102,15 +103,28 @@ function DialogFooter({ children, align = 'end' }: DialogFooterProps): React.JSX
 export interface DialogContentProps extends BaseComponentProps {
   /** Required heading. Renders as `<h2>` and is wired up via `aria-labelledby`. */
   title: string;
-  /** Optional sub-text. When present, wired up via `aria-describedby`. */
-  description?: string;
-  /** Visual size of the panel. @default 'md' */
+  /**
+   * Optional sub-text. Accepts a string for a single line or a `ReactNode`
+   * for richer metadata (subtitle, byline, dateline). Wired up via
+   * `aria-describedby` when present.
+   */
+  description?: ReactNode;
+  /**
+   * Visual size of the panel. Defaults to `'md'`, or `'lg'` when
+   * `mode="reader"`.
+   */
   size?: DialogSize;
   /**
    * `'danger'` switches the panel to `role="alertdialog"` and applies a
    * danger accent rail — pair with destructive footer actions. @default 'default'
    */
   severity?: DialogSeverity;
+  /**
+   * `'reader'` reframes the panel for long-form reading — wider default
+   * size, more generous header / body padding, relaxed line-height, and a
+   * `~65ch` reading measure capped on body content. @default 'default'
+   */
+  mode?: DialogMode;
   /**
    * Allow Escape and backdrop click to close. @default true
    * Set to false for forced-choice dialogs (the consumer must wire a
@@ -153,8 +167,9 @@ function partitionFooter(children: ReactNode): { body: ReactNode[]; footer: Reac
 function DialogPanel({
   title,
   description,
-  size = 'md',
+  size,
   severity = 'default',
+  mode = 'default',
   dismissible = true,
   dismissLabel = 'close',
   children,
@@ -173,6 +188,7 @@ function DialogPanel({
 
   const { body, footer } = partitionFooter(children);
   const role = severity === 'danger' ? 'alertdialog' : 'dialog';
+  const resolvedSize = size ?? (mode === 'reader' ? 'lg' : 'md');
 
   return createPortal(
     <div className={styles.backdrop}>
@@ -185,19 +201,23 @@ function DialogPanel({
         tabIndex={-1}
         id={id}
         data-testid={dataTestId}
-        className={styles.panel({ size, severity })}
+        className={styles.panel({ size: resolvedSize, severity })}
       >
-        <div className={styles.header}>
+        <div className={styles.header({ mode })}>
           <h2 id={ctx.titleId} className={styles.title}>
             {title}
           </h2>
           {description ? (
-            <p id={ctx.descriptionId} className={styles.description}>
+            <div id={ctx.descriptionId} className={styles.description}>
               {description}
-            </p>
+            </div>
           ) : null}
         </div>
-        {body.length > 0 ? <div className={styles.body}>{body}</div> : null}
+        {body.length > 0 ? (
+          <div className={styles.body({ mode })}>
+            <div className={styles.bodyInner({ mode })}>{body}</div>
+          </div>
+        ) : null}
         {footer}
         {dismissible ? (
           <span className={styles.dismissSlot}>

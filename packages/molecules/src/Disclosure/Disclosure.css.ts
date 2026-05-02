@@ -14,8 +14,8 @@ export const trigger = recipe({
     justifyContent: 'space-between',
     gap: vars.space[3],
     width: '100%',
-    paddingBlock: vars.space[2],
-    paddingInline: vars.space[3],
+    paddingBlock: vars.space[3],
+    paddingInline: vars.space[4],
     border: 'none',
     borderRadius: vars.radius.md,
     background: 'transparent',
@@ -41,6 +41,9 @@ export const trigger = recipe({
 export const triggerLabel = style({
   flex: 1,
   minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });
 
 export const chevron = style({
@@ -63,8 +66,8 @@ export const chevron = style({
 });
 
 export const content = style({
-  paddingBlock: vars.space[2],
-  paddingInline: vars.space[3],
+  paddingBlock: vars.space[3],
+  paddingInline: vars.space[4],
   color: vars.color.fg,
   fontFamily: vars.font.family.sans,
   fontSize: vars.font.size.md,
