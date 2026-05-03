@@ -6,10 +6,12 @@ export const sidebar = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
-    boxSizing: 'border-box',
     minWidth: 0,
     background: vars.color.bgSolid,
     color: vars.color.fg,
+    transition:
+      `width ${vars.duration.base} ${vars.easing.standard}, ` +
+      `min-width ${vars.duration.base} ${vars.easing.standard}`,
   },
   variants: {
     width: {
@@ -25,12 +27,34 @@ export const sidebar = recipe({
       full: { height: '100%' },
       auto: {},
     },
+    collapsed: {
+      true: {
+        width: vars.space[16],
+        minWidth: vars.space[16],
+      },
+      false: {},
+    },
   },
   defaultVariants: {
     width: 'md',
     divider: true,
     height: 'full',
+    collapsed: false,
   },
+});
+
+export const headerCompact = style({
+  paddingInline: vars.space[2],
+  justifyContent: 'center',
+});
+
+export const footerCompact = style({
+  paddingInline: vars.space[2],
+  justifyContent: 'center',
+});
+
+export const bodyCompact = style({
+  paddingInline: vars.space[2],
 });
 
 export const header = style({

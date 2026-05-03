@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Badge, Button, Input, Stack, Surface, Text } from '@touchstone/atoms';
-import { NavItem, NavSection, PageHeader } from '@touchstone/molecules';
-import { AppBar, AppShell, Sidebar } from '@touchstone/organisms';
+import { Avatar, Badge, Button, Input, Stack, Surface, Text } from '@touchstone/atoms';
+import { Disclosure, NavItem, NavSection, PageHeader } from '@touchstone/molecules';
+import { AppBar, AppShell, Drawer, Sidebar } from '@touchstone/organisms';
 
 function HammerGlyph(): React.JSX.Element {
   return (
@@ -86,10 +87,137 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Full: Story = {
-  name: 'full — every slot, every part',
-  render: () => (
+interface Mark {
+  who: string;
+  monogram: string;
+  tone: 'accent' | 'warning' | 'success' | 'neutral';
+  label: 'open' | 'in-progress' | 'sealed' | 'shelved';
+  title: string;
+  body: string;
+  when: string;
+}
+
+const todaysMarks: Mark[] = [
+  {
+    who: 'mei',
+    monogram: 'me',
+    tone: 'accent',
+    label: 'open',
+    title: 'a copper hinge for the lid',
+    body: 'cut from sheet, ready for the bench. the apprentice asks after the rivet pattern.',
+    when: 'this morning',
+  },
+  {
+    who: 'tav',
+    monogram: 'ta',
+    tone: 'warning',
+    label: 'in-progress',
+    title: 'three nails of the smaller mould',
+    body: 'two struck clean, the third bent. recasting after lunch.',
+    when: 'an hour ago',
+  },
+  {
+    who: 'rey',
+    monogram: 're',
+    tone: 'success',
+    label: 'sealed',
+    title: 'the dye-pot, refilled',
+    body: 'the indigo measured by weight, not by eye. ledger updated.',
+    when: 'two hours ago',
+  },
+];
+
+const earlierMarks: Mark[] = [
+  {
+    who: 'kai',
+    monogram: 'ka',
+    tone: 'neutral',
+    label: 'shelved',
+    title: 'a new handle for the apprentice',
+    body: 'the rosewood is on order. shelved until thursday.',
+    when: 'two days past',
+  },
+  {
+    who: 'mei',
+    monogram: 'me',
+    tone: 'success',
+    label: 'sealed',
+    title: 'the larger anvil, rebalanced',
+    body: 'shimmed and tested with the long bar. holds.',
+    when: 'three days past',
+  },
+];
+
+function MarkRow({ mark }: { mark: Mark }): React.JSX.Element {
+  return (
+    <Surface level="raised" radius="lg" padding="md">
+      <Stack direction="row" align="start" gap="md">
+        <Avatar monogram={mark.monogram} aria-label={mark.who} />
+        <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" align="center" justify="between" gap="sm">
+            <Text weight="semibold">{mark.title}</Text>
+            <Badge tone={mark.tone}>{mark.label}</Badge>
+          </Stack>
+          <Text size="sm" tone="muted">
+            {mark.body}
+          </Text>
+          <Text size="xs" tone="muted">
+            {mark.who} · {mark.when}
+          </Text>
+        </Stack>
+      </Stack>
+    </Surface>
+  );
+}
+
+function benchLedgerDrawer(): React.JSX.Element {
+  return (
+    <Drawer>
+      <Drawer.Content
+        title="today's marks at the bench"
+        description="the running ledger of strikes — ⌘` to summon, escape to dismiss."
+        side="right"
+        size="md"
+      >
+        <Stack gap="md">
+          {todaysMarks.map((mark) => (
+            <MarkRow key={mark.title} mark={mark} />
+          ))}
+          <Disclosure>
+            <Disclosure.Trigger>earlier in the week</Disclosure.Trigger>
+            <Disclosure.Content>
+              <Stack gap="md" style={{ paddingBlockStart: '0.75rem' }}>
+                {earlierMarks.map((mark) => (
+                  <MarkRow key={mark.title} mark={mark} />
+                ))}
+              </Stack>
+            </Disclosure.Content>
+          </Disclosure>
+        </Stack>
+        <Drawer.Footer align="between">
+          <Drawer.Close>
+            <Button intent="ghost">mark all read</Button>
+          </Drawer.Close>
+          <Drawer.Close>
+            <Button intent="primary">open all</Button>
+          </Drawer.Close>
+        </Drawer.Footer>
+      </Drawer.Content>
+    </Drawer>
+  );
+}
+
+function FullShell(): React.JSX.Element {
+  const [collapsed, setCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  return (
     <AppShell
+      sidebarCollapsed={collapsed}
+      onSidebarCollapsedChange={setCollapsed}
+      drawerOpen={drawerOpen}
+      onDrawerOpenChange={setDrawerOpen}
+      drawer={benchLedgerDrawer()}
       header={
         <AppBar
           brand={
@@ -101,7 +229,22 @@ export const Full: Story = {
           actions={
             <>
               <Input placeholder="search the ledger" style={{ width: '20rem' }} />
-              <Button intent="ghost">apprentice</Button>
+              <Button
+                intent="ghost"
+                onClick={() => setCollapsed((v) => !v)}
+                aria-label={collapsed ? 'expand sidebar' : 'collapse sidebar'}
+                aria-pressed={collapsed}
+              >
+                {collapsed ? 'expand ⌘B' : 'collapse ⌘B'}
+              </Button>
+              <Button
+                intent="ghost"
+                onClick={() => setDrawerOpen((v) => !v)}
+                aria-label={drawerOpen ? 'close ledger' : 'open ledger'}
+                aria-pressed={drawerOpen}
+              >
+                ledger ⌘`
+              </Button>
               <Button intent="primary">strike</Button>
             </>
           }
@@ -129,7 +272,7 @@ export const Full: Story = {
     >
       <PageHeader
         title="orders for today"
-        description="every strike of the day, in the order it was made. the master reads top to bottom; the apprentice strikes bottom to top."
+        description="every strike of the day, in the order it was made. the master reads top to bottom; the apprentice strikes bottom to top. press ⌘B to fold the rail."
         meta={
           <>
             <Badge tone="accent">14 open</Badge>
@@ -186,7 +329,12 @@ export const Full: Story = {
         ))}
       </Stack>
     </AppShell>
-  ),
+  );
+}
+
+export const Full: Story = {
+  name: 'full — every slot, every part (⌘B folds the rail)',
+  render: () => <FullShell />,
 };
 
 export const NoSidebar: Story = {

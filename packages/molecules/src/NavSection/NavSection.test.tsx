@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NavItem } from '../NavItem/NavItem.js';
+import { NavLayoutProvider } from '../navLayoutContext.js';
 import { NavSection } from './NavSection.js';
 
 describe('NavSection', () => {
@@ -100,5 +101,19 @@ describe('NavSection', () => {
       </NavSection>,
     );
     expect(screen.getByText('bench')).toBeInTheDocument();
+  });
+
+  describe('inside a collapsed NavLayoutProvider', () => {
+    it('hides the visible label but preserves the group accessible name', () => {
+      render(
+        <NavLayoutProvider collapsed>
+          <NavSection label="bench">
+            <NavItem icon={<svg />}>orders</NavItem>
+          </NavSection>
+        </NavLayoutProvider>,
+      );
+      expect(screen.queryByText('bench')).not.toBeInTheDocument();
+      expect(screen.getByRole('group', { name: 'bench' })).toBeInTheDocument();
+    });
   });
 });

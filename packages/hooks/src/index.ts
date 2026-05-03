@@ -19,6 +19,11 @@ export { useFocusTrap } from './useFocusTrap.js';
 export { useFocusReturn } from './useFocusReturn.js';
 export { useClickOutside } from './useClickOutside.js';
 export { useEscapeKey } from './useEscapeKey.js';
+export { useHotkey, type UseHotkeyOptions } from './useHotkey.js';
+export {
+  useDismissableLayer,
+  type UseDismissableLayerOptions,
+} from './useDismissableLayer.js';
 export { useScrollLock } from './useScrollLock.js';
 export {
   useModalStackEntry,

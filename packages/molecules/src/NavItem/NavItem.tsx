@@ -9,7 +9,8 @@ import type {
 import type { RecipeVariants } from '@vanilla-extract/recipes';
 import { Slot } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
-import { iconSlot, labelSlot, navItem, trailingSlot } from './NavItem.css.js';
+import { useNavLayout } from '../navLayoutContext.js';
+import { compact, iconSlot, labelSlot, navItem, trailingSlot } from './NavItem.css.js';
 
 type NavItemVariants = NonNullable<RecipeVariants<typeof navItem>>;
 
@@ -77,13 +78,21 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
     trailing,
     children,
     'aria-current': ariaCurrent,
+    'aria-label': ariaLabel,
     ...rest
   },
   ref,
 ) {
-  const recipeClass = navItem({ size, selected, tone });
+  const { collapsed } = useNavLayout();
+  const recipeClass = collapsed
+    ? `${navItem({ size, selected, tone })} ${compact}`
+    : navItem({ size, selected, tone });
   const resolvedAriaCurrent = ariaCurrent ?? (selected ? 'page' : undefined);
   const ariaDisabled = disabled || undefined;
+
+  const collapsedAriaLabel = collapsed
+    ? (ariaLabel ?? (typeof children === 'string' ? children : undefined))
+    : ariaLabel;
 
   const renderSlots = (label: ReactNode): ReactNode => (
     <>
@@ -92,8 +101,12 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
           {icon}
         </span>
       ) : null}
-      <span className={labelSlot}>{label}</span>
-      {trailing ? <span className={trailingSlot}>{trailing}</span> : null}
+      {collapsed ? null : (
+        <>
+          <span className={labelSlot}>{label}</span>
+          {trailing ? <span className={trailingSlot}>{trailing}</span> : null}
+        </>
+      )}
     </>
   );
 
@@ -107,6 +120,7 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
         className={recipeClass}
         aria-current={resolvedAriaCurrent}
         aria-disabled={ariaDisabled}
+        aria-label={collapsedAriaLabel}
         {...rest}
       >
         {replaced}
@@ -122,6 +136,7 @@ export const NavItem = forwardRef<HTMLElement, NavItemProps>(function NavItem(
       disabled={disabled}
       aria-disabled={ariaDisabled}
       aria-current={resolvedAriaCurrent}
+      aria-label={collapsedAriaLabel}
       {...rest}
     >
       {renderSlots(children)}

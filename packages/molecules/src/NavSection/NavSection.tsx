@@ -9,6 +9,7 @@ import type {
 } from 'react';
 import { useRovingFocus } from '@touchstone/hooks';
 import type { BaseComponentProps } from '@touchstone/atoms';
+import { useNavLayout } from '../navLayoutContext.js';
 import * as styles from './NavSection.css.js';
 
 interface FocusableChildProps {
@@ -58,10 +59,12 @@ export const NavSection = forwardRef<HTMLElement, NavSectionProps>(function NavS
   },
   ref,
 ) {
+  const { collapsed } = useNavLayout();
   const generatedLabelId = useId();
-  const labelId = label ? generatedLabelId : undefined;
+  const showVisibleLabel = label !== undefined && !collapsed;
+  const labelId = showVisibleLabel ? generatedLabelId : undefined;
   const resolvedLabelledBy = ariaLabelledBy ?? labelId;
-  const resolvedAriaLabel = label ? undefined : ariaLabel;
+  const resolvedAriaLabel = showVisibleLabel ? undefined : (ariaLabel ?? label);
 
   const items = Children.toArray(children).filter((c): c is ReactElement<FocusableChildProps> =>
     isValidElement(c),
@@ -95,7 +98,7 @@ export const NavSection = forwardRef<HTMLElement, NavSectionProps>(function NavS
       aria-labelledby={resolvedLabelledBy}
       className={styles.root}
     >
-      {label ? (
+      {showVisibleLabel ? (
         <div id={labelId} className={styles.label}>
           {label}
         </div>

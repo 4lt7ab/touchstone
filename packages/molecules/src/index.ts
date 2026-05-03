@@ -13,6 +13,12 @@ export {
 } from './Disclosure/Disclosure.js';
 export { NavItem, type NavItemProps } from './NavItem/NavItem.js';
 export { NavSection, type NavSectionProps } from './NavSection/NavSection.js';
+export {
+  NavLayoutProvider,
+  useNavLayout,
+  type NavLayoutContextValue,
+  type NavLayoutProviderProps,
+} from './navLayoutContext.js';
 export { PageHeader, type PageHeaderProps } from './PageHeader/PageHeader.js';
 export {
   Table,

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NavItem } from './NavItem.js';
+import { NavLayoutProvider } from '../navLayoutContext.js';
 
 describe('NavItem', () => {
   it('renders a button by default with the label as accessible name', () => {
@@ -97,5 +98,41 @@ describe('NavItem', () => {
     render(<NavItem tone="danger">leave the bench</NavItem>);
     const btn = screen.getByRole('button', { name: 'leave the bench' });
     expect(btn.className).toMatch(/tone_danger|toneDanger|tone-danger/);
+  });
+
+  describe('inside a collapsed NavLayoutProvider', () => {
+    it('hides the label and uses string children as the accessible name', () => {
+      render(
+        <NavLayoutProvider collapsed>
+          <NavItem icon={<svg data-testid="leading-icon" />}>orders</NavItem>
+        </NavLayoutProvider>,
+      );
+      const btn = screen.getByRole('button', { name: 'orders' });
+      expect(btn).toHaveAttribute('aria-label', 'orders');
+      expect(btn).not.toHaveTextContent('orders');
+      expect(screen.getByTestId('leading-icon')).toBeInTheDocument();
+    });
+
+    it('hides the trailing slot', () => {
+      render(
+        <NavLayoutProvider collapsed>
+          <NavItem icon={<svg />} trailing={<span data-testid="count">7</span>}>
+            moulds
+          </NavItem>
+        </NavLayoutProvider>,
+      );
+      expect(screen.queryByTestId('count')).not.toBeInTheDocument();
+    });
+
+    it('honors an explicit aria-label over the children', () => {
+      render(
+        <NavLayoutProvider collapsed>
+          <NavItem icon={<svg />} aria-label="orders queue">
+            orders
+          </NavItem>
+        </NavLayoutProvider>,
+      );
+      expect(screen.getByRole('button', { name: 'orders queue' })).toBeInTheDocument();
+    });
   });
 });

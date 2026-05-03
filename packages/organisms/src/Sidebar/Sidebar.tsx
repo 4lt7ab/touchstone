@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { ReactNode, Ref } from 'react';
 import type { RecipeVariants } from '@vanilla-extract/recipes';
 import type { BaseComponentProps } from '@touchstone/atoms';
+import { NavLayoutProvider } from '@touchstone/molecules';
 import * as styles from './Sidebar.css.js';
 
 type SidebarVariants = NonNullable<RecipeVariants<typeof styles.sidebar>>;
@@ -17,6 +18,11 @@ type SidebarVariants = NonNullable<RecipeVariants<typeof styles.sidebar>>;
  * `width` chooses a preset column width; the body always scrolls when its
  * content exceeds the available space, leaving the header and footer
  * pinned. Set `divider={false}` to remove the trailing border.
+ *
+ * `collapsed` swaps the column to a narrow icon-only rail. Descendant
+ * `NavItem` and `NavSection` components read this through `NavLayoutProvider`
+ * and switch to compact form (icon-only, label preserved as accessible
+ * name). Toggle from a hotkey with `useHotkey('mod+b', …)`.
  */
 export interface SidebarProps extends BaseComponentProps, SidebarVariants {
   /** Top slot — typically brand or section label. */
@@ -37,23 +43,32 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
     width,
     divider,
     height,
+    collapsed,
     id,
     'data-testid': dataTestId,
     'aria-label': ariaLabel,
   },
   ref,
 ) {
+  const isCollapsed = collapsed === true;
+  const headerClass = isCollapsed ? `${styles.header} ${styles.headerCompact}` : styles.header;
+  const bodyClass = isCollapsed ? `${styles.body} ${styles.bodyCompact}` : styles.body;
+  const footerClass = isCollapsed ? `${styles.footer} ${styles.footerCompact}` : styles.footer;
+
   return (
-    <nav
-      ref={ref as Ref<HTMLElement>}
-      id={id}
-      data-testid={dataTestId}
-      aria-label={ariaLabel ?? 'primary'}
-      className={styles.sidebar({ width, divider, height })}
-    >
-      {headerSlot ? <div className={styles.header}>{headerSlot}</div> : null}
-      <div className={styles.body}>{children}</div>
-      {footerSlot ? <div className={styles.footer}>{footerSlot}</div> : null}
-    </nav>
+    <NavLayoutProvider collapsed={isCollapsed}>
+      <nav
+        ref={ref as Ref<HTMLElement>}
+        id={id}
+        data-testid={dataTestId}
+        aria-label={ariaLabel ?? 'primary'}
+        className={styles.sidebar({ width, divider, height, collapsed })}
+        data-collapsed={isCollapsed || undefined}
+      >
+        {headerSlot ? <div className={headerClass}>{headerSlot}</div> : null}
+        <div className={bodyClass}>{children}</div>
+        {footerSlot ? <div className={footerClass}>{footerSlot}</div> : null}
+      </nav>
+    </NavLayoutProvider>
   );
 });

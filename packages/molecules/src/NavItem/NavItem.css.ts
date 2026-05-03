@@ -20,7 +20,6 @@ export const navItem = recipe({
     textAlign: 'left',
     textDecoration: 'none',
     cursor: 'pointer',
-    boxSizing: 'border-box',
     minWidth: 0,
     transition:
       `background-color ${vars.duration.base} ${vars.easing.standard}, ` +
@@ -109,4 +108,9 @@ export const trailingSlot = style({
   alignItems: 'center',
   flexShrink: 0,
   marginInlineStart: vars.space[2],
+});
+
+export const compact = style({
+  justifyContent: 'center',
+  paddingInline: vars.space[1],
 });
