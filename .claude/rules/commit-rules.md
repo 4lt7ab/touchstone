@@ -4,7 +4,7 @@
 
 ## Voice
 
-Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable; blank line; a `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer.
+Lowercase poetic title in workshop / craft allegory; blank line; a 3–4 line verse, indented two spaces, describing the change as a parable. End there.
 
 Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer, forge, shelf, vessel, scroll, chamber, dye, stone. Speak to the substance of the staged diff, not the file list. Mention version bumps only when they are the principal change.
 
@@ -15,6 +15,7 @@ Vocabulary lives around bench, anvil, ledger, mould, recipe, apprentice, hammer,
 - No `--amend`, `--no-verify`, `--no-gpg-sign`, no tag creation, no `-i` flags.
 - Never push as part of a commit.
 - Never include secrets, build artifacts, editor / OS junk, or harness state under `.claude/` (other than the checked-in `agents/`, `commands/`, `rules/`, `skills/`, and `settings.json`).
+- No `Co-Authored-By:` trailers, no generated-with footers, no tool attribution of any kind. The log carries the user's voice.
 
 ## Pre-commit hooks
 
