@@ -59,7 +59,7 @@ describe('Disclosure', () => {
     expect(screen.getByTestId('parent-state').textContent).toBe('true');
   });
 
-  it('peek=N: closed shows partial preview (no hidden, line-clamp set)', () => {
+  it('peek=N: closed shows partial preview (no hidden, max-height set in lh units)', () => {
     render(
       <Disclosure>
         <Disclosure.Trigger>label</Disclosure.Trigger>
@@ -69,9 +69,7 @@ describe('Disclosure', () => {
     const region = screen.getByText('peekable body');
     expect(region).not.toHaveAttribute('hidden');
     expect(region).toHaveAttribute('data-peek', '3');
-    expect(region.style.getPropertyValue('-webkit-line-clamp') || region.style.WebkitLineClamp).toBe(
-      '3',
-    );
+    expect(region.style.maxHeight).toBe('3lh');
   });
 
   it('peek=N: open removes the peek attribute', async () => {

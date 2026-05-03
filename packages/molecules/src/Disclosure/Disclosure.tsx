@@ -93,6 +93,12 @@ export interface DisclosureContentProps extends Omit<BaseComponentProps, 'id'> {
    * full content. Use for long-form previews (release notes, project
    * context, post bodies) where a binary closed / open is too coarse.
    * Omit (the default) for the standard hidden-when-closed behavior.
+   *
+   * Sized via `max-height: ${peek}lh` (line-height units) so the clamp
+   * survives any block formatting context inside the content. Tall block
+   * children (headings, etc.) consume more than one `lh`, so with mixed
+   * markdown the visible cut is approximate — the fade mask still resolves
+   * cleanly at the boundary.
    */
   peek?: number;
 }
@@ -103,7 +109,7 @@ const DisclosureContent = forwardRef<HTMLDivElement, DisclosureContentProps>(
     const peeking = peek !== undefined && peek > 0 && !ctx.open;
     const className = peeking ? `${styles.content} ${styles.peek}` : styles.content;
     const peekStyle = peeking
-      ? ({ WebkitLineClamp: peek, lineClamp: peek } as React.CSSProperties)
+      ? ({ maxHeight: `${peek}lh` } as React.CSSProperties)
       : undefined;
     return (
       <div

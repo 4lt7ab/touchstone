@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button } from '@touchstone/atoms';
+import { Button, Dropdown } from '@touchstone/atoms';
 import { Dialog } from './Dialog.js';
 
 describe('Dialog', () => {
@@ -169,6 +169,40 @@ describe('Dialog', () => {
     const desc = document.getElementById(describedBy ?? '');
     expect(desc).not.toBeNull();
     expect(desc?.contains(screen.getByTestId('byline'))).toBe(true);
+  });
+
+  it('selecting a Dropdown option inside a Dialog does not dismiss the Dialog', async () => {
+    function Host(): React.JSX.Element {
+      const [open, setOpen] = useState(true);
+      const [value, setValue] = useState<string>('one');
+      return (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog.Trigger>
+            <Button>open</Button>
+          </Dialog.Trigger>
+          <Dialog.Content title="pick a stamp">
+            <Dropdown
+              aria-label="stamp"
+              value={value}
+              onChange={setValue}
+              options={[
+                { value: 'one', label: 'one' },
+                { value: 'two', label: 'two' },
+              ]}
+            />
+          </Dialog.Content>
+        </Dialog>
+      );
+    }
+    render(<Host />);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'stamp' }));
+    const option = await screen.findByRole('option', { name: 'two' });
+    await userEvent.click(option);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'stamp' })).toHaveTextContent('two');
   });
 
   it('throws when subcomponents are used outside Dialog', () => {

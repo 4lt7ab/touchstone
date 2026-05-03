@@ -9,7 +9,6 @@ export const root = style({
   border: `1px solid ${vars.color.border}`,
   borderRadius: vars.radius.full,
   padding: vars.space[1],
-  boxSizing: 'border-box',
 });
 
 export const segment = recipe({

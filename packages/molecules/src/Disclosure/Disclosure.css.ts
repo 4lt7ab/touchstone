@@ -77,8 +77,6 @@ export const content = style({
 export const peek = style({
   position: 'relative',
   overflow: 'hidden',
-  display: '-webkit-box',
-  WebkitBoxOrient: 'vertical',
   WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
   maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
 });

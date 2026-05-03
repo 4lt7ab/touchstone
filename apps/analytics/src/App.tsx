@@ -50,7 +50,10 @@ const themeOptions: ThemeOption[] = [
 
 export function App() {
   const [route, setRoute] = useState<Route>({ name: 'overview' });
-  const [themeKey, setThemeKey] = useState<string>('warm-sand');
+  const [themeKey, setThemeKey] = useState<string>(() => {
+    const requested = new URLSearchParams(window.location.search).get('theme');
+    return requested && themeOptions.some((t) => t.key === requested) ? requested : 'warm-sand';
+  });
 
   const theme = useMemo(
     () => themeOptions.find((t) => t.key === themeKey) ?? themeOptions[0]!,

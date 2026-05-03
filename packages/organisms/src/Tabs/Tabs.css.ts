@@ -34,7 +34,6 @@ export const trigger = recipe({
     lineHeight: vars.font.lineHeight.tight,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
     borderBottom: '2px solid transparent',
     marginBottom: '-1px',
     transition:

@@ -17,7 +17,6 @@ export const viewport = recipe({
     pointerEvents: 'none',
     maxWidth: '24rem',
     width: '100%',
-    boxSizing: 'border-box',
   },
   variants: {
     placement: {

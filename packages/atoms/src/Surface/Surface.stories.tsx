@@ -23,6 +23,7 @@ const meta = {
         'panel',
         'input',
         'overlay',
+        'veil',
         'disabled',
         'page',
       ],
@@ -79,6 +80,7 @@ export const AllLevels: Story = {
           'input',
           'disabled',
           'overlay',
+          'veil',
           'page',
         ] as const
       ).map((level) => (

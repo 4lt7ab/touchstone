@@ -3,7 +3,6 @@ import { vars } from '@touchstone/themes';
 
 export const container = recipe({
   base: {
-    boxSizing: 'border-box',
     width: '100%',
     marginInline: 'auto',
     minWidth: 0,

@@ -8,7 +8,6 @@ export const appBar = recipe({
     alignItems: 'center',
     gap: vars.space[4],
     paddingInline: vars.space[5],
-    boxSizing: 'border-box',
     minWidth: 0,
     width: '100%',
     background: vars.color.bgSolid,

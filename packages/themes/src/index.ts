@@ -1,3 +1,5 @@
+import './reset.css.js';
+
 export { vars } from './contract.css.js';
 export { synthwaveTheme } from './synthwave.css.js';
 export { terminalTheme } from './terminal.css.js';

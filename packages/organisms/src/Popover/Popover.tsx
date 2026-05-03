@@ -5,7 +5,7 @@ import {
   createCompoundContext,
   useAnchoredPosition,
   useDisclosure,
-  useEscapeKey,
+  useDismissableLayer,
   useFocusReturn,
   useMergedRefs,
   type AnchoredPositionAlign,
@@ -38,9 +38,9 @@ export interface PopoverProps extends BaseComponentProps {
 
 /**
  * Non-modal panel anchored to a trigger. Composes `useDisclosure` for state,
- * `useAnchoredPosition` for placement, `useEscapeKey` for dismiss, and
- * `useFocusReturn` so focus comes back to the trigger on close. Click
- * outside the panel and trigger also dismisses.
+ * `useAnchoredPosition` for placement, `useDismissableLayer` for top-of-stack
+ * outside-press / Escape dismiss, and `useFocusReturn` so focus comes back to
+ * the trigger on close.
  *
  * Use for filter pickers, settings flyouts, action menus, hover cards. For
  * a modal centered surface that locks page scroll, use `Dialog`.
@@ -151,25 +151,11 @@ function PopoverPanel({
   });
 
   useFocusReturn(true);
-  useEscapeKey(() => {
-    if (dismissible) ctx.onClose();
-  }, true);
-
-  useEffect(() => {
-    if (!dismissible) return;
-    function handler(event: MouseEvent): void {
-      const panel = panelRef.current;
-      const anchor = ctx.anchorRef.current;
-      const target = event.target as Node;
-      if (panel && panel.contains(target)) return;
-      if (anchor && anchor.contains(target)) return;
-      ctx.onClose();
-    }
-    document.addEventListener('mousedown', handler);
-    return () => {
-      document.removeEventListener('mousedown', handler);
-    };
-  }, [dismissible, ctx]);
+  useDismissableLayer(panelRef, {
+    onDismiss: ctx.onClose,
+    triggerRef: ctx.anchorRef,
+    dismissible,
+  });
 
   useEffect(() => {
     panelRef.current?.focus();

@@ -6,7 +6,6 @@ export const root = style({
   display: 'grid',
   gridTemplateColumns: 'minmax(0, 1fr)',
   gap: vars.space[6],
-  boxSizing: 'border-box',
   minWidth: 0,
 });
 

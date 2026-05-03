@@ -5,7 +5,6 @@ export const root = style({
   display: 'flex',
   flexDirection: 'column',
   gap: vars.space[5],
-  boxSizing: 'border-box',
   minWidth: 0,
 });
 

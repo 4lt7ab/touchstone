@@ -8,7 +8,6 @@ export const root = style({
   width: '100%',
   background: vars.color.bgPage,
   color: vars.color.fg,
-  boxSizing: 'border-box',
 });
 
 export const headerSlot = style({

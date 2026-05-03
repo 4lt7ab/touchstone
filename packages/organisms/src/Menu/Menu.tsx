@@ -5,7 +5,7 @@ import {
   createCompoundContext,
   useAnchoredPosition,
   useDisclosure,
-  useEscapeKey,
+  useDismissableLayer,
   useFocusReturn,
   useMergedRefs,
   useRovingFocus,
@@ -40,7 +40,7 @@ export interface MenuProps extends BaseComponentProps {
 
 /**
  * Keyboard-navigable dropdown anchored to a trigger. Composes `Popover`'s
- * primitives — `useDisclosure`, `useAnchoredPosition`, `useEscapeKey`,
+ * primitives — `useDisclosure`, `useAnchoredPosition`, `useDismissableLayer`,
  * `useFocusReturn` — and adds menu semantics: `role="menu"` on the surface,
  * `role="menuitem"` on rows, arrow-key roving focus across items, and
  * close-on-select. Use for AppBar profile menus, table row actions, and
@@ -145,22 +145,10 @@ function MenuPanel({
   });
 
   useFocusReturn(true);
-  useEscapeKey(() => ctx.onClose(), true);
-
-  useEffect(() => {
-    function handler(event: MouseEvent): void {
-      const panel = panelRef.current;
-      const anchor = ctx.anchorRef.current;
-      const target = event.target as Node;
-      if (panel && panel.contains(target)) return;
-      if (anchor && anchor.contains(target)) return;
-      ctx.onClose();
-    }
-    document.addEventListener('mousedown', handler);
-    return () => {
-      document.removeEventListener('mousedown', handler);
-    };
-  }, [ctx]);
+  useDismissableLayer(panelRef, {
+    onDismiss: ctx.onClose,
+    triggerRef: ctx.anchorRef,
+  });
 
   const childArray = Children.toArray(children);
   const itemCount = childArray.filter((c) => isValidElement(c) && isMenuItemElement(c)).length;

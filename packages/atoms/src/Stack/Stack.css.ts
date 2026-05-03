@@ -4,7 +4,6 @@ import { vars } from '@touchstone/themes';
 export const stack = recipe({
   base: {
     display: 'flex',
-    boxSizing: 'border-box',
     minWidth: 0,
   },
   variants: {

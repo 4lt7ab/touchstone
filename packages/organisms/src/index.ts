@@ -31,6 +31,13 @@ export { AppBar, type AppBarProps } from './AppBar/AppBar.js';
 export { Sidebar, type SidebarProps } from './Sidebar/Sidebar.js';
 export { AppShell, type AppShellProps } from './AppShell/AppShell.js';
 export {
+  CenteredShell,
+  type CenteredShellProps,
+  type CenteredShellBrandProps,
+  type CenteredShellCardProps,
+  type CenteredShellFooterProps,
+} from './CenteredShell/CenteredShell.js';
+export {
   Menu,
   type MenuProps,
   type MenuTriggerProps,

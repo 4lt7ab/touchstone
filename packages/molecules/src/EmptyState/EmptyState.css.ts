@@ -9,7 +9,6 @@ export const root = recipe({
     alignItems: 'center',
     textAlign: 'center',
     gap: vars.space[3],
-    boxSizing: 'border-box',
     color: vars.color.fg,
   },
   variants: {

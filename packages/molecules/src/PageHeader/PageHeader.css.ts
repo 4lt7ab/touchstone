@@ -8,7 +8,6 @@ export const pageHeader = recipe({
     flexDirection: 'column',
     gap: vars.space[2],
     paddingBlockEnd: vars.space[4],
-    boxSizing: 'border-box',
     minWidth: 0,
   },
   variants: {

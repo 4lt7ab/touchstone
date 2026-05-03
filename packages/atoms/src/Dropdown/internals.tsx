@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { useAnchoredPosition, useEscapeKey } from '@touchstone/hooks';
+import { useAnchoredPosition, useDismissableLayer } from '@touchstone/hooks';
 import * as styles from './Dropdown.css.js';
 
 export interface DropdownOption {
@@ -182,25 +182,11 @@ export function DropdownListbox({
     setMinWidth(a.getBoundingClientRect().width);
   }, [open, anchorRef, matchAnchorWidth]);
 
-  useEscapeKey(() => {
-    if (open) onClose();
-  }, open);
-
-  useEffect(() => {
-    if (!open) return;
-    function onMouseDown(e: MouseEvent): void {
-      const panel = panelRef.current;
-      const trigger = triggerRef.current;
-      const target = e.target as Node;
-      if (panel && panel.contains(target)) return;
-      if (trigger && trigger.contains(target)) return;
-      onClose();
-    }
-    document.addEventListener('mousedown', onMouseDown);
-    return () => {
-      document.removeEventListener('mousedown', onMouseDown);
-    };
-  }, [open, onClose, triggerRef]);
+  useDismissableLayer(panelRef, {
+    onDismiss: onClose,
+    triggerRef,
+    active: open,
+  });
 
   useEffect(() => {
     if (!open) return;

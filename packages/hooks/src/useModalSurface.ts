@@ -1,7 +1,6 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import type { RefObject } from 'react';
-import { useClickOutside } from './useClickOutside.js';
-import { useEscapeKey } from './useEscapeKey.js';
+import { useDismissableLayer } from './useDismissableLayer.js';
 import { useFocusReturn } from './useFocusReturn.js';
 import { useFocusTrap } from './useFocusTrap.js';
 import { useModalStackEntry } from './useModalStack.js';
@@ -34,13 +33,18 @@ export interface UseModalSurfaceReturn {
 
 /**
  * Compose the full modal-surface recipe: scroll lock, focus trap, focus
- * return on close, click-outside dismiss, Escape dismiss, initial focus,
- * and a stack registration so nested modals dismiss in order. Intended for
- * use inside a panel that is conditionally mounted while open — the hook
- * activates as soon as the calling component mounts.
+ * return on close, dismissable-layer registration (outside-press + Escape,
+ * top-of-stack only), initial focus, and a modal-only stack entry for
+ * z-index layering. Intended for use inside a panel that is conditionally
+ * mounted while open — the hook activates as soon as the calling component
+ * mounts.
  *
- * Returns live stack position so the panel can offset its z-index when
- * stacked (a Dialog opened from inside a Drawer should sit above it).
+ * Dismiss coordination flows through `useDismissableLayer`, a single stack
+ * shared with non-modal overlays (popovers, menus, dropdown listboxes), so
+ * a click on a portaled listbox inside this surface counts as inside.
+ *
+ * Returns live modal-stack position so the panel can offset its z-index
+ * when stacked (a Dialog opened from inside a Drawer should sit above it).
  */
 export function useModalSurface(
   panelRef: RefObject<HTMLElement | null>,
@@ -54,14 +58,7 @@ export function useModalSurface(
   useFocusTrap(panelRef);
   useFocusReturn(true);
 
-  const dismiss = useCallback(() => {
-    if (!dismissible) return;
-    if (!isTop) return;
-    onDismiss();
-  }, [dismissible, isTop, onDismiss]);
-
-  useClickOutside(panelRef, dismiss, true);
-  useEscapeKey(dismiss, true);
+  useDismissableLayer(panelRef, { onDismiss, dismissible });
 
   useEffect(() => {
     const target = initialFocusRef?.current ?? panelRef.current;

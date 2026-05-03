@@ -4,7 +4,6 @@ import { vars } from '@touchstone/themes';
 export const grid = recipe({
   base: {
     display: 'grid',
-    boxSizing: 'border-box',
     minWidth: 0,
   },
   variants: {

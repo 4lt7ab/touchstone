@@ -3,7 +3,6 @@ import { vars } from '@touchstone/themes';
 
 export const avatar = recipe({
   base: {
-    boxSizing: 'border-box',
     display: 'inline-grid',
     placeItems: 'center',
     flexShrink: 0,
