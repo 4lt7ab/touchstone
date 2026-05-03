@@ -57,9 +57,9 @@ export const trigger = recipe({
       badge: {
         width: 'auto',
         minHeight: 0,
-        height: vars.space[5],
-        gap: vars.space[1],
-        paddingInline: vars.space[2],
+        height: vars.space[6],
+        gap: vars.space[2],
+        paddingInline: vars.space[3],
         borderRadius: vars.radius.full,
         fontSize: vars.font.size.xs,
         fontWeight: vars.font.weight.medium,

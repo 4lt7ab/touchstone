@@ -19,6 +19,7 @@ export const coralTheme = createTheme(vars, {
     bgMuted: '#3a2820',
     bgPanel: '#1f1714',
     bgOverlay: 'rgba(0, 0, 0, 0.7)',
+    bgVeil: 'rgba(41, 31, 27, 0.70)',
     bgInput: '#241b17',
     bgDisabled: '#3a2820',
     bgPage: '#1f1714',

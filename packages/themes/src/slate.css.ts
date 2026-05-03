@@ -19,6 +19,7 @@ export const slateTheme = createTheme(vars, {
     bgMuted: '#2a2f38',
     bgPanel: '#1a1d24',
     bgOverlay: 'rgba(0, 0, 0, 0.7)',
+    bgVeil: 'rgba(34, 38, 46, 0.70)',
     bgInput: '#1e2229',
     bgDisabled: '#2a2f38',
     bgPage: '#1a1d24',

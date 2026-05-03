@@ -19,6 +19,7 @@ export const synthwaveTheme = createTheme(vars, {
     bgMuted: '#1f1838',
     bgPanel: '#0c081c',
     bgOverlay: 'rgba(12, 8, 28, 0.85)',
+    bgVeil: 'rgba(22, 16, 42, 0.65)',
     bgInput: '#0e0e24',
     bgDisabled: 'rgba(31, 24, 56, 0.7)',
     bgPage: '#06020f',

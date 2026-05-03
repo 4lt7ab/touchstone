@@ -28,6 +28,7 @@ export const vars = createThemeContract({
     bgMuted: null,
     bgPanel: null,
     bgOverlay: null,
+    bgVeil: null,
     bgInput: null,
     bgDisabled: null,
     bgPage: null,

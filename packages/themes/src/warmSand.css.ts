@@ -19,6 +19,7 @@ export const warmSandTheme = createTheme(vars, {
     bgMuted: '#2e2a27',
     bgPanel: '#1c1917',
     bgOverlay: 'rgba(0, 0, 0, 0.7)',
+    bgVeil: 'rgba(37, 34, 32, 0.70)',
     bgInput: '#201d1b',
     bgDisabled: '#2e2a27',
     bgPage: '#1c1917',

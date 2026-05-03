@@ -84,6 +84,66 @@ export const SquareIcon: Story = {
   },
 };
 
+function PlusGlyph(): React.JSX.Element {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8 3v10M3 8h10" />
+    </svg>
+  );
+}
+
+function ArrowGlyph(): React.JSX.Element {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 8h10M9 4l4 4-4 4" />
+    </svg>
+  );
+}
+
+export const WithLeadingIcon: Story = {
+  args: {
+    icon: <PlusGlyph />,
+    children: 'new project',
+  },
+};
+
+export const WithTrailingIcon: Story = {
+  args: {
+    intent: 'secondary',
+    trailing: <ArrowGlyph />,
+    children: 'continue',
+  },
+};
+
+export const WithBothSlots: Story = {
+  args: {
+    intent: 'ghost',
+    icon: <PlusGlyph />,
+    trailing: <ArrowGlyph />,
+    children: 'add and follow',
+  },
+};
+
 export const SquareDanger: Story = {
   args: {
     intent: 'danger',

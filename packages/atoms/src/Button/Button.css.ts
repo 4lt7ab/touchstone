@@ -1,5 +1,20 @@
+import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { vars } from '@touchstone/themes';
+
+export const iconSlot = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+});
+
+export const trailingSlot = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+});
 
 export const button = recipe({
   base: {

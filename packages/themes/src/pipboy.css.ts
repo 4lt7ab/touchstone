@@ -22,6 +22,7 @@ export const pipboyTheme = createTheme(vars, {
     bgMuted: '#1a2e1a',
     bgPanel: '#0a0a0a',
     bgOverlay: 'rgba(0, 0, 0, 0.92)',
+    bgVeil: 'rgba(15, 26, 15, 0.75)',
     bgInput: '#0d140d',
     bgDisabled: '#1a2e1a',
     bgPage: '#0a0a0a',

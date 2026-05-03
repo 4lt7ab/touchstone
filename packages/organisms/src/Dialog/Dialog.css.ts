@@ -94,7 +94,8 @@ export const header = recipe({
         padding: `${vars.space[6]} ${vars.space[6]} 0`,
       },
       reader: {
-        padding: `${vars.space[8]} ${vars.space[8]} 0`,
+        padding: `${vars.space[10]} ${vars.space[8]} ${vars.space[4]}`,
+        alignItems: 'center',
       },
     },
   },
@@ -103,13 +104,47 @@ export const header = recipe({
   },
 });
 
-export const title = style({
-  margin: 0,
-  fontSize: vars.font.size.lg,
-  fontWeight: vars.font.weight.semibold,
-  lineHeight: vars.font.lineHeight.tight,
-  color: vars.color.fg,
-  paddingRight: vars.space[8],
+export const headerInner = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: vars.space[2],
+    width: '100%',
+  },
+  variants: {
+    mode: {
+      default: {},
+      reader: {
+        maxWidth: '65ch',
+      },
+    },
+  },
+  defaultVariants: {
+    mode: 'default',
+  },
+});
+
+export const title = recipe({
+  base: {
+    margin: 0,
+    fontWeight: vars.font.weight.semibold,
+    lineHeight: vars.font.lineHeight.tight,
+    color: vars.color.fg,
+  },
+  variants: {
+    mode: {
+      default: {
+        fontSize: vars.font.size.lg,
+        paddingRight: vars.space[8],
+      },
+      reader: {
+        fontSize: vars.font.size.xl,
+      },
+    },
+  },
+  defaultVariants: {
+    mode: 'default',
+  },
 });
 
 export const description = style({
@@ -133,7 +168,7 @@ export const body = recipe({
         padding: `${vars.space[4]} ${vars.space[6]}`,
       },
       reader: {
-        padding: `${vars.space[6]} ${vars.space[8]}`,
+        padding: `${vars.space[6]} ${vars.space[8]} ${vars.space[10]}`,
         lineHeight: vars.font.lineHeight.relaxed,
         alignItems: 'center',
       },
@@ -155,6 +190,7 @@ export const bodyInner = recipe({
     mode: {
       default: {},
       reader: {
+        gap: vars.space[5],
         maxWidth: '65ch',
       },
     },

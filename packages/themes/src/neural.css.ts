@@ -19,6 +19,7 @@ export const neuralTheme = createTheme(vars, {
     bgMuted: '#1a1a3a',
     bgPanel: '#0a0a1a',
     bgOverlay: 'rgba(0, 0, 0, 0.90)',
+    bgVeil: 'rgba(18, 18, 42, 0.70)',
     bgInput: '#0e0e22',
     bgDisabled: '#1a1a3a',
     bgPage: '#0a0a1a',

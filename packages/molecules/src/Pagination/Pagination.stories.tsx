@@ -69,3 +69,33 @@ export const Disabled: Story = {
     disabled: true,
   },
 };
+
+export const WithPageSize: Story = {
+  render: () => {
+    const Demo = () => {
+      const [page, setPage] = useState(1);
+      const [pageSize, setPageSize] = useState(25);
+      const total = 200;
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
+      return (
+        <Stack gap={3}>
+          <Text tone="muted" size="sm">
+            page {page} of {pageCount} ({pageSize}/page, {total} total)
+          </Text>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageSizeChange={(s) => {
+              setPageSize(s);
+              setPage(1);
+            }}
+          />
+        </Stack>
+      );
+    };
+    return <Demo />;
+  },
+};

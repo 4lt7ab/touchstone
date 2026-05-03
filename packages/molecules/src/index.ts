@@ -47,4 +47,5 @@ export {
   type ProseDensity,
   type ProseWidth,
 } from './Prose/Prose.js';
-export { Markdown, type MarkdownProps } from './Markdown/Markdown.js';
+export { Markdown, type MarkdownProps, type MarkdownMode } from './Markdown/Markdown.js';
+export { markdownToPlainText } from './Markdown/markdownToPlainText.js';

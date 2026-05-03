@@ -59,6 +59,34 @@ describe('Disclosure', () => {
     expect(screen.getByTestId('parent-state').textContent).toBe('true');
   });
 
+  it('peek=N: closed shows partial preview (no hidden, line-clamp set)', () => {
+    render(
+      <Disclosure>
+        <Disclosure.Trigger>label</Disclosure.Trigger>
+        <Disclosure.Content peek={3}>peekable body</Disclosure.Content>
+      </Disclosure>,
+    );
+    const region = screen.getByText('peekable body');
+    expect(region).not.toHaveAttribute('hidden');
+    expect(region).toHaveAttribute('data-peek', '3');
+    expect(region.style.getPropertyValue('-webkit-line-clamp') || region.style.WebkitLineClamp).toBe(
+      '3',
+    );
+  });
+
+  it('peek=N: open removes the peek attribute', async () => {
+    render(
+      <Disclosure>
+        <Disclosure.Trigger>label</Disclosure.Trigger>
+        <Disclosure.Content peek={3}>peekable body</Disclosure.Content>
+      </Disclosure>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'label' }));
+    const region = screen.getByText('peekable body');
+    expect(region).not.toHaveAttribute('data-peek');
+    expect(region).not.toHaveAttribute('hidden');
+  });
+
   it('throws when subcomponents are used outside Disclosure', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Disclosure.Trigger>orphan</Disclosure.Trigger>)).toThrow(

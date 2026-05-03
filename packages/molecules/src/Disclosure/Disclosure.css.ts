@@ -73,3 +73,12 @@ export const content = style({
   fontSize: vars.font.size.md,
   lineHeight: vars.font.lineHeight.normal,
 });
+
+export const peek = style({
+  position: 'relative',
+  overflow: 'hidden',
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+  maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+});

@@ -22,6 +22,7 @@ export const terminalTheme = createTheme(vars, {
     bgMuted: '#181c18',
     bgPanel: '#101410',
     bgOverlay: 'rgba(10, 10, 10, 0.85)',
+    bgVeil: 'rgba(16, 20, 16, 0.75)',
     bgInput: '#0a0a0a',
     bgDisabled: '#181c18',
     bgPage: '#000000',

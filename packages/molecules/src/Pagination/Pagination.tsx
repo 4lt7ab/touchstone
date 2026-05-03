@@ -1,5 +1,6 @@
-import { forwardRef } from 'react';
+import { forwardRef, useId, useMemo } from 'react';
 import { useControllableState, useRovingFocus } from '@touchstone/hooks';
+import { Dropdown } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
 import * as styles from './Pagination.css.js';
 
@@ -20,6 +21,20 @@ export interface PaginationProps extends BaseComponentProps {
   size?: 'sm' | 'md';
   /** Disable every button in the control. */
   disabled?: boolean;
+  /**
+   * Page size options to expose as a "rows per page" selector. Render the
+   * selector inline before the page chips when this is non-empty. Omit (the
+   * default) to keep the bare page navigator.
+   */
+  pageSizeOptions?: ReadonlyArray<number>;
+  /** Controlled page size. Pair with `onPageSizeChange`. */
+  pageSize?: number;
+  /** Uncontrolled initial page size. Defaults to the first `pageSizeOptions` entry. */
+  defaultPageSize?: number;
+  /** Called when the user picks a different page size. */
+  onPageSizeChange?: (size: number) => void;
+  /** Visible label for the page-size selector. @default 'Rows per page' */
+  pageSizeLabel?: string;
   /** Required nav landmark label. @default 'Pagination' */
   'aria-label'?: string;
 }
@@ -83,6 +98,11 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     boundaryCount = 1,
     size = 'md',
     disabled = false,
+    pageSizeOptions,
+    pageSize,
+    defaultPageSize,
+    onPageSizeChange,
+    pageSizeLabel = 'Rows per page',
     id,
     'data-testid': dataTestId,
     'aria-label': ariaLabel = 'Pagination',
@@ -94,6 +114,24 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     defaultValue: defaultPage,
     onChange: onPageChange,
   });
+
+  const showPageSize = !!pageSizeOptions && pageSizeOptions.length > 0;
+  const pageSizeFallback =
+    defaultPageSize ?? (pageSizeOptions && pageSizeOptions[0]) ?? 0;
+  const [currentPageSize, setCurrentPageSize] = useControllableState<number>({
+    value: pageSize,
+    defaultValue: pageSizeFallback,
+    onChange: onPageSizeChange,
+  });
+  const pageSizeLabelId = useId();
+  const dropdownOptions = useMemo(
+    () =>
+      (pageSizeOptions ?? []).map((n) => ({
+        value: String(n),
+        label: String(n),
+      })),
+    [pageSizeOptions],
+  );
 
   const clamped = Math.min(Math.max(current, 1), Math.max(pageCount, 1));
   const atStart = clamped <= 1;
@@ -163,8 +201,14 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
 
   let focusIdx = 0;
 
-  return (
-    <nav ref={ref} id={id} data-testid={dataTestId} aria-label={ariaLabel} className={styles.root}>
+  const nav = (
+    <nav
+      ref={ref}
+      id={showPageSize ? undefined : id}
+      data-testid={showPageSize ? undefined : dataTestId}
+      aria-label={ariaLabel}
+      className={styles.root}
+    >
       <ul className={styles.list}>
         {items.map((it, i) => {
           if (it.type === 'ellipsis') {
@@ -199,5 +243,26 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
         })}
       </ul>
     </nav>
+  );
+
+  if (!showPageSize) return nav;
+
+  return (
+    <div id={id} data-testid={dataTestId} className={styles.layout}>
+      <div className={styles.pageSize}>
+        <span id={pageSizeLabelId} className={styles.pageSizeLabel}>
+          {pageSizeLabel}
+        </span>
+        <Dropdown
+          size={size}
+          options={dropdownOptions}
+          value={String(currentPageSize)}
+          onChange={(v) => setCurrentPageSize(Number(v))}
+          disabled={disabled}
+          aria-labelledby={pageSizeLabelId}
+        />
+      </div>
+      {nav}
+    </div>
   );
 });

@@ -28,7 +28,7 @@ export const surface = recipe({
       muted: { background: vars.color.bgMuted },
       panel: { background: vars.color.bgPanel },
       input: { background: vars.color.bgInput },
-      overlay: { background: vars.color.bgOverlay },
+      overlay: { background: vars.color.bgVeil },
       disabled: { background: vars.color.bgDisabled },
       page: { background: vars.color.bgPage },
     },

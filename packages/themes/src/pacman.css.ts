@@ -21,6 +21,7 @@ export const pacmanTheme = createTheme(vars, {
     bgMuted: '#1a1a4a',
     bgPanel: '#000000',
     bgOverlay: 'rgba(0, 0, 0, 0.90)',
+    bgVeil: 'rgba(10, 10, 42, 0.75)',
     bgInput: '#0a0a2a',
     bgDisabled: '#1a1a4a',
     bgPage: '#000000',

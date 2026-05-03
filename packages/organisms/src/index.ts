@@ -9,6 +9,7 @@ export {
   type DialogSeverity,
   type DialogFooterAlign,
 } from './Dialog/Dialog.js';
+export { ConfirmDialog, type ConfirmDialogProps } from './Dialog/ConfirmDialog.js';
 export {
   Drawer,
   type DrawerProps,

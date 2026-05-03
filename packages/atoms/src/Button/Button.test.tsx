@@ -49,4 +49,40 @@ describe('Button', () => {
     );
     expect(screen.getByRole('button', { name: 'dismiss' })).toBeInTheDocument();
   });
+
+  it('renders a leading icon slot, decorated and aria-hidden', () => {
+    render(
+      <Button icon={<span data-testid="leading">+</span>}>New project</Button>,
+    );
+    const btn = screen.getByRole('button', { name: 'New project' });
+    const slot = screen.getByTestId('leading').parentElement;
+    expect(btn.contains(slot)).toBe(true);
+    expect(slot).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders a trailing slot, decorated and aria-hidden', () => {
+    render(
+      <Button trailing={<span data-testid="kbd">⌘K</span>}>Search</Button>,
+    );
+    const btn = screen.getByRole('button', { name: 'Search' });
+    const slot = screen.getByTestId('kbd').parentElement;
+    expect(btn.contains(slot)).toBe(true);
+    expect(slot).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('splices icon and trailing into the cloned child when asChild is true', () => {
+    render(
+      <Button
+        asChild
+        icon={<span data-testid="leading">+</span>}
+        trailing={<span data-testid="trail">→</span>}
+      >
+        <a href="/new">create</a>
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: /create/ });
+    expect(link.contains(screen.getByTestId('leading'))).toBe(true);
+    expect(link.contains(screen.getByTestId('trail'))).toBe(true);
+    expect(link).toHaveTextContent('create');
+  });
 });

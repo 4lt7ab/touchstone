@@ -7,6 +7,9 @@ import type { BaseComponentProps } from '@touchstone/atoms';
 import { Prose } from '../Prose/Prose.js';
 import type { ProseDensity, ProseWidth } from '../Prose/Prose.js';
 import { Table } from '../Table/Table.js';
+import { markdownToPlainText } from './markdownToPlainText.js';
+
+export type MarkdownMode = 'rich' | 'text';
 
 type ReactMarkdownProps = ComponentProps<typeof ReactMarkdown>;
 
@@ -78,6 +81,14 @@ export interface MarkdownProps extends BaseComponentProps {
    * @default false
    */
   unstyled?: boolean;
+  /**
+   * `'rich'` is the full markdown render. `'text'` strips the markup and
+   * emits the inner text content as a single `<span>` — for line-clamped
+   * previews in tables, breadcrumbs, snippet excerpts. The same stripping is
+   * exposed as `markdownToPlainText` for callers that need the string only.
+   * @default 'rich'
+   */
+  mode?: MarkdownMode;
 }
 
 /**
@@ -99,6 +110,7 @@ export function Markdown({
   density,
   width,
   unstyled = false,
+  mode = 'rich',
   id,
   'data-testid': dataTestId,
 }: MarkdownProps): React.JSX.Element {
@@ -106,6 +118,14 @@ export function Markdown({
     if (!components) return defaultComponents;
     return { ...defaultComponents, ...components };
   }, [components]);
+
+  if (mode === 'text') {
+    return (
+      <span id={id} data-testid={dataTestId}>
+        {markdownToPlainText(children)}
+      </span>
+    );
+  }
 
   const tree = (
     <ReactMarkdown

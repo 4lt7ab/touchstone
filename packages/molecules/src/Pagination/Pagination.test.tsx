@@ -77,4 +77,40 @@ describe('Pagination', () => {
       expect(button).toBeDisabled();
     }
   });
+
+  it('renders a page-size selector when pageSizeOptions is provided', () => {
+    render(
+      <Pagination
+        pageCount={5}
+        defaultPage={1}
+        pageSizeOptions={[10, 25, 50]}
+        defaultPageSize={25}
+      />,
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveTextContent('25');
+    expect(screen.getByText('Rows per page')).toBeInTheDocument();
+  });
+
+  it('fires onPageSizeChange with a number when the user picks a different size', async () => {
+    const onPageSizeChange = vi.fn();
+    render(
+      <Pagination
+        pageCount={5}
+        defaultPage={1}
+        pageSizeOptions={[10, 25, 50]}
+        defaultPageSize={10}
+        onPageSizeChange={onPageSizeChange}
+      />,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    await userEvent.click(screen.getByRole('option', { name: '50' }));
+    expect(onPageSizeChange).toHaveBeenLastCalledWith(50);
+  });
+
+  it('omitting pageSizeOptions keeps the bare nav landmark layout', () => {
+    render(<Pagination pageCount={5} aria-label="Pages" />);
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.queryByText('Rows per page')).not.toBeInTheDocument();
+  });
 });

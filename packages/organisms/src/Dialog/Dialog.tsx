@@ -110,7 +110,7 @@ export interface DialogContentProps extends BaseComponentProps {
    */
   description?: ReactNode;
   /**
-   * Visual size of the panel. Defaults to `'md'`, or `'lg'` when
+   * Visual size of the panel. Defaults to `'md'`, or `'xl'` when
    * `mode="reader"`.
    */
   size?: DialogSize;
@@ -188,7 +188,7 @@ function DialogPanel({
 
   const { body, footer } = partitionFooter(children);
   const role = severity === 'danger' ? 'alertdialog' : 'dialog';
-  const resolvedSize = size ?? (mode === 'reader' ? 'lg' : 'md');
+  const resolvedSize = size ?? (mode === 'reader' ? 'xl' : 'md');
 
   return createPortal(
     <div className={styles.backdrop}>
@@ -204,14 +204,16 @@ function DialogPanel({
         className={styles.panel({ size: resolvedSize, severity })}
       >
         <div className={styles.header({ mode })}>
-          <h2 id={ctx.titleId} className={styles.title}>
-            {title}
-          </h2>
-          {description ? (
-            <div id={ctx.descriptionId} className={styles.description}>
-              {description}
-            </div>
-          ) : null}
+          <div className={styles.headerInner({ mode })}>
+            <h2 id={ctx.titleId} className={styles.title({ mode })}>
+              {title}
+            </h2>
+            {description ? (
+              <div id={ctx.descriptionId} className={styles.description}>
+                {description}
+              </div>
+            ) : null}
+          </div>
         </div>
         {body.length > 0 ? (
           <div className={styles.body({ mode })}>

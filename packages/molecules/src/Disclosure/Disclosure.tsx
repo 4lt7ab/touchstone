@@ -87,19 +87,34 @@ const DisclosureTrigger = forwardRef<HTMLButtonElement, DisclosureTriggerProps>(
 export interface DisclosureContentProps extends Omit<BaseComponentProps, 'id'> {
   /** Region content. */
   children: ReactNode;
+  /**
+   * When set, the content is partially visible while collapsed — the first
+   * `peek` lines render with a fade mask, and the trigger expands to the
+   * full content. Use for long-form previews (release notes, project
+   * context, post bodies) where a binary closed / open is too coarse.
+   * Omit (the default) for the standard hidden-when-closed behavior.
+   */
+  peek?: number;
 }
 
 const DisclosureContent = forwardRef<HTMLDivElement, DisclosureContentProps>(
-  function DisclosureContent({ children, 'data-testid': dataTestId }, ref) {
+  function DisclosureContent({ children, peek, 'data-testid': dataTestId }, ref) {
     const ctx = useDisclosureScope('Disclosure.Content');
+    const peeking = peek !== undefined && peek > 0 && !ctx.open;
+    const className = peeking ? `${styles.content} ${styles.peek}` : styles.content;
+    const peekStyle = peeking
+      ? ({ WebkitLineClamp: peek, lineClamp: peek } as React.CSSProperties)
+      : undefined;
     return (
       <div
         ref={ref}
         data-testid={dataTestId}
         id={ctx.contentProps.id}
         role={ctx.contentProps.role}
-        hidden={ctx.contentProps.hidden}
-        className={styles.content}
+        hidden={peeking ? undefined : ctx.contentProps.hidden}
+        data-peek={peeking ? String(peek) : undefined}
+        className={className}
+        style={peekStyle}
       >
         {children}
       </div>

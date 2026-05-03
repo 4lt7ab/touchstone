@@ -6,6 +6,26 @@ export const root = style({
   display: 'inline-block',
 });
 
+export const layout = style({
+  display: 'inline-flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: vars.space[4],
+});
+
+export const pageSize = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: vars.space[2],
+  fontFamily: vars.font.family.sans,
+  fontSize: vars.font.size.sm,
+  color: vars.color.fgMuted,
+});
+
+export const pageSizeLabel = style({
+  whiteSpace: 'nowrap',
+});
+
 export const list = style({
   display: 'inline-flex',
   flexWrap: 'wrap',

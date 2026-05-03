@@ -19,6 +19,7 @@ export const blackholeTheme = createTheme(vars, {
     bgMuted: '#1e1a2e',
     bgPanel: '#08070d',
     bgOverlay: 'rgba(0, 0, 0, 0.92)',
+    bgVeil: 'rgba(17, 15, 26, 0.70)',
     bgInput: '#0c0a14',
     bgDisabled: '#1e1a2e',
     bgPage: '#050508',

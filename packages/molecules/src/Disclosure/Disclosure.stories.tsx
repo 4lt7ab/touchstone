@@ -39,6 +39,24 @@ export const Open: Story = {
   ),
 };
 
+const longBody = [
+  'every drawer has a name in the ledger; switch the cabinet to see how the same name fetches a different fire.',
+  'still themes sleep; rhythmic themes breathe. one recipe, four heartbeats. the bench remembers the rim and the rim remembers the bench.',
+  'tokens → themes → atoms → molecules → organisms. nothing leans upward.',
+  'the apprentice draws a chip and the chip remembers the drawer. the journeyman draws a vat and the vat remembers the dye. the master draws a chamber and the chamber remembers the seal.',
+].join(' ');
+
+export const Peek: Story = {
+  render: () => (
+    <Surface level="raised" radius="md" padding="sm" style={{ width: '32rem' }}>
+      <Disclosure>
+        <Disclosure.Trigger>the long scroll</Disclosure.Trigger>
+        <Disclosure.Content peek={2}>{longBody}</Disclosure.Content>
+      </Disclosure>
+    </Surface>
+  ),
+};
+
 export const Stack: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (

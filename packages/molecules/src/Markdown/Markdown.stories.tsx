@@ -116,3 +116,30 @@ export const Compact: Story = {
   },
   render: () => <Markdown density="compact">{longRead}</Markdown>,
 };
+
+export const TextMode: Story = {
+  name: 'mode=text (line-clamped preview)',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`mode="text"` strips the markup and emits the inner text content as a single ' +
+          '`<span>` — for line-clamped previews in tables, breadcrumbs, snippet excerpts. ' +
+          'The same stripping is exposed as `markdownToPlainText`.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      style={{
+        width: '32rem',
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+      }}
+    >
+      <Markdown mode="text">{longRead}</Markdown>
+    </div>
+  ),
+};

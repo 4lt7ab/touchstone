@@ -19,6 +19,7 @@ export const mossTheme = createTheme(vars, {
     bgMuted: '#243024',
     bgPanel: '#141a14',
     bgOverlay: 'rgba(0, 0, 0, 0.7)',
+    bgVeil: 'rgba(28, 35, 28, 0.70)',
     bgInput: '#181f18',
     bgDisabled: '#243024',
     bgPage: '#141a14',

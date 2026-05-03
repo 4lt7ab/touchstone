@@ -52,6 +52,20 @@ describe('Markdown', () => {
     expect(screen.getByText('bold').tagName).toBe('STRONG');
   });
 
+  it('mode="text" emits the stripped text content as a single span', () => {
+    render(
+      <Markdown mode="text" data-testid="md">
+        {`# title\n\nthe **anvil** rings`}
+      </Markdown>,
+    );
+    const span = screen.getByTestId('md');
+    expect(span.tagName).toBe('SPAN');
+    expect(span.textContent).toContain('title');
+    expect(span.textContent).toContain('anvil rings');
+    expect(span.querySelector('h1')).toBeNull();
+    expect(span.querySelector('strong')).toBeNull();
+  });
+
   it('unstyled=true skips the Prose wrapper', () => {
     render(
       <Markdown unstyled data-testid="md">
