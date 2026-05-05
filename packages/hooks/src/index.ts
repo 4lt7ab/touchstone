@@ -49,6 +49,11 @@ export {
   type UseAnchoredPositionReturn,
 } from './useAnchoredPosition.js';
 export {
+  useHoverIntent,
+  type UseHoverIntentOptions,
+  type UseHoverIntentReturn,
+} from './useHoverIntent.js';
+export {
   useTableSelection,
   type UseTableSelectionOptions,
   type UseTableSelectionReturn,

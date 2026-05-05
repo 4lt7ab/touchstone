@@ -55,3 +55,10 @@ export {
 } from './Prose/Prose.js';
 export { Markdown, type MarkdownProps, type MarkdownMode } from './Markdown/Markdown.js';
 export { markdownToPlainText } from './Markdown/markdownToPlainText.js';
+export {
+  Tooltip,
+  TooltipContent,
+  type TooltipProps,
+  type TooltipContentProps,
+} from './Tooltip/Tooltip.js';
+export { CommandItem, type CommandItemProps } from './CommandItem/CommandItem.js';

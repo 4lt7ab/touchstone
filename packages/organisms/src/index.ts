@@ -76,3 +76,8 @@ export {
   type DataTablePagePaginationProps,
   type DataTablePageEmptyProps,
 } from './DataTablePage/DataTablePage.js';
+export {
+  CommandPalette,
+  type CommandPaletteProps,
+  type CommandPaletteCommand,
+} from './CommandPalette/CommandPalette.js';

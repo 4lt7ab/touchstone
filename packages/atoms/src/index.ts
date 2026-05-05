@@ -15,6 +15,7 @@ export { Divider, type DividerProps } from './Divider/Divider.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Skeleton, type SkeletonProps } from './Skeleton/Skeleton.js';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar.js';
+export { Slider, type SliderProps } from './Slider/Slider.js';
 export {
   Background,
   type BackgroundProps,
