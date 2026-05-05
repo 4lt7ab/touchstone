@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NavItem, NavSection } from '@touchstone/molecules';
 import { AppShell } from './AppShell.js';
 import { Sidebar } from '../Sidebar/Sidebar.js';
@@ -182,6 +183,238 @@ describe('AppShell', () => {
       );
       fireEvent.keyDown(document, { key: 'b', ...modKey() });
       expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('mobile menu (responsive)', () => {
+    let originalMatchMedia: typeof window.matchMedia | undefined;
+    let mockListener: ((e: MediaQueryListEvent) => void) | null = null;
+    let currentMatches = false;
+
+    function installMatchMedia(initialMobile: boolean): void {
+      currentMatches = initialMobile;
+      window.matchMedia = ((_query: string) => ({
+        get matches() {
+          return currentMatches;
+        },
+        media: '',
+        addEventListener: (_event: string, cb: (e: MediaQueryListEvent) => void) => {
+          mockListener = cb;
+        },
+        removeEventListener: () => {
+          mockListener = null;
+        },
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => true,
+        onchange: null,
+      })) as unknown as typeof window.matchMedia;
+    }
+
+    function setMobile(matches: boolean): void {
+      currentMatches = matches;
+      mockListener?.({ matches } as MediaQueryListEvent);
+    }
+
+    beforeEach(() => {
+      originalMatchMedia = window.matchMedia;
+    });
+
+    afterEach(() => {
+      mockListener = null;
+      if (originalMatchMedia !== undefined) {
+        window.matchMedia = originalMatchMedia;
+      }
+    });
+
+    it('renders the hamburger trigger only when a sidebar is mounted', () => {
+      installMatchMedia(true);
+      const { rerender } = render(
+        <AppShell>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('button', { name: 'Open menu' })).not.toBeInTheDocument();
+
+      rerender(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument();
+    });
+
+    it('toggling the hamburger opens the overlay; toggling again closes it', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Open menu' });
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await userEvent.click(trigger);
+
+      // Trigger label flips and the sidebar gets the data-mobile-open attribute
+      expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+      const nav = screen.getByRole('navigation', { name: 'primary' });
+      expect(nav.parentElement).toHaveAttribute('data-mobile-open', 'true');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Close menu' }));
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+      expect(nav.parentElement).not.toHaveAttribute('data-mobile-open');
+    });
+
+    it('clicking the backdrop closes the overlay', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      const backdrop = screen.getByRole('button', { name: 'Dismiss menu' });
+      await userEvent.click(backdrop);
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    });
+
+    it('Escape closes the mobile overlay when open', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    });
+
+    it('forces collapsed=false on the sidebar while mobile (overlay shows full labels)', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell
+          defaultSidebarCollapsed
+          sidebar={
+            <Sidebar aria-label="primary">
+              <NavSection label="bench">
+                <NavItem icon={<svg />}>orders</NavItem>
+              </NavSection>
+            </Sidebar>
+          }
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      // At mobile, "collapsed" doesn't apply — the section label is visible.
+      expect(screen.getByText('bench')).toBeInTheDocument();
+      expect(screen.getByRole('navigation', { name: 'primary' })).not.toHaveAttribute(
+        'data-collapsed',
+      );
+    });
+
+    it('auto-closes the overlay when the viewport resizes back to desktop', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+
+      // Resize back to desktop — the matchMedia listener fires false.
+      act(() => {
+        setMobile(false);
+      });
+      // The trigger is hidden via CSS, but we can verify the state went back.
+      // The button still renders (CSS hides it); aria-expanded reverts to false.
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    });
+
+    it('honors a controlled mobileMenuOpen / onMobileMenuOpenChange pair', async () => {
+      installMatchMedia(true);
+      const onChange = vi.fn();
+      const { rerender } = render(
+        <AppShell
+          mobileMenuOpen={false}
+          onMobileMenuOpenChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      expect(onChange).toHaveBeenCalledWith(true);
+      // Controlled — value doesn't change until parent rerenders
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+
+      rerender(
+        <AppShell
+          mobileMenuOpen
+          onMobileMenuOpenChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+    });
+
+    it('places the trigger inside the header row when a header is present', () => {
+      installMatchMedia(true);
+      render(
+        <AppShell
+          header={<header data-testid="bar">bar</header>}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Open menu' });
+      const header = screen.getByTestId('bar');
+      // Both inside the same .headerRow wrapper
+      expect(trigger.parentElement).toBe(header.parentElement?.parentElement);
+    });
+
+    it('respects custom openMenuLabel / closeMenuLabel', async () => {
+      installMatchMedia(true);
+      render(
+        <AppShell
+          openMenuLabel="Show ledger"
+          closeMenuLabel="Hide ledger"
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Show ledger' });
+      await userEvent.click(trigger);
+      expect(screen.getByRole('button', { name: 'Hide ledger' })).toBeInTheDocument();
     });
   });
 

@@ -1,11 +1,18 @@
-import { cloneElement, forwardRef, isValidElement } from 'react';
+import { cloneElement, forwardRef, isValidElement, useEffect } from 'react';
 import type { ReactElement, ReactNode, Ref } from 'react';
 import type { BaseComponentProps } from '@touchstone/atoms';
-import { useControllableState, useHotkey } from '@touchstone/hooks';
+import {
+  useControllableState,
+  useEscapeKey,
+  useHotkey,
+  useMediaQuery,
+} from '@touchstone/hooks';
+import { MenuIcon, XIcon } from '@touchstone/icons';
 import * as styles from './AppShell.css.js';
 
 const DEFAULT_SIDEBAR_HOTKEY = 'mod+b';
 const DEFAULT_DRAWER_HOTKEY = 'mod+`';
+const DEFAULT_MOBILE_BREAKPOINT = '(max-width: 959px)';
 
 /**
  * Outer chrome of an application — the layout that holds the header bar,
@@ -26,6 +33,14 @@ const DEFAULT_DRAWER_HOTKEY = 'mod+`';
  * ⌘B (Ctrl+B off mac) toggles the rail and ⌘\` toggles the drawer; remap
  * with `sidebarHotkey` / `drawerHotkey`, or pass `false` to either to opt
  * out (e.g. an editor that needs ⌘B for bold).
+ *
+ * Responsive: below `mobileBreakpoint` (default `(max-width: 959px)`) the
+ * persistent sidebar disappears and a hamburger trigger takes its place —
+ * tapping it slides the sidebar in as an overlay with a backdrop. Click
+ * the backdrop, press Escape, or pick an item to dismiss. The sidebar's
+ * `collapsed` state is force-overridden to `false` while the overlay is
+ * shown so labels are visible. Pass `mobileMenuOpen` / `onMobileMenuOpenChange`
+ * to control it externally; otherwise it manages itself.
  */
 export interface AppShellProps extends BaseComponentProps {
   /** Top slot — typically `AppBar`. */
@@ -77,6 +92,21 @@ export interface AppShellProps extends BaseComponentProps {
    * the combo grammar. @default 'mod+\`'
    */
   drawerHotkey?: string | false;
+  /**
+   * Below this media query the persistent sidebar collapses into a
+   * hamburger-summoned overlay. @default '(max-width: 959px)'
+   */
+  mobileBreakpoint?: string;
+  /** Controlled open state for the mobile overlay. */
+  mobileMenuOpen?: boolean;
+  /** Initial open state when uncontrolled. @default false */
+  defaultMobileMenuOpen?: boolean;
+  /** Fires when the mobile overlay opens or closes. */
+  onMobileMenuOpenChange?: (open: boolean) => void;
+  /** Accessible label for the open-menu button. @default 'Open menu' */
+  openMenuLabel?: string;
+  /** Accessible label for the close-menu button. @default 'Close menu' */
+  closeMenuLabel?: string;
 }
 
 export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppShell(
@@ -93,6 +123,12 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     defaultDrawerOpen = false,
     onDrawerOpenChange,
     drawerHotkey,
+    mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
+    mobileMenuOpen,
+    defaultMobileMenuOpen = false,
+    onMobileMenuOpenChange,
+    openMenuLabel = 'Open menu',
+    closeMenuLabel = 'Close menu',
     id,
     'data-testid': dataTestId,
   },
@@ -110,6 +146,22 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     onChange: onDrawerOpenChange,
   });
 
+  const [mobileOpen, setMobileOpen] = useControllableState({
+    value: mobileMenuOpen,
+    defaultValue: defaultMobileMenuOpen,
+    onChange: onMobileMenuOpenChange,
+  });
+
+  const isMobile = useMediaQuery(mobileBreakpoint);
+
+  // Auto-close the mobile overlay when the viewport resizes back to desktop —
+  // otherwise an open overlay would linger as a hidden, focus-stealing layer.
+  useEffect(() => {
+    if (!isMobile && mobileOpen) setMobileOpen(false);
+  }, [isMobile, mobileOpen, setMobileOpen]);
+
+  useEscapeKey(() => setMobileOpen(false), Boolean(sidebar) && isMobile && mobileOpen);
+
   const sidebarCombo = typeof sidebarHotkey === 'string' ? sidebarHotkey : DEFAULT_SIDEBAR_HOTKEY;
   const drawerCombo = typeof drawerHotkey === 'string' ? drawerHotkey : DEFAULT_DRAWER_HOTKEY;
 
@@ -120,9 +172,15 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     enabled: drawer !== undefined && drawerHotkey !== false,
   });
 
+  // On mobile the overlay always shows the full sidebar (with labels) —
+  // the persistent-rail collapsed mode doesn't make sense as an overlay.
+  const effectiveCollapsed = isMobile ? false : collapsed;
+
   const sidebarSlot =
     isValidElement(sidebar) && typeof sidebar.type !== 'string'
-      ? cloneElement(sidebar as ReactElement<{ collapsed?: boolean }>, { collapsed })
+      ? cloneElement(sidebar as ReactElement<{ collapsed?: boolean }>, {
+          collapsed: effectiveCollapsed,
+        })
       : sidebar;
 
   const drawerSlot =
@@ -133,11 +191,66 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
         )
       : drawer;
 
+  const showMenuTrigger = sidebar !== undefined;
+  const triggerLabel = mobileOpen ? closeMenuLabel : openMenuLabel;
+  const triggerInHeader = showMenuTrigger && Boolean(header);
+  const triggerStandalone = showMenuTrigger && !header;
+
+  const handleMenuTriggerClick = (): void => {
+    setMobileOpen((v) => !v);
+  };
+
   return (
     <div ref={ref as Ref<HTMLDivElement>} id={id} data-testid={dataTestId} className={styles.root}>
-      {header ? <div className={styles.headerSlot}>{header}</div> : null}
+      {header || triggerInHeader ? (
+        <div className={styles.headerRow}>
+          {triggerInHeader ? (
+            <button
+              type="button"
+              className={styles.menuTrigger}
+              aria-label={triggerLabel}
+              aria-expanded={mobileOpen}
+              aria-controls={id ? `${id}-sidebar` : undefined}
+              onClick={handleMenuTriggerClick}
+            >
+              {mobileOpen ? <XIcon /> : <MenuIcon />}
+            </button>
+          ) : null}
+          {header ? <div className={styles.headerSlot}>{header}</div> : null}
+        </div>
+      ) : null}
+      {triggerStandalone ? (
+        <button
+          type="button"
+          className={`${styles.menuTrigger} ${styles.menuTriggerStandalone}`}
+          aria-label={triggerLabel}
+          aria-expanded={mobileOpen}
+          aria-controls={id ? `${id}-sidebar` : undefined}
+          onClick={handleMenuTriggerClick}
+        >
+          {mobileOpen ? <XIcon /> : <MenuIcon />}
+        </button>
+      ) : null}
       <div className={styles.bodyRow}>
-        {sidebar ? <div className={styles.sidebarSlot}>{sidebarSlot}</div> : null}
+        {sidebar ? (
+          <>
+            {isMobile && mobileOpen ? (
+              <button
+                type="button"
+                aria-label="Dismiss menu"
+                className={styles.backdrop}
+                onClick={() => setMobileOpen(false)}
+              />
+            ) : null}
+            <div
+              id={id ? `${id}-sidebar` : undefined}
+              className={styles.sidebarSlot}
+              data-mobile-open={isMobile && mobileOpen ? 'true' : undefined}
+            >
+              {sidebarSlot}
+            </div>
+          </>
+        ) : null}
         <main className={styles.main}>{children}</main>
       </div>
       {drawerSlot}

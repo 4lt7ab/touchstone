@@ -53,6 +53,7 @@ export {
   type UseHoverIntentOptions,
   type UseHoverIntentReturn,
 } from './useHoverIntent.js';
+export { useMediaQuery } from './useMediaQuery.js';
 export {
   useTableSelection,
   type UseTableSelectionOptions,
