@@ -1,7 +1,62 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Stack } from '@touchstone/atoms';
-import { GearIcon, InboxIcon, SearchIcon } from '@touchstone/icons';
 import { Tooltip } from './Tooltip.js';
+
+function GearGlyph(): React.JSX.Element {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="8" cy="8" r="2.5" />
+      <path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8L3.4 3.4" />
+    </svg>
+  );
+}
+
+function SearchGlyph(): React.JSX.Element {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="7" cy="7" r="4" />
+      <path d="m13.5 13.5-3-3" />
+    </svg>
+  );
+}
+
+function InboxGlyph(): React.JSX.Element {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2 8.5h3l1 2h4l1-2h3M2 8.5l1.5-5h9L14 8.5M2 8.5v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4" />
+    </svg>
+  );
+}
 
 const meta = {
   title: 'Molecules/Tooltip',
@@ -26,17 +81,17 @@ export const IconOnly: Story = {
     <Stack direction="row" gap="sm">
       <Tooltip content="settings">
         <Button intent="ghost" shape="square" aria-label="settings">
-          <GearIcon />
+          <GearGlyph />
         </Button>
       </Tooltip>
       <Tooltip content="search">
         <Button intent="ghost" shape="square" aria-label="search">
-          <SearchIcon />
+          <SearchGlyph />
         </Button>
       </Tooltip>
       <Tooltip content="inbox (3 unread)">
         <Button intent="ghost" shape="square" aria-label="inbox">
-          <InboxIcon />
+          <InboxGlyph />
         </Button>
       </Tooltip>
     </Stack>
