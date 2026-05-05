@@ -55,12 +55,11 @@ export const menuTrigger = style({
     // While the overlay is open, lift the trigger above the sidebar so the
     // user can still tap it to close. Without this, the slid-in sidebar
     // (zIndex.modal) intercepts the click and the menu can only be closed
-    // via Escape or the backdrop. Literal value rather than vars.zIndex.popover
-    // because the same var hash differs between packages in some build paths.
+    // via Escape or the backdrop.
     '&[aria-expanded="true"]': {
       '@media': {
         [MOBILE_BREAKPOINT]: {
-          zIndex: 1500,
+          zIndex: vars.zIndex.popover,
         },
       },
     },
