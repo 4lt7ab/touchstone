@@ -6,6 +6,11 @@ export { Slot, type SlotProps } from './Slot/Slot.js';
 export { Text, type TextProps } from './Text/Text.js';
 export { Button, type ButtonProps } from './Button/Button.js';
 export { Input, type InputProps, type InputType } from './Input/Input.js';
+export {
+  DateInput,
+  type DateInputProps,
+  type DateSegmentOrder,
+} from './DateInput/DateInput.js';
 export { Textarea, type TextareaProps } from './Textarea/Textarea.js';
 export { Code, type CodeProps } from './Code/Code.js';
 export { Kbd, type KbdProps } from './Kbd/Kbd.js';
@@ -16,6 +21,12 @@ export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Skeleton, type SkeletonProps } from './Skeleton/Skeleton.js';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar.js';
 export { Slider, type SliderProps } from './Slider/Slider.js';
+export {
+  Calendar,
+  type CalendarProps,
+  type CalendarValue,
+  type CalendarRangeValue,
+} from './Calendar/Calendar.js';
 export {
   Background,
   type BackgroundProps,

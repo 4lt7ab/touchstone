@@ -27,6 +27,13 @@ export {
   type PopoverTriggerProps,
   type PopoverContentProps,
 } from './Popover/Popover.js';
+export {
+  DatePicker,
+  type DatePickerProps,
+  type DatePickerValue,
+  type DatePickerRangeValue,
+  type DatePickerValueFormat,
+} from './DatePicker/DatePicker.js';
 export { AppBar, type AppBarProps } from './AppBar/AppBar.js';
 export { Sidebar, type SidebarProps } from './Sidebar/Sidebar.js';
 export { AppShell, type AppShellProps } from './AppShell/AppShell.js';
