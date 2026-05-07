@@ -1,40 +1,39 @@
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
-import type { ChangeEvent, FocusEvent, KeyboardEvent, Ref } from 'react';
+import type { ChangeEvent, FocusEvent, KeyboardEvent } from 'react';
 import { useControllableState } from '@touchstone/hooks';
 import type { BaseComponentProps } from '../types.js';
-import * as styles from './DateInput.css.js';
+import * as styles from './TimeInput.css.js';
 
 /**
- * The order of segments in a date string. `MDY` = `MM/DD/YYYY`, `DMY` =
- * `DD/MM/YYYY`, `YMD` = `YYYY/MM/DD`.
+ * Segmented 24-hour time entry. `HH:MM` by default; `HH:MM:SS` when
+ * `precision="second"`. Mirrors `DateInput`'s shape — auto-advance on
+ * a full segment, arrow keys nudge values, `:` advances. Always 24-hour
+ * for input determinism; pair with `Time` for locale-derived display.
  */
-export type DateSegmentOrder = 'MDY' | 'DMY' | 'YMD';
-
-export interface DateInputProps extends BaseComponentProps {
-  /** Controlled value as ISO date `"YYYY-MM-DD"`, or `null` for empty. */
+export interface TimeInputProps extends BaseComponentProps {
+  /** Controlled value as `"HH:MM"` or `"HH:MM:SS"`, or `null`. */
   value?: string | null;
   /** Initial value for uncontrolled usage. */
   defaultValue?: string | null;
   /**
-   * Fired when the value changes. Emits `null` while the input is empty or
-   * partially filled; emits a complete ISO date once all three segments are
-   * valid.
+   * Fires on change. Emits `null` while incomplete or invalid; emits a
+   * complete string once all segments are valid.
    */
   onChange?: (value: string | null) => void;
 
-  /** Lower bound (inclusive) — ISO date. Out-of-bounds values flag invalid. */
+  /** Smallest unit. @default 'minute' */
+  precision?: 'minute' | 'second';
+
+  /** Earliest time (inclusive) — same format as `value`. */
   min?: string;
-  /** Upper bound (inclusive) — ISO date. */
+  /** Latest time (inclusive). */
   max?: string;
 
-  /** Mark the input as invalid. Sets `aria-invalid` automatically. */
+  /** Mark invalid. */
   invalid?: boolean;
   /**
    * Strip the input's own chrome — border, background, padding, fixed
-   * width / height. Use when an outer wrapper provides the visual container
-   * (e.g. a `DatePicker` combining date + time segments under one border).
-   * The internal segments stay accessible — only the outer chrome is
-   * suppressed.
+   * height. Use when an outer wrapper provides the visual container.
    * @default false
    */
   bare?: boolean;
@@ -42,15 +41,12 @@ export interface DateInputProps extends BaseComponentProps {
   disabled?: boolean;
   /** Make the input read-only. */
   readOnly?: boolean;
-  /** Mark as required for form submission. */
+  /** Mark as required. */
   required?: boolean;
   /** Auto-focus the first segment on mount. */
   autoFocus?: boolean;
 
-  /** Segment order. @default 'MDY' */
-  segmentOrder?: DateSegmentOrder;
-
-  /** Field name — when set, a hidden input carries the ISO value into form data. */
+  /** Form name — when set, a hidden input carries the value. */
   name?: string;
   /** Form id this input belongs to. */
   form?: string;
@@ -64,69 +60,63 @@ export interface DateInputProps extends BaseComponentProps {
   'aria-invalid'?: boolean | 'true' | 'false' | 'grammar' | 'spelling';
 }
 
+type Segment = 'hour' | 'minute' | 'second';
+
 interface SegmentState {
-  month: string;
-  day: string;
-  year: string;
+  hour: string;
+  minute: string;
+  second: string;
 }
 
-const EMPTY: SegmentState = { month: '', day: '', year: '' };
+const EMPTY: SegmentState = { hour: '', minute: '', second: '' };
+
+const PLACEHOLDER: Record<Segment, string> = {
+  hour: 'HH',
+  minute: 'MM',
+  second: 'SS',
+};
+
+const LIMITS: Record<Segment, { min: number; max: number; pad: number }> = {
+  hour: { min: 0, max: 23, pad: 2 },
+  minute: { min: 0, max: 59, pad: 2 },
+  second: { min: 0, max: 59, pad: 2 },
+};
 
 function pad(s: string, len: number): string {
   return s.padStart(len, '0');
 }
 
 function parseValue(value: string | null | undefined): SegmentState {
-  if (!value || value.length !== 10) return EMPTY;
-  const y = value.slice(0, 4);
-  const m = value.slice(5, 7);
-  const d = value.slice(8, 10);
-  if (!/^\d{4}$/.test(y) || !/^\d{2}$/.test(m) || !/^\d{2}$/.test(d)) return EMPTY;
-  return { month: m, day: d, year: y };
+  if (!value) return EMPTY;
+  const parts = value.split(':');
+  if (parts.length < 2) return EMPTY;
+  const h = parts[0] ?? '';
+  const m = parts[1] ?? '';
+  const s = parts[2] ?? '';
+  if (!/^\d{2}$/.test(h) || !/^\d{2}$/.test(m)) return EMPTY;
+  if (s && !/^\d{2}$/.test(s)) return EMPTY;
+  return { hour: h, minute: m, second: s };
 }
 
-function daysInMonth(y: number, m: number): number {
-  return new Date(Date.UTC(y, m, 0)).getUTCDate();
+function isValidSegments(seg: SegmentState, precision: 'minute' | 'second'): string | null {
+  if (seg.hour.length !== 2 || seg.minute.length !== 2) return null;
+  const h = Number(seg.hour);
+  const m = Number(seg.minute);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  if (precision === 'minute') return `${pad(seg.hour, 2)}:${pad(seg.minute, 2)}`;
+  if (seg.second.length !== 2) return null;
+  const s = Number(seg.second);
+  if (!Number.isFinite(s) || s < 0 || s > 59) return null;
+  return `${pad(seg.hour, 2)}:${pad(seg.minute, 2)}:${pad(seg.second, 2)}`;
 }
 
-function isCompleteAndValid(seg: SegmentState): string | null {
-  if (seg.month.length !== 2 || seg.day.length !== 2 || seg.year.length !== 4) return null;
-  const m = Number(seg.month);
-  const d = Number(seg.day);
-  const y = Number(seg.year);
-  if (!Number.isFinite(m) || !Number.isFinite(d) || !Number.isFinite(y)) return null;
-  if (m < 1 || m > 12) return null;
-  if (y < 1 || y > 9999) return null;
-  if (d < 1 || d > daysInMonth(y, m)) return null;
-  return `${pad(seg.year, 4)}-${pad(seg.month, 2)}-${pad(seg.day, 2)}`;
+function clampSegment(_part: Segment, raw: string): string {
+  return raw.replace(/\D/g, '').slice(0, 2);
 }
 
-function clampSegment(part: 'month' | 'day' | 'year', raw: string): string {
-  const digits = raw.replace(/\D/g, '');
-  if (part === 'year') return digits.slice(0, 4);
-  return digits.slice(0, 2);
-}
-
-const PLACEHOLDER: Record<keyof SegmentState, string> = {
-  month: 'MM',
-  day: 'DD',
-  year: 'YYYY',
-};
-
-const SEGMENT_LABEL: Record<keyof SegmentState, string> = {
-  month: 'month',
-  day: 'day',
-  year: 'year',
-};
-
-const SEGMENT_LIMITS: Record<keyof SegmentState, { min: number; max: number; pad: number }> = {
-  month: { min: 1, max: 12, pad: 2 },
-  day: { min: 1, max: 31, pad: 2 },
-  year: { min: 1, max: 9999, pad: 4 },
-};
-
-function nudge(part: keyof SegmentState, raw: string, delta: number): string {
-  const limits = SEGMENT_LIMITS[part];
+function nudge(part: Segment, raw: string, delta: number): string {
+  const limits = LIMITS[part];
   const current = raw === '' ? limits.min : Number(raw);
   let next = current + delta;
   if (next > limits.max) next = limits.min;
@@ -134,22 +124,12 @@ function nudge(part: keyof SegmentState, raw: string, delta: number): string {
   return pad(String(next), limits.pad);
 }
 
-function segmentsForOrder(order: DateSegmentOrder): (keyof SegmentState)[] {
-  switch (order) {
-    case 'MDY':
-      return ['month', 'day', 'year'];
-    case 'DMY':
-      return ['day', 'month', 'year'];
-    case 'YMD':
-      return ['year', 'month', 'day'];
-  }
-}
-
-export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function DateInput(
+export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(function TimeInput(
   {
     value: controlledValue,
     defaultValue,
     onChange,
+    precision = 'minute',
     min,
     max,
     invalid = false,
@@ -158,7 +138,6 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
     readOnly = false,
     required = false,
     autoFocus = false,
-    segmentOrder = 'MDY',
     name,
     form,
     id: providedId,
@@ -186,10 +165,10 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
   segmentsRef.current = segments;
   const lastEmittedRef = useRef<string | null>(value);
   const containerRef = useRef<HTMLDivElement>(null);
-  const segmentRefs = useRef<Record<keyof SegmentState, HTMLInputElement | null>>({
-    month: null,
-    day: null,
-    year: null,
+  const segmentRefs = useRef<Record<Segment, HTMLInputElement | null>>({
+    hour: null,
+    minute: null,
+    second: null,
   });
 
   useImperativeHandle(ref, () => containerRef.current as HTMLDivElement, []);
@@ -197,11 +176,10 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
   useEffect(() => {
     const parsed = parseValue(value);
     if (
-      parsed.month !== segments.month ||
-      parsed.day !== segments.day ||
-      parsed.year !== segments.year
+      parsed.hour !== segments.hour ||
+      parsed.minute !== segments.minute ||
+      parsed.second !== segments.second
     ) {
-      // controlled value changed externally — reflect in segments
       if (value !== lastEmittedRef.current) {
         setSegments(parsed);
       }
@@ -209,9 +187,9 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const order = segmentsForOrder(segmentOrder);
+  const order: Segment[] = precision === 'second' ? ['hour', 'minute', 'second'] : ['hour', 'minute'];
 
-  const focusSegment = useCallback((part: keyof SegmentState): void => {
+  const focusSegment = useCallback((part: Segment): void => {
     const el = segmentRefs.current[part];
     if (!el) return;
     el.focus();
@@ -219,7 +197,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
   }, []);
 
   const focusNext = useCallback(
-    (part: keyof SegmentState): void => {
+    (part: Segment): void => {
       const idx = order.indexOf(part);
       const next = order[idx + 1];
       if (next) focusSegment(next);
@@ -228,7 +206,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
   );
 
   const focusPrev = useCallback(
-    (part: keyof SegmentState): void => {
+    (part: Segment): void => {
       const idx = order.indexOf(part);
       const prev = order[idx - 1];
       if (prev) focusSegment(prev);
@@ -240,38 +218,35 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
     (next: SegmentState): void => {
       segmentsRef.current = next;
       setSegments(next);
-      const iso = isCompleteAndValid(next);
+      const iso = isValidSegments(next, precision);
       if (iso !== lastEmittedRef.current) {
         lastEmittedRef.current = iso;
         setValue(iso);
       }
     },
-    [setValue],
+    [setValue, precision],
   );
 
-  const onSegmentChange = (part: keyof SegmentState) => (e: ChangeEvent<HTMLInputElement>): void => {
+  const onSegmentChange = (part: Segment) => (e: ChangeEvent<HTMLInputElement>): void => {
     if (readOnly) return;
     const cleaned = clampSegment(part, e.target.value);
     const next = { ...segments, [part]: cleaned };
     commitSegments(next);
-    const limit = SEGMENT_LIMITS[part];
-    if (cleaned.length === limit.pad) focusNext(part);
+    if (cleaned.length === LIMITS[part].pad) focusNext(part);
   };
 
-  const onSegmentKeyDown = (part: keyof SegmentState) => (e: KeyboardEvent<HTMLInputElement>): void => {
+  const onSegmentKeyDown = (part: Segment) => (e: KeyboardEvent<HTMLInputElement>): void => {
     if (disabled) return;
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (readOnly) return;
-      const next = { ...segments, [part]: nudge(part, segments[part], 1) };
-      commitSegments(next);
+      commitSegments({ ...segments, [part]: nudge(part, segments[part], 1) });
       return;
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (readOnly) return;
-      const next = { ...segments, [part]: nudge(part, segments[part], -1) };
-      commitSegments(next);
+      commitSegments({ ...segments, [part]: nudge(part, segments[part], -1) });
       return;
     }
     if (e.key === 'ArrowLeft') {
@@ -295,28 +270,35 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
       focusPrev(part);
       return;
     }
-    if (e.key === '/' || e.key === '-' || e.key === '.') {
+    if (e.key === ':' || e.key === '.' || e.key === ' ') {
       e.preventDefault();
       focusNext(part);
       return;
     }
   };
 
-  const onSegmentFocus = (part: keyof SegmentState) => (e: FocusEvent<HTMLInputElement>): void => {
+  const onSegmentFocus = (_part: Segment) => (e: FocusEvent<HTMLInputElement>): void => {
     e.currentTarget.select();
   };
 
-  const onSegmentBlur = (part: keyof SegmentState) => (): void => {
-    if (part === 'year') return;
+  // Browsers place the cursor at the click point even when a focus handler
+  // already called `.select()`. Re-select on mouse-up so a click on a
+  // focused segment doesn't drop the selection — typing always overwrites,
+  // matching how segmented date / time inputs behave in design systems.
+  const onSegmentMouseUp = (_part: Segment) => (e: React.MouseEvent<HTMLInputElement>): void => {
+    e.currentTarget.select();
+  };
+
+  const onSegmentBlur = (part: Segment) => (): void => {
     const current = segmentsRef.current;
     const raw = current[part];
-    if (raw === '' || raw.length === SEGMENT_LIMITS[part].pad) return;
-    const padded = pad(raw, SEGMENT_LIMITS[part].pad);
+    if (raw === '' || raw.length === LIMITS[part].pad) return;
+    const padded = pad(raw, LIMITS[part].pad);
     if (padded !== raw) commitSegments({ ...current, [part]: padded });
   };
 
   const isOutOfBounds = (() => {
-    const iso = isCompleteAndValid(segments);
+    const iso = isValidSegments(segments, precision);
     if (!iso) return false;
     if (min && iso < min) return true;
     if (max && iso > max) return true;
@@ -325,10 +307,8 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
 
   const showInvalid = invalid || isOutOfBounds;
 
-  const renderSegment = (part: keyof SegmentState, isFirst: boolean): React.JSX.Element => {
-    const limits = SEGMENT_LIMITS[part];
-    const placeholderText = PLACEHOLDER[part];
-    const widthVariant: 'sm' | 'lg' = part === 'year' ? 'lg' : 'sm';
+  const renderSegment = (part: Segment, isFirst: boolean): React.JSX.Element => {
+    const limits = LIMITS[part];
     return (
       <input
         key={part}
@@ -345,24 +325,25 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
         disabled={disabled}
         readOnly={readOnly}
         required={required}
-        aria-label={SEGMENT_LABEL[part]}
+        aria-label={part}
         aria-valuenow={segments[part] ? Number(segments[part]) : undefined}
         aria-valuemin={limits.min}
         aria-valuemax={limits.max}
         data-testid={dataTestId ? `${dataTestId}-${part}` : undefined}
-        className={styles.segment({ width: widthVariant })}
-        placeholder={placeholderText}
+        className={styles.segment}
+        placeholder={PLACEHOLDER[part]}
         value={segments[part]}
         size={limits.pad}
         onChange={onSegmentChange(part)}
         onKeyDown={onSegmentKeyDown(part)}
         onFocus={onSegmentFocus(part)}
+        onMouseUp={onSegmentMouseUp(part)}
         onBlur={onSegmentBlur(part)}
       />
     );
   };
 
-  const isoForForm = isCompleteAndValid(segments) ?? '';
+  const isoForForm = isValidSegments(segments, precision) ?? '';
 
   return (
     <div
@@ -381,7 +362,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(function Dat
     >
       {order.map((part, i) => {
         const isFirst = i === 0;
-        const sep = i < order.length - 1 ? <span aria-hidden="true" className={styles.separator}>/</span> : null;
+        const sep = i < order.length - 1 ? <span aria-hidden="true" className={styles.separator}>:</span> : null;
         return (
           <span key={part} className={styles.segmentSlot}>
             {renderSegment(part, isFirst)}

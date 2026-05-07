@@ -1,5 +1,6 @@
 export { Field, type FieldProps } from './Field/Field.js';
 export { DateField, type DateFieldProps } from './DateField/DateField.js';
+export { TimeField, type TimeFieldProps } from './TimeField/TimeField.js';
 export {
   SegmentedControl,
   type SegmentedControlProps,

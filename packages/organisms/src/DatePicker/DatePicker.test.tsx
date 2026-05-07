@@ -95,6 +95,86 @@ describe('DatePicker — single mode', () => {
   });
 });
 
+describe('DatePicker — includeTime', () => {
+  it('renders a time input alongside the date input', () => {
+    render(<DatePicker aria-label="event" includeTime defaultValue="2026-05-15T14:30:00-04:00" />);
+    expect(screen.getByRole('group', { name: 'time' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'hour' })).toHaveValue('14');
+    expect(screen.getByRole('textbox', { name: 'minute' })).toHaveValue('30');
+  });
+
+  it('hydrates time from the timestamp value', () => {
+    render(
+      <DatePicker
+        aria-label="event"
+        includeTime
+        timePrecision="second"
+        defaultValue="2026-05-15T14:30:45-04:00"
+      />,
+    );
+    expect(screen.getByRole('textbox', { name: 'second' })).toHaveValue('45');
+  });
+
+  it('emits a timestamp combining the date and the typed time', async () => {
+    const onChange = vi.fn();
+    render(
+      <DatePicker
+        aria-label="event"
+        includeTime
+        timeZone="America/New_York"
+        defaultValue="2026-05-15T00:00:00-04:00"
+        onChange={onChange}
+      />,
+    );
+    const hour = screen.getByRole('textbox', { name: 'hour' });
+    hour.focus();
+    hour.select();
+    await userEvent.keyboard('14');
+    await userEvent.type(screen.getByRole('textbox', { name: 'minute' }), '30');
+    const last = onChange.mock.calls.at(-1)?.[0];
+    expect(last).toMatch(/^2026-05-15T14:30:00[+-]\d{2}:\d{2}$/);
+  });
+
+  it('preserves the typed time when the date is changed via the calendar', async () => {
+    function Harness(): React.JSX.Element {
+      const [v, setV] = useState<string | null>('2026-05-15T14:30:00-04:00');
+      return (
+        <DatePicker
+          aria-label="event"
+          includeTime
+          timeZone="America/New_York"
+          value={v}
+          onChange={(next) => setV(typeof next === 'string' ? next : null)}
+        />
+      );
+    }
+    render(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: /open calendar/i }));
+    await userEvent.click(screen.getByRole('button', { name: /May 20, 2026/ }));
+    expect(screen.getByRole('textbox', { name: 'day' })).toHaveValue('20');
+    expect(screen.getByRole('textbox', { name: 'hour' })).toHaveValue('14');
+    expect(screen.getByRole('textbox', { name: 'minute' })).toHaveValue('30');
+  });
+
+  it('coerces valueFormat to timestamp when includeTime is on', async () => {
+    const onChange = vi.fn();
+    render(
+      <DatePicker
+        aria-label="event"
+        includeTime
+        valueFormat="date"
+        timeZone="America/New_York"
+        defaultValue="2026-05-15T00:00:00-04:00"
+        onChange={onChange}
+      />,
+    );
+    await userEvent.type(screen.getByRole('textbox', { name: 'hour' }), '09');
+    await userEvent.type(screen.getByRole('textbox', { name: 'minute' }), '15');
+    const last = onChange.mock.calls.at(-1)?.[0];
+    expect(last).toMatch(/^2026-05-15T09:15:00/);
+  });
+});
+
 describe('DatePicker — range mode', () => {
   it('renders two inputs for start and end', () => {
     render(
@@ -105,8 +185,8 @@ describe('DatePicker — range mode', () => {
       />,
     );
     expect(screen.getByRole('group', { name: 'trip' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'start date' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'end date' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'start' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'end' })).toBeInTheDocument();
     const months = screen.getAllByRole('textbox', { name: 'month' });
     expect(months).toHaveLength(2);
   });

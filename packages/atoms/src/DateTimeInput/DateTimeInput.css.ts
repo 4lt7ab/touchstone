@@ -6,9 +6,18 @@ export const root = recipe({
   base: {
     display: 'inline-flex',
     alignItems: 'center',
+    gap: vars.space[2],
     width: '100%',
+    minWidth: 0,
     height: vars.space[10],
     paddingInline: vars.space[3],
+    '@media': {
+      // Shrink the inner gap on narrow viewports so date + time pack
+      // tightly when nested inside `DateRangeInput`'s chrome.
+      '(max-width: 600px)': {
+        gap: vars.space[1],
+      },
+    },
     border: `1px solid ${vars.color.border}`,
     borderRadius: vars.radius.md,
     background: vars.color.bgInput,
@@ -44,12 +53,8 @@ export const root = recipe({
         color: vars.color.fgDisabled,
       },
     },
-    /**
-     * Strips the input chrome (border, background, padding, height, fixed
-     * width). Used when an outer wrapper provides the visual container — for
-     * example, a `DatePicker` combining date + time segments under a single
-     * border. Focus styling defers to the parent.
-     */
+    /** Strip chrome so an outer wrapper can provide a unified container —
+     * e.g. `DateRangeInput` placing two `DateTimeInput`s under one border. */
     bare: {
       true: {
         width: 'auto',
@@ -73,46 +78,17 @@ export const root = recipe({
   },
 });
 
-export const segmentSlot = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-});
-
-export const segment = recipe({
-  base: {
-    margin: 0,
-    padding: 0,
-    background: 'transparent',
-    border: 'none',
-    color: 'inherit',
-    fontFamily: 'inherit',
-    fontSize: 'inherit',
-    fontVariantNumeric: 'tabular-nums',
-    textAlign: 'center',
-    outline: 'none',
-    selectors: {
-      '&::placeholder': {
-        color: vars.color.fgPlaceholder,
-      },
-      '&:disabled': {
-        color: vars.color.fgDisabled,
-        cursor: 'not-allowed',
-      },
+export const divider = style({
+  width: '1px',
+  height: vars.space[5],
+  background: vars.color.border,
+  flexShrink: 0,
+  // Hide the divider on narrow viewports — the gap + the slash/colon
+  // separators inside the segments make the date↔time boundary clear
+  // enough without a vertical line eating horizontal space.
+  '@media': {
+    '(max-width: 600px)': {
+      display: 'none',
     },
   },
-  variants: {
-    width: {
-      sm: { width: '2ch' },
-      lg: { width: '4ch' },
-    },
-  },
-  defaultVariants: {
-    width: 'sm',
-  },
-});
-
-export const separator = style({
-  paddingInline: '2px',
-  color: vars.color.fgMuted,
-  userSelect: 'none',
 });

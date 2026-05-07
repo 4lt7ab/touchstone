@@ -107,6 +107,11 @@ export const weekdayCell = style({
   textAlign: 'center',
   textTransform: 'uppercase',
   letterSpacing: vars.letterSpacing.wide,
+  '@media': {
+    '(pointer: coarse)': {
+      width: vars.space[10],
+    },
+  },
 });
 
 export const dayCell = style({
@@ -131,6 +136,12 @@ export const day = recipe({
     color: vars.color.fg,
     cursor: 'pointer',
     transition: `background-color ${vars.duration.fast} ${vars.easing.standard}, color ${vars.duration.fast} ${vars.easing.standard}`,
+    '@media': {
+      '(pointer: coarse)': {
+        width: vars.space[10],
+        height: vars.space[10],
+      },
+    },
     selectors: {
       '&:focus-visible': {
         outline: `${vars.focus.ringWidth} solid ${vars.focus.ringColor}`,

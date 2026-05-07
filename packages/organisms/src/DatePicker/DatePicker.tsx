@@ -3,14 +3,18 @@ import type { FocusEvent, KeyboardEvent, Ref } from 'react';
 import {
   Calendar,
   DateInput,
+  DateRangeInput,
+  DateTimeInput,
   type CalendarRangeValue,
   type CalendarValue,
+  type DateRangeValue,
   type DateSegmentOrder,
 } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
 import { CalendarIcon } from '@touchstone/icons';
 import {
   useControllableState,
+  useMediaQuery,
   useMergedRefs,
   type AnchoredPositionAlign,
   type AnchoredPositionSide,
@@ -44,19 +48,20 @@ export interface DatePickerProps extends BaseComponentProps {
   /**
    * How the value strings are encoded.
    *
-   * - `"timestamp"` — ISO 8601 with offset (`"2026-05-15T00:00:00-04:00"`).
-   *   The default. Emits unambiguous instants the server can interpret
-   *   without a second timezone channel.
-   * - `"date"` — ISO date only (`"2026-05-15"`). For inputs where the day
-   *   is the unit (birthdays, anniversaries) and timezone is irrelevant.
+   * - `"timestamp"` — ISO 8601 with offset. The default.
+   * - `"date"` — ISO date only (`"2026-05-15"`).
+   *
+   * `valueFormat="date"` is silently coerced to `"timestamp"` when
+   * `includeTime` is `true` — a date-only output with a time picker
+   * doesn't make sense.
    *
    * @default 'timestamp'
    */
   valueFormat?: DatePickerValueFormat;
   /**
-   * Timezone the picked day is anchored in. Defaults to the browser's
+   * Timezone the picked moment is anchored in. Defaults to the browser's
    * resolved timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone`.
-   * Only relevant when `valueFormat="timestamp"`.
+   * Only relevant when the emitted value is a timestamp.
    */
   timeZone?: string;
 
@@ -82,8 +87,18 @@ export interface DatePickerProps extends BaseComponentProps {
   weekStartsOn?: 0 | 1;
   /** BCP-47 locale for calendar labels. */
   locale?: string;
-  /** Number of months in the calendar popover. @default 1 (or 2 in range mode) */
+  /** Number of months in the calendar popover. @default 1 (or 2 in range mode on wide viewports) */
   numberOfMonths?: 1 | 2;
+
+  /**
+   * Render time inputs alongside the date inputs and emit full timestamps
+   * with hour/minute (or hour/minute/second). Forces `valueFormat` to
+   * `"timestamp"`.
+   * @default false
+   */
+  includeTime?: boolean;
+  /** Time precision when `includeTime` is on. @default 'minute' */
+  timePrecision?: 'minute' | 'second';
 
   /** Form name — hidden inputs carry the value. */
   name?: string;
@@ -99,7 +114,7 @@ export interface DatePickerProps extends BaseComponentProps {
 
   /** Popover side. @default 'bottom' */
   side?: AnchoredPositionSide;
-  /** Popover alignment. @default 'start' */
+  /** Popover alignment. @default 'end' */
   align?: AnchoredPositionAlign;
 
   onFocus?: (event: FocusEvent<HTMLDivElement>) => void;
@@ -120,8 +135,6 @@ function browserTimeZone(): string {
 
 function offsetForDate(dateStr: string, timeZone: string): string {
   if (timeZone === 'UTC') return 'Z';
-  // Probe noon-UTC on the date — far from any DST transition (which fires
-  // around 02:00 local) so the offset for midnight-local is the same.
   const probe = new Date(`${dateStr}T12:00:00Z`);
   try {
     const fmt = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'longOffset' });
@@ -143,9 +156,25 @@ function toDateOnly(s: string | null | undefined): string | null {
   return null;
 }
 
-function encodeValue(date: string, format: DatePickerValueFormat, timeZone: string): string {
+/** Strip the offset portion off an ISO timestamp; returns the local
+ * `"YYYY-MM-DDTHH:MM(:SS)"` portion, which is what `DateTimeInput` and
+ * `DateRangeInput` (timezone-agnostic atoms) accept. */
+function stripOffset(timestamp: string | null, precision: 'minute' | 'second'): string | null {
+  if (!timestamp || timestamp.length < 16 || timestamp[10] !== 'T') return null;
+  const tlen = precision === 'second' ? 19 : 16;
+  return timestamp.slice(0, tlen);
+}
+
+function encodeDateOnly(date: string, format: DatePickerValueFormat, timeZone: string): string {
   if (format === 'date') return date;
   return `${date}T00:00:00${offsetForDate(date, timeZone)}`;
+}
+
+function encodeDateTime(datetime: string, timeZone: string, precision: 'minute' | 'second'): string {
+  const date = datetime.slice(0, 10);
+  const timePart = datetime.slice(11);
+  const tFull = precision === 'second' ? timePart : `${timePart}:00`;
+  return `${date}T${tFull}${offsetForDate(date, timeZone)}`;
 }
 
 function readSingle(value: DatePickerValue | undefined): string | null {
@@ -180,6 +209,8 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
     weekStartsOn = 0,
     locale,
     numberOfMonths,
+    includeTime = false,
+    timePrecision = 'minute',
     name,
     form,
     open: controlledOpen,
@@ -200,6 +231,10 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
   const reactId = useId();
   const id = providedId ?? reactId;
   const timeZone = tzProp ?? browserTimeZone();
+
+  // includeTime forces timestamp output — date-only with a time picker
+  // is contradictory.
+  const effectiveFormat: DatePickerValueFormat = includeTime ? 'timestamp' : valueFormat;
 
   const initialValue = useMemo<DatePickerValue>(() => {
     if (defaultValue !== undefined) return defaultValue;
@@ -224,60 +259,90 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
     return readRange(value);
   }, [mode, value]);
 
-  const inputValue = mode === 'single' ? readSingle(value) : readRange(value).start;
+  const singleDateOnly = mode === 'single' ? readSingle(value) : null;
+  const singleDateTime =
+    mode === 'single' && typeof value === 'string' ? stripOffset(value, timePrecision) : null;
 
-  const emitSingle = useCallback(
+  const rangeForInput = useMemo<DateRangeValue>(() => {
+    if (mode !== 'range' || !value || typeof value === 'string') {
+      return { start: null, end: null };
+    }
+    if (includeTime) {
+      return {
+        start: stripOffset(value.start, timePrecision),
+        end: stripOffset(value.end, timePrecision),
+      };
+    }
+    return {
+      start: toDateOnly(value.start),
+      end: toDateOnly(value.end),
+    };
+  }, [mode, value, includeTime, timePrecision]);
+
+  const emitSingleDate = useCallback(
     (date: string | null): void => {
-      if (date === null) {
-        setValue(null);
-      } else {
-        setValue(encodeValue(date, valueFormat, timeZone));
-      }
+      if (date === null) setValue(null);
+      else setValue(encodeDateOnly(date, effectiveFormat, timeZone));
     },
-    [setValue, valueFormat, timeZone],
+    [setValue, effectiveFormat, timeZone],
   );
 
-  const emitRange = useCallback(
-    (range: CalendarRangeValue): void => {
-      const next: DatePickerRangeValue = {
-        start: range.start ? encodeValue(range.start, valueFormat, timeZone) : null,
-        end: range.end ? encodeValue(range.end, valueFormat, timeZone) : null,
-      };
-      setValue(next);
+  const emitSingleDateTime = useCallback(
+    (datetime: string | null): void => {
+      if (datetime === null) setValue(null);
+      else setValue(encodeDateTime(datetime, timeZone, timePrecision));
     },
-    [setValue, valueFormat, timeZone],
+    [setValue, timeZone, timePrecision],
+  );
+
+  const emitRangeFromInput = useCallback(
+    (next: DateRangeValue): void => {
+      if (includeTime) {
+        setValue({
+          start: next.start ? encodeDateTime(next.start, timeZone, timePrecision) : null,
+          end: next.end ? encodeDateTime(next.end, timeZone, timePrecision) : null,
+        });
+      } else {
+        setValue({
+          start: next.start ? encodeDateOnly(next.start, effectiveFormat, timeZone) : null,
+          end: next.end ? encodeDateOnly(next.end, effectiveFormat, timeZone) : null,
+        });
+      }
+    },
+    [setValue, includeTime, effectiveFormat, timeZone, timePrecision],
   );
 
   const onCalendarChange = useCallback(
     (next: CalendarValue): void => {
       if (mode === 'single') {
         const date = typeof next === 'string' ? next : null;
-        emitSingle(date);
-        if (date) {
-          setOpen(false);
+        if (includeTime) {
+          const currentTime = singleDateTime ? singleDateTime.slice(11) : null;
+          const placeholder = timePrecision === 'second' ? '00:00:00' : '00:00';
+          const t = currentTime ?? placeholder;
+          emitSingleDateTime(date ? `${date}T${t}` : null);
+        } else {
+          emitSingleDate(date);
         }
+        if (date) setOpen(false);
       } else {
-        const range: CalendarRangeValue = next && typeof next !== 'string'
-          ? next
-          : { start: null, end: null };
-        emitRange(range);
+        const range: CalendarRangeValue =
+          next && typeof next !== 'string' ? next : { start: null, end: null };
+        if (includeTime) {
+          const placeholder = timePrecision === 'second' ? '00:00:00' : '00:00';
+          const sTime = rangeForInput.start ? rangeForInput.start.slice(11) : placeholder;
+          const eTime = rangeForInput.end ? rangeForInput.end.slice(11) : placeholder;
+          emitRangeFromInput({
+            start: range.start ? `${range.start}T${sTime}` : null,
+            end: range.end ? `${range.end}T${eTime}` : null,
+          });
+        } else {
+          emitRangeFromInput(range);
+        }
         if (range.start && range.end) setOpen(false);
       }
     },
-    [mode, emitSingle, emitRange],
-  );
-
-  const onInputChange = useCallback(
-    (date: string | null): void => {
-      if (readOnly) return;
-      if (mode === 'single') {
-        emitSingle(date);
-      } else {
-        const range = readRange(value);
-        emitRange({ ...range, start: date });
-      }
-    },
-    [mode, emitSingle, emitRange, readOnly, value],
+    [mode, includeTime, timePrecision, singleDateTime, rangeForInput, emitSingleDate, emitSingleDateTime, emitRangeFromInput],
   );
 
   // popover open state
@@ -291,182 +356,178 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
     [controlledOpen, onOpenChange],
   );
 
-  const onTriggerKeyDown = (e: KeyboardEvent<HTMLButtonElement>): void => {
-    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-      // popover trigger handles open already; nothing extra to do
-    }
+  const onTriggerKeyDown = (_e: KeyboardEvent<HTMLButtonElement>): void => {
+    // popover handles trigger keys; reserved for future affordances.
   };
 
-  const monthsToShow = numberOfMonths ?? (mode === 'range' ? 2 : 1);
-  // The trigger button sits at the right edge of the input row. Anchoring
-  // the popover with align="end" makes it extend leftward, keeping wide
-  // multi-month grids on-screen. Single-month is narrow enough for either.
+  const isNarrow = useMediaQuery('(max-width: 600px)');
+  const monthsToShow = numberOfMonths ?? (mode === 'range' && !isNarrow ? 2 : 1);
   const align = alignProp ?? 'end';
 
-  const inputForRange = mode === 'range';
+  const triggerLabel = open ? 'Close calendar' : 'Open calendar';
 
   return (
-    <div
-      ref={mergedRef}
-      id={`${id}-root`}
-      data-testid={dataTestId}
-      role="group"
-      aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      aria-describedby={ariaDescribedBy}
-      className={styles.root}
-      onFocus={onFocus}
-      onBlur={onBlur}
-    >
-      <div className={styles.inputRow}>
-        {inputForRange ? (
-          <RangeInputs
-            value={readRange(value)}
-            onStartChange={(d) => onInputChange(d)}
-            onEndChange={(d) => {
-              if (readOnly) return;
-              const range = readRange(value);
-              emitRange({ ...range, end: d });
-            }}
-            disabled={disabled}
-            readOnly={readOnly}
-            invalid={invalid}
-            segmentOrder={segmentOrder}
-            ariaLabel={ariaLabel}
-            ariaLabelledBy={ariaLabelledBy}
-            ariaDescribedBy={ariaDescribedBy}
-            id={id}
-          />
-        ) : (
-          <DateInput
-            id={id}
-            value={inputValue}
-            onChange={onInputChange}
-            min={dateOnlyMin}
-            max={dateOnlyMax}
-            invalid={invalid}
-            disabled={disabled}
-            readOnly={readOnly}
-            required={required}
-            autoFocus={autoFocus}
-            segmentOrder={segmentOrder}
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            aria-describedby={ariaDescribedBy}
-          />
-        )}
-        <Popover open={open} onOpenChange={setOpen}>
-          <Popover.Trigger>
-            <button
-              ref={triggerRef}
-              type="button"
-              aria-label={open ? 'Close calendar' : 'Open calendar'}
+    <Popover open={open} onOpenChange={setOpen}>
+      <div
+        ref={mergedRef}
+        id={`${id}-root`}
+        data-testid={dataTestId}
+        role="group"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        className={styles.root}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        <div className={styles.inputRow}>
+          {mode === 'range' ? (
+            <DateRangeInput
+              id={id}
+              value={rangeForInput}
+              onChange={emitRangeFromInput}
+              includeTime={includeTime}
+              precision={timePrecision}
+              segmentOrder={segmentOrder}
+              invalid={invalid}
               disabled={disabled}
-              className={styles.triggerButton}
-              onKeyDown={onTriggerKeyDown}
-              data-testid={dataTestId ? `${dataTestId}-trigger` : undefined}
-            >
-              <CalendarIcon size={16} />
-            </button>
-          </Popover.Trigger>
-          <Popover.Content side={side} align={align} aria-label="Date picker calendar">
-            <Calendar
-              mode={mode}
-              value={calendarValue}
-              onChange={onCalendarChange}
-              {...(dateOnlyMin !== undefined ? { min: dateOnlyMin } : {})}
-              {...(dateOnlyMax !== undefined ? { max: dateOnlyMax } : {})}
-              weekStartsOn={weekStartsOn}
-              {...(locale !== undefined ? { locale } : {})}
-              numberOfMonths={monthsToShow}
-              aria-label={ariaLabel ?? 'Pick a date'}
+              readOnly={readOnly}
+              required={required}
+              autoFocus={autoFocus}
+              aria-describedby={ariaDescribedBy}
+              endAdornment={
+                <Popover.Trigger>
+                  <button
+                    ref={triggerRef}
+                    type="button"
+                    aria-label={triggerLabel}
+                    disabled={disabled}
+                    className={styles.embeddedTrigger}
+                    onKeyDown={onTriggerKeyDown}
+                    data-testid={dataTestId ? `${dataTestId}-trigger` : undefined}
+                  >
+                    <CalendarIcon size={16} />
+                  </button>
+                </Popover.Trigger>
+              }
             />
-          </Popover.Content>
-        </Popover>
+          ) : (
+            <>
+              <div className={styles.inputs}>
+                {includeTime ? (
+                  <DateTimeInput
+                    id={id}
+                    value={singleDateTime}
+                    onChange={emitSingleDateTime}
+                    precision={timePrecision}
+                    segmentOrder={segmentOrder}
+                    invalid={invalid}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                    required={required}
+                    autoFocus={autoFocus}
+                    aria-label={ariaLabel}
+                    aria-labelledby={ariaLabelledBy}
+                    aria-describedby={ariaDescribedBy}
+                  />
+                ) : (
+                  <DateInput
+                    id={id}
+                    value={singleDateOnly}
+                    onChange={emitSingleDate}
+                    min={dateOnlyMin}
+                    max={dateOnlyMax}
+                    invalid={invalid}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                    required={required}
+                    autoFocus={autoFocus}
+                    segmentOrder={segmentOrder}
+                    aria-label={ariaLabel}
+                    aria-labelledby={ariaLabelledBy}
+                    aria-describedby={ariaDescribedBy}
+                  />
+                )}
+              </div>
+              <Popover.Trigger>
+                <button
+                  ref={triggerRef}
+                  type="button"
+                  aria-label={triggerLabel}
+                  disabled={disabled}
+                  className={styles.triggerButton}
+                  onKeyDown={onTriggerKeyDown}
+                  data-testid={dataTestId ? `${dataTestId}-trigger` : undefined}
+                >
+                  <CalendarIcon size={16} />
+                </button>
+              </Popover.Trigger>
+            </>
+          )}
+        </div>
+        {name ? (
+          mode === 'range' ? (
+            <>
+              <input
+                type="hidden"
+                name={`${name}.start`}
+                value={
+                  includeTime
+                    ? rangeForInput.start
+                      ? encodeDateTime(rangeForInput.start, timeZone, timePrecision)
+                      : ''
+                    : rangeForInput.start
+                      ? encodeDateOnly(rangeForInput.start, effectiveFormat, timeZone)
+                      : ''
+                }
+                form={form}
+              />
+              <input
+                type="hidden"
+                name={`${name}.end`}
+                value={
+                  includeTime
+                    ? rangeForInput.end
+                      ? encodeDateTime(rangeForInput.end, timeZone, timePrecision)
+                      : ''
+                    : rangeForInput.end
+                      ? encodeDateOnly(rangeForInput.end, effectiveFormat, timeZone)
+                      : ''
+                }
+                form={form}
+              />
+            </>
+          ) : (
+            <input
+              type="hidden"
+              name={name}
+              value={
+                includeTime
+                  ? singleDateTime
+                    ? encodeDateTime(singleDateTime, timeZone, timePrecision)
+                    : ''
+                  : singleDateOnly
+                    ? encodeDateOnly(singleDateOnly, effectiveFormat, timeZone)
+                    : ''
+              }
+              form={form}
+            />
+          )
+        ) : null}
       </div>
-      {name ? (
-        mode === 'range' ? (
-          <>
-            <input
-              type="hidden"
-              name={`${name}.start`}
-              value={(readRange(value).start && encodeValue(readRange(value).start!, valueFormat, timeZone)) || ''}
-              form={form}
-            />
-            <input
-              type="hidden"
-              name={`${name}.end`}
-              value={(readRange(value).end && encodeValue(readRange(value).end!, valueFormat, timeZone)) || ''}
-              form={form}
-            />
-          </>
-        ) : (
-          <input
-            type="hidden"
-            name={name}
-            value={(readSingle(value) && encodeValue(readSingle(value)!, valueFormat, timeZone)) || ''}
-            form={form}
-          />
-        )
-      ) : null}
-    </div>
+      <Popover.Content side={side} align={align} aria-label="Date picker calendar">
+        <Calendar
+          mode={mode}
+          value={calendarValue}
+          onChange={onCalendarChange}
+          {...(dateOnlyMin !== undefined ? { min: dateOnlyMin } : {})}
+          {...(dateOnlyMax !== undefined ? { max: dateOnlyMax } : {})}
+          weekStartsOn={weekStartsOn}
+          {...(locale !== undefined ? { locale } : {})}
+          numberOfMonths={monthsToShow}
+          aria-label={ariaLabel ?? 'Pick a date'}
+        />
+      </Popover.Content>
+    </Popover>
   );
 });
-
-interface RangeInputsProps {
-  value: DatePickerRangeValue;
-  onStartChange: (date: string | null) => void;
-  onEndChange: (date: string | null) => void;
-  disabled: boolean;
-  readOnly: boolean;
-  invalid: boolean;
-  segmentOrder: DateSegmentOrder;
-  ariaLabel: string | undefined;
-  ariaLabelledBy: string | undefined;
-  ariaDescribedBy: string | undefined;
-  id: string;
-}
-
-function RangeInputs({
-  value,
-  onStartChange,
-  onEndChange,
-  disabled,
-  readOnly,
-  invalid,
-  segmentOrder,
-  ariaLabel,
-  ariaLabelledBy,
-  ariaDescribedBy,
-  id,
-}: RangeInputsProps): React.JSX.Element {
-  return (
-    <div className={styles.rangeRow}>
-      <DateInput
-        id={`${id}-start`}
-        value={value.start}
-        onChange={onStartChange}
-        invalid={invalid}
-        disabled={disabled}
-        readOnly={readOnly}
-        segmentOrder={segmentOrder}
-        aria-label="start date"
-        aria-describedby={ariaDescribedBy}
-      />
-      <span aria-hidden="true" className={styles.rangeArrow}>
-        →
-      </span>
-      <DateInput
-        id={`${id}-end`}
-        value={value.end}
-        onChange={onEndChange}
-        invalid={invalid}
-        disabled={disabled}
-        readOnly={readOnly}
-        segmentOrder={segmentOrder}
-        aria-label="end date"
-        aria-describedby={ariaDescribedBy}
-      />
-    </div>
-  );
-}

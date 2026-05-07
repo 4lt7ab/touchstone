@@ -6,7 +6,6 @@ export const root = recipe({
   base: {
     display: 'inline-flex',
     alignItems: 'center',
-    width: '100%',
     height: vars.space[10],
     paddingInline: vars.space[3],
     border: `1px solid ${vars.color.border}`,
@@ -44,15 +43,10 @@ export const root = recipe({
         color: vars.color.fgDisabled,
       },
     },
-    /**
-     * Strips the input chrome (border, background, padding, height, fixed
-     * width). Used when an outer wrapper provides the visual container — for
-     * example, a `DatePicker` combining date + time segments under a single
-     * border. Focus styling defers to the parent.
-     */
+    /** See `DateInput`'s `bare` variant — strips chrome so an outer wrapper
+     * can provide a unified visual container. */
     bare: {
       true: {
-        width: 'auto',
         height: 'auto',
         paddingInline: 0,
         border: 'none',
@@ -78,36 +72,26 @@ export const segmentSlot = style({
   alignItems: 'center',
 });
 
-export const segment = recipe({
-  base: {
-    margin: 0,
-    padding: 0,
-    background: 'transparent',
-    border: 'none',
-    color: 'inherit',
-    fontFamily: 'inherit',
-    fontSize: 'inherit',
-    fontVariantNumeric: 'tabular-nums',
-    textAlign: 'center',
-    outline: 'none',
-    selectors: {
-      '&::placeholder': {
-        color: vars.color.fgPlaceholder,
-      },
-      '&:disabled': {
-        color: vars.color.fgDisabled,
-        cursor: 'not-allowed',
-      },
+export const segment = style({
+  margin: 0,
+  padding: 0,
+  width: '2ch',
+  background: 'transparent',
+  border: 'none',
+  color: 'inherit',
+  fontFamily: 'inherit',
+  fontSize: 'inherit',
+  fontVariantNumeric: 'tabular-nums',
+  textAlign: 'center',
+  outline: 'none',
+  selectors: {
+    '&::placeholder': {
+      color: vars.color.fgPlaceholder,
     },
-  },
-  variants: {
-    width: {
-      sm: { width: '2ch' },
-      lg: { width: '4ch' },
+    '&:disabled': {
+      color: vars.color.fgDisabled,
+      cursor: 'not-allowed',
     },
-  },
-  defaultVariants: {
-    width: 'sm',
   },
 });
 

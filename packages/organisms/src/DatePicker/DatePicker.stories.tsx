@@ -136,6 +136,70 @@ export const Disabled: Story = {
   args: { defaultValue: '2026-05-15T00:00:00-04:00', disabled: true },
 };
 
+function IncludeTimeDemo(): React.JSX.Element {
+  const [value, setValue] = useState<string | null>('2026-05-15T14:30:00-04:00');
+  return (
+    <Stack direction="column" gap="md" style={{ maxWidth: '480px', minHeight: '440px' }}>
+      <DatePicker
+        aria-label="event"
+        includeTime
+        value={value}
+        onChange={(v) => setValue(typeof v === 'string' ? v : null)}
+      />
+      <Text size="sm">value: {value ?? '(empty)'}</Text>
+    </Stack>
+  );
+}
+
+export const IncludeTime: Story = {
+  name: 'includeTime — date + time',
+  render: () => <IncludeTimeDemo />,
+};
+
+function IncludeTimeRangeDemo(): React.JSX.Element {
+  const [value, setValue] = useState<DatePickerRangeValue>({
+    start: '2026-05-15T09:00:00-04:00',
+    end: '2026-05-15T17:00:00-04:00',
+  });
+  return (
+    <Stack direction="column" gap="md" style={{ maxWidth: '720px', minHeight: '480px' }}>
+      <DatePicker
+        aria-label="meeting window"
+        mode="range"
+        includeTime
+        value={value}
+        onChange={(v: DatePickerValue) => {
+          if (v && typeof v !== 'string') setValue(v);
+        }}
+      />
+      <Text size="sm">
+        start: {value.start ?? '—'} · end: {value.end ?? '—'}
+      </Text>
+    </Stack>
+  );
+}
+
+export const IncludeTimeRange: Story = {
+  name: 'includeTime + range',
+  render: () => <IncludeTimeRangeDemo />,
+};
+
+export const IncludeTimeWithSeconds: Story = {
+  name: 'includeTime — second precision',
+  args: {
+    includeTime: true,
+    timePrecision: 'second',
+    defaultValue: '2026-05-15T14:30:45-04:00',
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: '480px', minHeight: '440px' }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
+
 export const FixedTimezone: Story = {
   name: 'Fixed timeZone (Asia/Tokyo)',
   args: {
