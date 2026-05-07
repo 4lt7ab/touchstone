@@ -1,6 +1,6 @@
 {
   "name": "@touchstone/molecules",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": true,
   "description": "Atomic-design 'molecules' — small compositions of atoms (Field, ...).",
   "license": "MIT",
