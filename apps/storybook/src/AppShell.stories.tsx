@@ -1,8 +1,22 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Avatar, Badge, Button, Input, Stack, Surface, Text } from '@touchstone/atoms';
-import { Disclosure, NavItem, NavSection, PageHeader } from '@touchstone/molecules';
-import { AppBar, AppShell, Drawer, Sidebar } from '@touchstone/organisms';
+import { Avatar, Badge, Button, Input, Kbd, Stack, Surface, Text } from '@touchstone/atoms';
+import {
+  Disclosure,
+  NavItem,
+  NavSection,
+  PageHeader,
+  toast,
+} from '@touchstone/molecules';
+import {
+  AppBar,
+  AppShell,
+  CommandPalette,
+  Drawer,
+  Sidebar,
+} from '@touchstone/organisms';
+import type { CommandPaletteCommand } from '@touchstone/organisms';
+import { vars } from '@touchstone/themes';
 
 function HammerGlyph(): React.JSX.Element {
   return (
@@ -396,4 +410,290 @@ export const NoHeader: Story = {
       </Surface>
     </AppShell>
   ),
+};
+
+interface OrderRow {
+  id: string;
+  title: string;
+  when: string;
+  tone: 'accent' | 'warning' | 'success' | 'neutral';
+  label: 'open' | 'in-progress' | 'sealed' | 'shelved';
+  notes: string;
+  hand: string;
+}
+
+const inspectorOrders: OrderRow[] = [
+  {
+    id: 'o-001',
+    title: 'a copper hinge for the lid',
+    when: 'this morning',
+    tone: 'accent',
+    label: 'open',
+    notes:
+      'cut from sheet 18, two rivets per leaf. the apprentice asks after the pattern — refer her to recipe 47.',
+    hand: 'mei',
+  },
+  {
+    id: 'o-002',
+    title: 'three nails of the smaller mould',
+    when: 'yesterday',
+    tone: 'warning',
+    label: 'in-progress',
+    notes: 'two struck clean, the third bent at the head. recasting after lunch — check the temper.',
+    hand: 'tav',
+  },
+  {
+    id: 'o-003',
+    title: 'the dye-pot, refilled',
+    when: 'two days past',
+    tone: 'success',
+    label: 'sealed',
+    notes: 'measured by weight, not by eye. ledger entry 218.',
+    hand: 'rey',
+  },
+];
+
+function InspectorShell(): React.JSX.Element {
+  const [selectedId, setSelectedId] = useState<string>(inspectorOrders[0]!.id);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const selected = inspectorOrders.find((o) => o.id === selectedId) ?? inspectorOrders[0]!;
+
+  return (
+    <AppShell
+      inspectorOpen={inspectorOpen}
+      onInspectorOpenChange={setInspectorOpen}
+      header={
+        <AppBar
+          brand={
+            <>
+              <HammerGlyph />
+              <span>the workshop</span>
+            </>
+          }
+          actions={
+            <>
+              <Button
+                intent="ghost"
+                onClick={() => setInspectorOpen((v) => !v)}
+                aria-pressed={inspectorOpen}
+              >
+                inspector <Kbd size="sm">⌘I</Kbd>
+              </Button>
+              <Button intent="primary">strike</Button>
+            </>
+          }
+        />
+      }
+      sidebar={
+        <Sidebar>
+          <NavSection label="bench">
+            <NavItem icon={<HingeGlyph />} selected>
+              orders
+            </NavItem>
+            <NavItem icon={<HingeGlyph />}>moulds</NavItem>
+          </NavSection>
+        </Sidebar>
+      }
+      inspector={
+        <Surface
+          level="panel"
+          padding="lg"
+          style={{
+            width: '20rem',
+            blockSize: '100%',
+            borderInlineStart: `1px solid ${vars.color.border}`,
+            overflowY: 'auto',
+          }}
+        >
+          <Stack gap="md">
+            <Stack gap="xs">
+              <Text size="xs" tone="muted">
+                under the loupe
+              </Text>
+              <Text weight="semibold">{selected.title}</Text>
+              <Stack direction="row" gap="sm" align="center">
+                <Badge tone={selected.tone}>{selected.label}</Badge>
+                <Text size="xs" tone="muted">
+                  {selected.hand} · {selected.when}
+                </Text>
+              </Stack>
+            </Stack>
+            <Surface level="raised" radius="md" padding="md">
+              <Text size="sm">{selected.notes}</Text>
+            </Surface>
+            <Stack direction="row" gap="sm">
+              <Button intent="ghost" size="sm">
+                seal
+              </Button>
+              <Button intent="ghost" size="sm">
+                shelve
+              </Button>
+            </Stack>
+          </Stack>
+        </Surface>
+      }
+    >
+      <PageHeader
+        title="orders for today"
+        description="select a row to bring it under the loupe; press ⌘I to fold the inspector."
+        divider
+      />
+      <Stack gap="md">
+        {inspectorOrders.map((row) => {
+          const isSelected = row.id === selectedId;
+          return (
+            <Surface
+              key={row.id}
+              level={isSelected ? 'raised' : 'base'}
+              radius="lg"
+              padding="md"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setSelectedId(row.id)}
+            >
+              <Stack direction="row" align="center" justify="between" gap="md">
+                <Stack gap="xs">
+                  <Text weight={isSelected ? 'semibold' : 'medium'}>{row.title}</Text>
+                  <Text size="sm" tone="muted">
+                    {row.hand} · {row.when}
+                  </Text>
+                </Stack>
+                <Badge tone={row.tone}>{row.label}</Badge>
+              </Stack>
+            </Surface>
+          );
+        })}
+      </Stack>
+    </AppShell>
+  );
+}
+
+export const WithInspector: Story = {
+  name: 'inspector — trailing panel for the loupe (⌘I folds it)',
+  render: () => <InspectorShell />,
+};
+
+function CommandedShell(): React.JSX.Element {
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [theme, setTheme] = useState<'warm sand' | 'slate' | 'moss'>('warm sand');
+
+  const commands = useMemo<CommandPaletteCommand[]>(
+    () => [
+      {
+        id: 'strike',
+        label: 'new strike',
+        description: 'open a fresh entry in the ledger',
+        group: 'bench',
+        keywords: ['add', 'create', 'entry'],
+        shortcut: <Kbd size="sm">N</Kbd>,
+        onSelect: () => {
+          toast({ tone: 'success', title: 'a fresh strike on the bench' });
+        },
+      },
+      {
+        id: 'seal',
+        label: 'seal the current order',
+        description: 'mark today’s open strike as sealed',
+        group: 'bench',
+        keywords: ['close', 'done'],
+        onSelect: () => {
+          toast({ tone: 'info', title: 'the wax is set' });
+        },
+      },
+      {
+        id: 'theme-sand',
+        label: 'switch to warm sand',
+        group: 'workshop',
+        keywords: ['theme'],
+        onSelect: () => setTheme('warm sand'),
+      },
+      {
+        id: 'theme-slate',
+        label: 'switch to slate',
+        group: 'workshop',
+        keywords: ['theme'],
+        onSelect: () => setTheme('slate'),
+      },
+      {
+        id: 'theme-moss',
+        label: 'switch to moss',
+        group: 'workshop',
+        keywords: ['theme'],
+        onSelect: () => setTheme('moss'),
+      },
+      {
+        id: 'discard',
+        label: 'discard the apprentice draft',
+        description: 'destructive — there is no undo',
+        group: 'danger',
+        tone: 'danger',
+        onSelect: () => {
+          toast({ tone: 'danger', title: 'draft swept from the bench' });
+        },
+      },
+    ],
+    [],
+  );
+
+  return (
+    <AppShell
+      commandPaletteOpen={paletteOpen}
+      onCommandPaletteOpenChange={setPaletteOpen}
+      commandPalette={
+        <CommandPalette open={false} onOpenChange={() => {}} commands={commands} />
+      }
+      header={
+        <AppBar
+          brand={
+            <>
+              <HammerGlyph />
+              <span>the workshop</span>
+            </>
+          }
+          actions={
+            <>
+              <Button intent="ghost" onClick={() => setPaletteOpen(true)}>
+                summon <Kbd size="sm">⌘K</Kbd>
+              </Button>
+              <Button intent="primary">strike</Button>
+            </>
+          }
+        />
+      }
+      sidebar={
+        <Sidebar>
+          <NavSection label="bench">
+            <NavItem icon={<HingeGlyph />} selected>
+              orders
+            </NavItem>
+            <NavItem icon={<HingeGlyph />}>moulds</NavItem>
+          </NavSection>
+        </Sidebar>
+      }
+    >
+      <PageHeader
+        title="under the chosen theme"
+        description={`press ⌘K to summon the palette; pick a verb. the current theme is "${theme}" — try switching it from the palette. each command also posts a notice into the default toaster the shell ships.`}
+        divider
+      />
+      <Surface level="raised" radius="lg" padding="lg">
+        <Stack gap="sm">
+          <Text weight="semibold">things to try</Text>
+          <Text size="sm" tone="muted">
+            · ⌘K → "new strike" raises a success notice
+          </Text>
+          <Text size="sm" tone="muted">
+            · ⌘K → "switch to slate" changes the page chrome below
+          </Text>
+          <Text size="sm" tone="muted">
+            · ⌘K → "discard" demonstrates a danger-toned command
+          </Text>
+        </Stack>
+      </Surface>
+    </AppShell>
+  );
+}
+
+export const WithCommandPalette: Story = {
+  name: 'command palette — ⌘K everywhere, toaster rides along',
+  render: () => <CommandedShell />,
 };

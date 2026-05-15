@@ -29,6 +29,14 @@ export { Avatar, type AvatarProps } from './Avatar/Avatar.js';
 export { Divider, type DividerProps } from './Divider/Divider.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Skeleton, type SkeletonProps } from './Skeleton/Skeleton.js';
+export {
+  TypingIndicator,
+  type TypingIndicatorProps,
+} from './TypingIndicator/TypingIndicator.js';
+export {
+  SuggestionChip,
+  type SuggestionChipProps,
+} from './SuggestionChip/SuggestionChip.js';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar.js';
 export { Slider, type SliderProps } from './Slider/Slider.js';
 export {

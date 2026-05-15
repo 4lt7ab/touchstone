@@ -64,3 +64,24 @@ export {
   type TooltipContentProps,
 } from './Tooltip/Tooltip.js';
 export { CommandItem, type CommandItemProps } from './CommandItem/CommandItem.js';
+export {
+  Message,
+  type MessageProps,
+  type MessageAuthor,
+  type MessageState,
+  type MessageAlign,
+} from './Message/Message.js';
+export {
+  MessageActions,
+  type MessageActionsProps,
+} from './MessageActions/MessageActions.js';
+export {
+  ToolCall,
+  type ToolCallProps,
+  type ToolCallStatus,
+} from './ToolCall/ToolCall.js';
+export {
+  Composer,
+  type ComposerProps,
+  type ComposerState,
+} from './Composer/Composer.js';

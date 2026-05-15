@@ -55,6 +55,12 @@ export {
 } from './useHoverIntent.js';
 export { useMediaQuery } from './useMediaQuery.js';
 export {
+  useSnapDrag,
+  type UseSnapDragOptions,
+  type UseSnapDragHandleProps,
+  type UseSnapDragReturn,
+} from './useSnapDrag.js';
+export {
   useTableSelection,
   type UseTableSelectionOptions,
   type UseTableSelectionReturn,

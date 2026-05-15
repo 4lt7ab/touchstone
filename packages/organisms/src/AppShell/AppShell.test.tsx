@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { NavItem, NavSection } from '@touchstone/molecules';
+import { NavItem, NavSection, toast } from '@touchstone/molecules';
 import { AppShell } from './AppShell.js';
 import { Sidebar } from '../Sidebar/Sidebar.js';
 import { Drawer } from '../Drawer/Drawer.js';
+import { CommandPalette } from '../CommandPalette/CommandPalette.js';
 
 const isMac = (): boolean =>
   typeof navigator !== 'undefined' && /mac|iphone|ipad|ipod/i.test(navigator.platform);
@@ -222,6 +223,10 @@ describe('AppShell', () => {
 
     afterEach(() => {
       mockListener = null;
+      // Reset the closure flag so a leaked mock (jsdom doesn't provide
+      // matchMedia by default, so the conditional restore below may be a
+      // no-op) reports `matches: false` to any subsequent useMediaQuery call.
+      currentMatches = false;
       if (originalMatchMedia !== undefined) {
         window.matchMedia = originalMatchMedia;
       }
@@ -525,6 +530,713 @@ describe('AppShell', () => {
       );
       fireEvent.keyDown(document, { key: '`', ...modKey() });
       expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('skip link', () => {
+    it('renders a focusable skip-to-content link pointing at <main>', () => {
+      render(
+        <AppShell>
+          <p>page</p>
+        </AppShell>,
+      );
+      const link = screen.getByRole('link', { name: 'Skip to content' });
+      const main = screen.getByRole('main');
+      expect(link).toBeInTheDocument();
+      expect(link.getAttribute('href')).toBe(`#${main.id}`);
+      expect(main.id).not.toBe('');
+    });
+
+    it('honors a custom label', () => {
+      render(
+        <AppShell skipLink={{ label: 'jump to bench' }}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('link', { name: 'jump to bench' })).toBeInTheDocument();
+    });
+
+    it('omits the link when skipLink={false}', () => {
+      render(
+        <AppShell skipLink={false}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('link', { name: 'Skip to content' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('toaster', () => {
+    afterEach(() => {
+      act(() => {
+        toast.dismissAll();
+      });
+    });
+
+    it('renders an in-shell Toaster by default so toast() calls surface', () => {
+      render(
+        <AppShell>
+          <p>page</p>
+        </AppShell>,
+      );
+      act(() => {
+        toast({ title: 'forged', duration: Infinity });
+      });
+      expect(screen.getByText('forged')).toBeInTheDocument();
+    });
+
+    it('suppresses the default Toaster when toaster={false}', () => {
+      render(
+        <AppShell toaster={false}>
+          <p>page</p>
+        </AppShell>,
+      );
+      act(() => {
+        toast({ title: 'silenced' });
+      });
+      expect(screen.queryByText('silenced')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('inspector', () => {
+    it('renders the inspector slot when provided and starts open by default', () => {
+      render(
+        <AppShell inspector={<aside data-testid="ins">inspector body</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      const ins = screen.getByTestId('ins');
+      expect(ins).toBeInTheDocument();
+      expect(ins.parentElement).toHaveAttribute('data-open', 'true');
+    });
+
+    it('toggles open state on ⌘I', () => {
+      render(
+        <AppShell inspector={<aside data-testid="ins">inspector body</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      const wrapper = screen.getByTestId('ins').parentElement;
+      expect(wrapper).toHaveAttribute('data-open', 'true');
+
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(wrapper).toHaveAttribute('data-open', 'false');
+
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(wrapper).toHaveAttribute('data-open', 'true');
+    });
+
+    it('honors defaultInspectorOpen={false}', () => {
+      render(
+        <AppShell
+          defaultInspectorOpen={false}
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'false');
+    });
+
+    it('mirrors controlled inspectorOpen and forwards onInspectorOpenChange', () => {
+      const onChange = vi.fn();
+      const { rerender } = render(
+        <AppShell
+          inspectorOpen
+          onInspectorOpenChange={onChange}
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'true');
+
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(false);
+      // Controlled — value doesn't change until parent rerenders.
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'true');
+
+      rerender(
+        <AppShell
+          inspectorOpen={false}
+          onInspectorOpenChange={onChange}
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'false');
+    });
+
+    it('does not toggle when no inspector is mounted', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell onInspectorOpenChange={onChange}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('honors a custom inspectorHotkey', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          inspectorHotkey="mod+u"
+          onInspectorOpenChange={onChange}
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(document, { key: 'u', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(false);
+    });
+
+    it('disables the inspector hotkey when inspectorHotkey={false}', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          inspectorHotkey={false}
+          onInspectorOpenChange={onChange}
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('command palette', () => {
+    function paletteSlot(onSelect = vi.fn()): React.JSX.Element {
+      return (
+        <CommandPalette
+          open={false}
+          onOpenChange={() => {}}
+          commands={[{ id: 'a', label: 'apprentice', onSelect }]}
+        />
+      );
+    }
+
+    it('starts closed by default and opens on ⌘K', () => {
+      render(
+        <AppShell commandPalette={paletteSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('dialog', { name: 'Command palette' })).not.toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'k', ...modKey() });
+      expect(screen.getByRole('dialog', { name: 'Command palette' })).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'k', ...modKey() });
+      expect(screen.queryByRole('dialog', { name: 'Command palette' })).not.toBeInTheDocument();
+    });
+
+    it('honors defaultCommandPaletteOpen for the initial state', () => {
+      render(
+        <AppShell defaultCommandPaletteOpen commandPalette={paletteSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('dialog', { name: 'Command palette' })).toBeInTheDocument();
+    });
+
+    it('mirrors controlled commandPaletteOpen and forwards onCommandPaletteOpenChange', () => {
+      const onChange = vi.fn();
+      const { rerender } = render(
+        <AppShell
+          commandPaletteOpen={false}
+          onCommandPaletteOpenChange={onChange}
+          commandPalette={paletteSlot()}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'k', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(true);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      rerender(
+        <AppShell
+          commandPaletteOpen
+          onCommandPaletteOpenChange={onChange}
+          commandPalette={paletteSlot()}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('dialog', { name: 'Command palette' })).toBeInTheDocument();
+    });
+
+    it('does not toggle when no commandPalette is mounted', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell onCommandPaletteOpenChange={onChange}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'k', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('honors a custom commandPaletteHotkey', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          commandPaletteHotkey="mod+p"
+          onCommandPaletteOpenChange={onChange}
+          commandPalette={paletteSlot()}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'k', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(document, { key: 'p', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('storageKey persistence', () => {
+    beforeEach(() => {
+      window.localStorage.clear();
+    });
+    afterEach(() => {
+      window.localStorage.clear();
+    });
+
+    it('hydrates sidebar collapsed state from localStorage on first paint', () => {
+      window.localStorage.setItem('demo/sidebar-collapsed', 'true');
+      render(
+        <AppShell storageKey="demo" sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('navigation', { name: 'primary' })).toHaveAttribute(
+        'data-collapsed',
+        'true',
+      );
+    });
+
+    it('writes sidebar collapsed state to localStorage when toggled', () => {
+      render(
+        <AppShell storageKey="demo" sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(window.localStorage.getItem('demo/sidebar-collapsed')).toBeNull();
+      fireEvent.keyDown(document, { key: 'b', ...modKey() });
+      expect(window.localStorage.getItem('demo/sidebar-collapsed')).toBe('true');
+    });
+
+    it('hydrates inspector open state from localStorage', () => {
+      window.localStorage.setItem('demo/inspector-open', 'false');
+      render(
+        <AppShell storageKey="demo" inspector={<aside data-testid="ins">body</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'false');
+    });
+
+    it('writes inspector open state to localStorage when toggled', () => {
+      render(
+        <AppShell storageKey="demo" inspector={<aside data-testid="ins">body</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(window.localStorage.getItem('demo/inspector-open')).toBeNull();
+      fireEvent.keyDown(document, { key: 'i', ...modKey() });
+      expect(window.localStorage.getItem('demo/inspector-open')).toBe('false');
+    });
+
+    it('does not write storage when sidebarCollapsed is controlled', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          storageKey="demo"
+          sidebarCollapsed={false}
+          onSidebarCollapsedChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'b', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(true);
+      expect(window.localStorage.getItem('demo/sidebar-collapsed')).toBeNull();
+    });
+  });
+
+  describe('resizable rails', () => {
+    afterEach(() => {
+      window.localStorage.clear();
+    });
+
+    it('does not render any resize handle when both resize flags are off', () => {
+      render(
+        <AppShell
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+          inspector={<aside data-testid="ins">i</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryAllByRole('separator')).toHaveLength(0);
+    });
+
+    it('renders a sidebar resize handle when sidebarResize is true', () => {
+      render(
+        <AppShell sidebarResize sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle = screen.getByRole('separator', { name: 'Resize sidebar' });
+      expect(handle).toBeInTheDocument();
+      expect(handle).toHaveAttribute('aria-orientation', 'vertical');
+      expect(handle).toHaveAttribute('aria-valuenow', '240'); // md = 15rem ≈ 240px
+    });
+
+    it('keyboard ArrowRight steps the sidebar from md to lg', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          sidebarResize
+          onSidebarWidthChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle = screen.getByRole('separator', { name: 'Resize sidebar' });
+      fireEvent.keyDown(handle, { key: 'ArrowRight' });
+      expect(onChange).toHaveBeenCalledWith('lg');
+    });
+
+    it('keyboard ArrowLeft steps the sidebar from md to sm', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          sidebarResize
+          onSidebarWidthChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle = screen.getByRole('separator', { name: 'Resize sidebar' });
+      fireEvent.keyDown(handle, { key: 'ArrowLeft' });
+      expect(onChange).toHaveBeenCalledWith('sm');
+    });
+
+    it('keeps the sidebar handle visible when collapsed so the user can drag back out', () => {
+      render(
+        <AppShell
+          sidebarResize
+          defaultSidebarCollapsed
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('separator', { name: 'Resize sidebar' })).toBeInTheDocument();
+    });
+
+    it('renders an inspector handle when inspectorResize is true and the panel is open', () => {
+      render(
+        <AppShell inspectorResize inspector={<aside data-testid="ins">i</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('separator', { name: 'Resize inspector' })).toBeInTheDocument();
+    });
+
+    it('hides the inspector handle when the panel is closed', () => {
+      render(
+        <AppShell
+          inspectorResize
+          defaultInspectorOpen={false}
+          inspector={<aside data-testid="ins">i</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(
+        screen.queryByRole('separator', { name: 'Resize inspector' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('persists sidebar width through storageKey', () => {
+      const { unmount } = render(
+        <AppShell
+          storageKey="demo"
+          sidebarResize
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle = screen.getByRole('separator', { name: 'Resize sidebar' });
+      fireEvent.keyDown(handle, { key: 'ArrowRight' });
+      expect(window.localStorage.getItem('demo/sidebar-width')).toBe('lg');
+      unmount();
+
+      // Remount — should hydrate to lg from storage.
+      render(
+        <AppShell
+          storageKey="demo"
+          sidebarResize
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle2 = screen.getByRole('separator', { name: 'Resize sidebar' });
+      expect(handle2).toHaveAttribute('aria-valuenow', '288'); // lg = 18rem ≈ 288px
+    });
+
+    it('treats sm width as collapsed when resize is on', () => {
+      render(
+        <AppShell
+          sidebarResize
+          defaultSidebarWidth="sm"
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('navigation', { name: 'primary' })).toHaveAttribute(
+        'data-collapsed',
+        'true',
+      );
+    });
+
+    it('mod+B toggles between sm and the last expanded width when resize is on', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          sidebarResize
+          defaultSidebarWidth="lg"
+          onSidebarWidthChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      // Starts at lg → ⌘B should collapse to sm.
+      fireEvent.keyDown(document, { key: 'b', ...modKey() });
+      expect(onChange).toHaveBeenLastCalledWith('sm');
+    });
+
+    it('mirrors controlled sidebarWidth without persisting', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell
+          storageKey="demo"
+          sidebarResize
+          sidebarWidth="lg"
+          onSidebarWidthChange={onChange}
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const handle = screen.getByRole('separator', { name: 'Resize sidebar' });
+      expect(handle).toHaveAttribute('aria-valuenow', '288');
+      fireEvent.keyDown(handle, { key: 'ArrowLeft' });
+      expect(onChange).toHaveBeenCalledWith('md');
+      // Controlled — storage is not touched.
+      expect(window.localStorage.getItem('demo/sidebar-width')).toBeNull();
+    });
+  });
+
+  describe('inspector edge tab', () => {
+    it('renders an expand affordance on the trailing edge when the inspector is closed', () => {
+      render(
+        <AppShell defaultInspectorOpen={false} inspector={<aside>i</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('button', { name: 'Open inspector' })).toBeInTheDocument();
+    });
+
+    it('opens the inspector on click', () => {
+      render(
+        <AppShell defaultInspectorOpen={false} inspector={<aside data-testid="ins">i</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Open inspector' }));
+      expect(screen.getByTestId('ins').parentElement).toHaveAttribute('data-open', 'true');
+      expect(screen.queryByRole('button', { name: 'Open inspector' })).not.toBeInTheDocument();
+    });
+
+    it('is hidden when the inspector is already open', () => {
+      render(
+        <AppShell inspector={<aside>i</aside>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('button', { name: 'Open inspector' })).not.toBeInTheDocument();
+    });
+
+    it('honors a custom inspectorEdgeTabLabel', () => {
+      render(
+        <AppShell
+          defaultInspectorOpen={false}
+          inspectorEdgeTabLabel="Show details"
+          inspector={<aside>i</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('button', { name: 'Show details' })).toBeInTheDocument();
+    });
+
+    it('omits the edge tab when inspectorEdgeTab={false}', () => {
+      render(
+        <AppShell
+          defaultInspectorOpen={false}
+          inspectorEdgeTab={false}
+          inspector={<aside>i</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('button', { name: 'Open inspector' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('main column density / padding', () => {
+    it('applies the default density variant by default', () => {
+      render(
+        <AppShell>
+          <p>page</p>
+        </AppShell>,
+      );
+      const main = screen.getByRole('main');
+      // Recipe class names follow the `<file>_<name>_<variant>_<value>` shape.
+      expect(main.className).toMatch(/main_density_default/);
+      expect(main.className).toMatch(/main_padded_true/);
+    });
+
+    it('applies the compact density variant when requested', () => {
+      render(
+        <AppShell mainDensity="compact">
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('main').className).toMatch(/main_density_compact/);
+    });
+
+    it('applies the comfortable density variant when requested', () => {
+      render(
+        <AppShell mainDensity="comfortable">
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('main').className).toMatch(/main_density_comfortable/);
+    });
+
+    it('zeroes padding when mainPadding={false}', () => {
+      render(
+        <AppShell mainPadding={false}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('main').className).toMatch(/main_padded_false/);
+    });
+  });
+
+  describe('keyboard cheat-sheet', () => {
+    it('opens the cheat-sheet dialog on shift+?', () => {
+      render(
+        <AppShell sidebar={<Sidebar aria-label="primary">rail</Sidebar>}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(
+        screen.queryByRole('dialog', { name: 'Keyboard shortcuts' }),
+      ).not.toBeInTheDocument();
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      expect(
+        screen.getByRole('dialog', { name: 'Keyboard shortcuts' }),
+      ).toBeInTheDocument();
+    });
+
+    it('lists the active shell hotkeys', () => {
+      render(
+        <AppShell
+          sidebar={<Sidebar aria-label="primary">rail</Sidebar>}
+          inspector={<aside>i</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+      expect(dialog).toHaveTextContent(/toggle sidebar/i);
+      expect(dialog).toHaveTextContent(/toggle inspector/i);
+    });
+
+    it('omits hotkeys for slots that are not mounted', () => {
+      render(
+        <AppShell>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+      expect(dialog).not.toHaveTextContent(/toggle sidebar/i);
+      expect(dialog).not.toHaveTextContent(/toggle inspector/i);
+    });
+
+    it('appends consumer-supplied hints under a "This app" heading', () => {
+      render(
+        <AppShell keyboardHints={[{ keys: 'mod+s', description: 'Save draft' }]}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+      expect(dialog).toHaveTextContent('This app');
+      expect(dialog).toHaveTextContent('Save draft');
+    });
+
+    it('does not fire when typing in an input', () => {
+      render(
+        <AppShell>
+          <input data-testid="text" />
+        </AppShell>,
+      );
+      const input = screen.getByTestId('text');
+      input.focus();
+      fireEvent.keyDown(input, { key: '?', shiftKey: true });
+      expect(
+        screen.queryByRole('dialog', { name: 'Keyboard shortcuts' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('opts out when keyboardHintsHotkey is false', () => {
+      render(
+        <AppShell keyboardHintsHotkey={false}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      expect(
+        screen.queryByRole('dialog', { name: 'Keyboard shortcuts' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

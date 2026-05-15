@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Background } from '@touchstone/atoms';
-import { Toaster } from '@touchstone/molecules';
 import { ThemeRhythmProvider } from '@touchstone/hooks';
 import {
   blackholeTheme,
@@ -84,7 +83,6 @@ export function App() {
         {route.name === 'funnels' && <Funnels />}
         {route.name === 'audiences' && <Audiences />}
       </AppShellLayout>
-      <Toaster />
     </ThemeRhythmProvider>
   );
 }

@@ -51,3 +51,9 @@ export { SendIcon } from './SendIcon.js';
 export { AttachIcon } from './AttachIcon.js';
 export { StarIcon } from './StarIcon.js';
 export { MenuIcon } from './MenuIcon.js';
+
+export { ThumbsUpIcon } from './ThumbsUpIcon.js';
+export { ThumbsDownIcon } from './ThumbsDownIcon.js';
+export { BotIcon } from './BotIcon.js';
+export { WrenchIcon } from './WrenchIcon.js';
+export { QuoteIcon } from './QuoteIcon.js';
