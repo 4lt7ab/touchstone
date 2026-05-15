@@ -9,11 +9,12 @@ import {
 } from 'react';
 import type { KeyboardEvent, ReactNode, Ref } from 'react';
 import { createPortal } from 'react-dom';
-import { useMergedRefs, useModalSurface } from '@touchstone/hooks';
+import { useDisclosure, useMergedRefs, useModalSurface } from '@touchstone/hooks';
 import type { BaseComponentProps } from '@touchstone/atoms';
 import { Kbd } from '@touchstone/atoms';
 import { CommandItem } from '@touchstone/molecules';
 import { SearchIcon } from '@touchstone/icons';
+import { useAppShellSlot } from '../AppShell/appShellSlot.js';
 import * as styles from './CommandPalette.css.js';
 
 /**
@@ -46,10 +47,15 @@ export interface CommandPaletteCommand {
 }
 
 export interface CommandPaletteProps extends BaseComponentProps {
-  /** Whether the palette is open. */
-  open: boolean;
+  /**
+   * Controlled open state. Omit when rendered inside an `AppShell`
+   * command-palette slot — the shell drives the state via context.
+   */
+  open?: boolean;
+  /** Uncontrolled initial open state. @default false */
+  defaultOpen?: boolean;
   /** Called when the palette wants to open or close. */
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
   /** All available commands. The palette filters them on the input query. */
   commands: CommandPaletteCommand[];
   /** Input placeholder. @default 'Type a command or search…' */
@@ -83,16 +89,42 @@ export interface CommandPaletteProps extends BaseComponentProps {
  * Toggle with the consumer's own hotkey — typically `useHotkey('mod+k', ...)`.
  * The palette doesn't bind a global shortcut so consumers can pick the combo
  * that fits their app.
+ *
+ * When rendered inside an `AppShell` command-palette slot the palette
+ * auto-wires to the shell's open/onOpenChange pair — no need to pass them
+ * explicitly. Explicit `open` / `onOpenChange` props always win over the
+ * slot context.
  */
 export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
   function CommandPalette(props, ref) {
-    if (!props.open) return null;
+    const slot = useAppShellSlot();
+    const effectiveOpen = props.open ?? slot?.open;
+    const effectiveOnChange = props.onOpenChange ?? slot?.onOpenChange;
+    const { open, onClose } = useDisclosure({
+      ...(effectiveOpen !== undefined ? { open: effectiveOpen } : {}),
+      ...(props.defaultOpen !== undefined ? { defaultOpen: props.defaultOpen } : {}),
+      ...(effectiveOnChange ? { onOpenChange: effectiveOnChange } : {}),
+    });
+    if (!open) return null;
     if (typeof document === 'undefined') return null;
-    return <CommandPalettePanel {...props} forwardedRef={ref} />;
+    const handleOpenChange = (next: boolean): void => {
+      if (next) return;
+      onClose();
+    };
+    return (
+      <CommandPalettePanel
+        {...props}
+        open
+        onOpenChange={handleOpenChange}
+        forwardedRef={ref}
+      />
+    );
   },
 );
 
-interface PanelProps extends CommandPaletteProps {
+interface PanelProps extends Omit<CommandPaletteProps, 'open' | 'onOpenChange'> {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   forwardedRef: Ref<HTMLDivElement>;
 }
 

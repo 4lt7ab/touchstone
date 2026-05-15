@@ -13,6 +13,7 @@ import {
   Textarea,
 } from '@touchstone/atoms';
 import {
+  Composer,
   Field,
   NavItem,
   NavSection,
@@ -25,6 +26,7 @@ import {
   AppShell,
   CommandPalette,
   Dialog,
+  Dock,
   Sidebar,
   ThemeSwitcher,
 } from '@touchstone/organisms';
@@ -158,11 +160,12 @@ export function AppShellLayout({
       storageKey="touchstone-pm"
       sidebarResize
       inspectorResize
+      mobileInspector="drawer"
+      mobileInspectorTitle="Under the loupe"
       commandPaletteOpen={paletteOpen}
       onCommandPaletteOpenChange={setPaletteOpen}
-      commandPalette={
-        <CommandPalette open={false} onOpenChange={() => {}} commands={commands} />
-      }
+      dock={<ActivityDock />}
+      commandPalette={<CommandPalette commands={commands} />}
       inspector={<InspectorPanel route={route} onNavigate={onNavigate} />}
       header={
         <AppBar
@@ -274,6 +277,34 @@ export function AppShellLayout({
     >
       {children}
     </AppShell>
+  );
+}
+
+function ActivityDock() {
+  const handleAsk = (value: string) => {
+    const draft = value.trim();
+    if (!draft) return;
+    toast({
+      tone: 'info',
+      title: 'The workshop nods',
+      description: draft,
+    });
+  };
+  return (
+    <Dock>
+      <Dock.Content
+        title="Ask the workshop"
+        chrome="bare"
+        width="reading"
+        size="sm"
+      >
+        <Composer
+          onSubmit={handleAsk}
+          placeholder="ask the workshop anything…"
+          iconOnlySubmit
+        />
+      </Dock.Content>
+    </Dock>
   );
 }
 

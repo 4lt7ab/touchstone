@@ -5,6 +5,7 @@ import { NavItem, NavSection, toast } from '@touchstone/molecules';
 import { AppShell } from './AppShell.js';
 import { Sidebar } from '../Sidebar/Sidebar.js';
 import { Drawer } from '../Drawer/Drawer.js';
+import { Dock } from '../Dock/Dock.js';
 import { CommandPalette } from '../CommandPalette/CommandPalette.js';
 
 const isMac = (): boolean =>
@@ -713,15 +714,233 @@ describe('AppShell', () => {
     });
   });
 
+  describe('mobile inspector', () => {
+    let originalMatchMedia: typeof window.matchMedia | undefined;
+
+    function installMobile(): void {
+      originalMatchMedia = window.matchMedia;
+      window.matchMedia = ((_q: string) => ({
+        matches: true,
+        media: '',
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => true,
+        onchange: null,
+      })) as unknown as typeof window.matchMedia;
+    }
+
+    afterEach(() => {
+      if (originalMatchMedia !== undefined) {
+        window.matchMedia = originalMatchMedia;
+      }
+    });
+
+    it('hides inspector on mobile by default and skips the auto-Drawer', () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      // Body-slot wrapper still renders (its CSS hides it on mobile via the
+      // existing rule), but no auto-Drawer is mounted.
+      expect(screen.queryByRole('dialog', { name: 'Inspector' })).not.toBeInTheDocument();
+    });
+
+    it('mounts the inspector inside an auto-Drawer when mobileInspector="drawer"', () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen
+          mobileInspector="drawer"
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const dialog = screen.getByRole('dialog', { name: 'Inspector' });
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveTextContent('body');
+    });
+
+    it('does not render the inspector in the body slot when in drawer mode', () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen
+          mobileInspector="drawer"
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      // The aside renders once — inside the Drawer dialog, not in the body slot.
+      const dialog = screen.getByRole('dialog', { name: 'Inspector' });
+      const inside = dialog.querySelector('[data-testid="ins"]');
+      expect(inside).not.toBeNull();
+      expect(screen.getAllByTestId('ins')).toHaveLength(1);
+    });
+
+    it('shows the edge tab on mobile when mobileInspector="drawer" and inspector is closed', () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen={false}
+          mobileInspector="drawer"
+          inspector={<aside>body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      const tab = screen.getByRole('button', { name: 'Open inspector' });
+      expect(tab).toHaveAttribute('data-mobile-summon', 'true');
+    });
+
+    it('clicking the edge tab opens the mobile inspector Drawer', async () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen={false}
+          mobileInspector="drawer"
+          inspector={<aside data-testid="ins">body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('dialog', { name: 'Inspector' })).not.toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: 'Open inspector' }));
+      expect(screen.getByRole('dialog', { name: 'Inspector' })).toBeInTheDocument();
+    });
+
+    it('honors a custom mobileInspectorTitle', () => {
+      installMobile();
+      render(
+        <AppShell
+          defaultInspectorOpen
+          mobileInspector="drawer"
+          mobileInspectorTitle="Under the loupe"
+          inspector={<aside>body</aside>}
+        >
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('dialog', { name: 'Under the loupe' })).toBeInTheDocument();
+    });
+  });
+
+  describe('dock', () => {
+    function dockSlot(): React.JSX.Element {
+      return (
+        <Dock>
+          <Dock.Content title="Logs">
+            <p>panel body</p>
+          </Dock.Content>
+        </Dock>
+      );
+    }
+
+    it('starts closed by default and opens on ⌘J', () => {
+      render(
+        <AppShell dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('region', { name: 'Logs' })).not.toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(screen.getByRole('region', { name: 'Logs' })).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(screen.queryByRole('region', { name: 'Logs' })).not.toBeInTheDocument();
+    });
+
+    it('honors defaultDockOpen for the initial state', () => {
+      render(
+        <AppShell defaultDockOpen dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('region', { name: 'Logs' })).toBeInTheDocument();
+    });
+
+    it('mirrors controlled dockOpen and forwards onDockOpenChange', () => {
+      const onChange = vi.fn();
+      const { rerender } = render(
+        <AppShell dockOpen={false} onDockOpenChange={onChange} dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.queryByRole('region', { name: 'Logs' })).not.toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(true);
+      // Controlled — value does not change until parent rerenders.
+      expect(screen.queryByRole('region', { name: 'Logs' })).not.toBeInTheDocument();
+
+      rerender(
+        <AppShell dockOpen onDockOpenChange={onChange} dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      expect(screen.getByRole('region', { name: 'Logs' })).toBeInTheDocument();
+    });
+
+    it('does not toggle when no dock is mounted', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell onDockOpenChange={onChange}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('honors a custom dockHotkey', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell dockHotkey="mod+l" onDockOpenChange={onChange} dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(document, { key: 'l', ...modKey() });
+      expect(onChange).toHaveBeenCalledWith(true);
+    });
+
+    it('disables the dock hotkey when dockHotkey={false}', () => {
+      const onChange = vi.fn();
+      render(
+        <AppShell dockHotkey={false} onDockOpenChange={onChange} dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: 'j', ...modKey() });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('lists the dock hotkey in the keyboard cheat-sheet when a dock is mounted', () => {
+      render(
+        <AppShell dock={dockSlot()}>
+          <p>page</p>
+        </AppShell>,
+      );
+      fireEvent.keyDown(document, { key: '?', shiftKey: true });
+      const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+      expect(dialog).toHaveTextContent(/toggle dock/i);
+    });
+  });
+
   describe('command palette', () => {
     function paletteSlot(onSelect = vi.fn()): React.JSX.Element {
-      return (
-        <CommandPalette
-          open={false}
-          onOpenChange={() => {}}
-          commands={[{ id: 'a', label: 'apprentice', onSelect }]}
-        />
-      );
+      return <CommandPalette commands={[{ id: 'a', label: 'apprentice', onSelect }]} />;
     }
 
     it('starts closed by default and opens on ⌘K', () => {

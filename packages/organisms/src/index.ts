@@ -22,6 +22,16 @@ export {
   type DrawerFooterAlign,
 } from './Drawer/Drawer.js';
 export {
+  Dock,
+  type DockProps,
+  type DockTriggerProps,
+  type DockContentProps,
+  type DockCloseProps,
+  type DockSize,
+  type DockWidth,
+  type DockChrome,
+} from './Dock/Dock.js';
+export {
   Popover,
   type PopoverProps,
   type PopoverTriggerProps,

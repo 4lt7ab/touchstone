@@ -638,9 +638,7 @@ function CommandedShell(): React.JSX.Element {
     <AppShell
       commandPaletteOpen={paletteOpen}
       onCommandPaletteOpenChange={setPaletteOpen}
-      commandPalette={
-        <CommandPalette open={false} onOpenChange={() => {}} commands={commands} />
-      }
+      commandPalette={<CommandPalette commands={commands} />}
       header={
         <AppBar
           brand={

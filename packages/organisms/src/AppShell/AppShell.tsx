@@ -21,12 +21,15 @@ import type { ToasterProps } from '@touchstone/molecules';
 import { ChevronLeftIcon, MenuIcon, XIcon } from '@touchstone/icons';
 import { Kbd } from '@touchstone/atoms';
 import { Dialog } from '../Dialog/Dialog.js';
+import { Drawer } from '../Drawer/Drawer.js';
+import { AppShellSlotProvider } from './appShellSlot.js';
 import * as styles from './AppShell.css.js';
 
 const DEFAULT_SIDEBAR_HOTKEY = 'mod+b';
 const DEFAULT_DRAWER_HOTKEY = 'mod+`';
 const DEFAULT_INSPECTOR_HOTKEY = 'mod+i';
 const DEFAULT_COMMAND_PALETTE_HOTKEY = 'mod+k';
+const DEFAULT_DOCK_HOTKEY = 'mod+j';
 const DEFAULT_MOBILE_BREAKPOINT = '(max-width: 959px)';
 
 const STORAGE_SUFFIX_SIDEBAR = 'sidebar-collapsed';
@@ -184,30 +187,32 @@ export interface AppShellProps extends BaseComponentProps {
   /** Trailing-edge slot — typically a details / inspector panel. */
   inspector?: ReactNode;
   /**
-   * Overlay slot — a fully-formed `<Drawer>` summoned with the drawer
-   * hotkey. AppShell injects `open` and `onOpenChange` via `cloneElement`,
-   * so the inner Drawer behaves as a controlled overlay. Side, size,
-   * title, and dismissible all stay on the Drawer itself.
-   *
-   * IMPORTANT: this must be a `<Drawer>` element directly. Wrapping it in
-   * your own component (e.g. `<MyLedger />` returning a Drawer) silently
-   * breaks the wiring — `cloneElement` injects onto the outer wrapper, not
-   * the inner Drawer, and the open state never reaches the modal. Inline
-   * the Drawer at the call site or factor a function (not a component)
-   * that returns the Drawer JSX.
+   * Overlay slot — a `<Drawer>` summoned with the drawer hotkey. AppShell
+   * exposes its open/onOpenChange pair through a slot context, so the inner
+   * Drawer auto-wires without `cloneElement`. Wrap the Drawer in your own
+   * component if you want — the Drawer reads the context wherever it ends
+   * up in the tree. Side, size, title, and dismissible all stay on the
+   * Drawer itself.
    *
    * For drawers triggered from a row or a button — not summoned from a
    * global hotkey — drop a standalone `<Drawer>` anywhere in `children`
-   * with its own state. AppShell's drawer slot is for the one always-
-   * summonable overlay (notification center, inspector pinned overlay).
+   * with its own `open` / `onOpenChange`. Those explicit props win over
+   * the slot context, so the standalone Drawer keeps its own state.
    */
   drawer?: ReactNode;
   /**
-   * Always-summonable command palette. Pass a `<CommandPalette>` element
-   * directly; AppShell injects `open` and `onOpenChange` via `cloneElement`
-   * — same caveat as `drawer` about not wrapping in your own component.
+   * Always-summonable `<CommandPalette>`. AppShell exposes its
+   * open/onOpenChange pair through a slot context — the palette auto-wires.
+   * Pass explicit `open` / `onOpenChange` to take over the wiring.
    */
   commandPalette?: ReactNode;
+  /**
+   * Always-summonable `<Dock>`. Non-modal panel that floats at the bottom
+   * of the viewport — for logs, transport bars, mini-players, status
+   * footers. AppShell exposes its open/onOpenChange pair through a slot
+   * context — the Dock auto-wires.
+   */
+  dock?: ReactNode;
   /** Main content area — your page. */
   children?: ReactNode;
   /** Controlled collapsed state for the sidebar rail. */
@@ -278,6 +283,18 @@ export interface AppShellProps extends BaseComponentProps {
    * `useHotkey` for the combo grammar. @default 'mod+k'
    */
   commandPaletteHotkey?: string | false;
+  /** Controlled open state for the dock. */
+  dockOpen?: boolean;
+  /** Initial open state when uncontrolled. @default false */
+  defaultDockOpen?: boolean;
+  /** Fires when the dock opens or closes. */
+  onDockOpenChange?: (open: boolean) => void;
+  /**
+   * Combo that toggles the dock. Pass `false` to disable the binding (the
+   * dock still works through `dockOpen`). See `useHotkey` for the combo
+   * grammar. @default 'mod+j'
+   */
+  dockHotkey?: string | false;
   /**
    * Below this media query the persistent sidebar collapses into a
    * hamburger-summoned overlay. @default '(max-width: 959px)'
@@ -322,6 +339,21 @@ export interface AppShellProps extends BaseComponentProps {
   /** Accessible label for the inspector edge tab. @default 'Open inspector' */
   inspectorEdgeTabLabel?: string;
   /**
+   * What to do with the inspector on viewports below `mobileBreakpoint`.
+   * `'hidden'` (default) hides the panel outright — the consumer is expected
+   * to surface that content elsewhere (a route, a sheet) on small screens.
+   * `'drawer'` mounts the inspector content inside an edge-anchored Drawer
+   * controlled by the same open state, with the edge tab visible as the
+   * summon affordance. Note: switching the prop or crossing the breakpoint
+   * remounts the inspector tree (its own internal state is reset). @default 'hidden'
+   */
+  mobileInspector?: 'hidden' | 'drawer';
+  /**
+   * Title shown on the mobile-inspector Drawer header when
+   * `mobileInspector="drawer"`. @default 'Inspector'
+   */
+  mobileInspectorTitle?: string;
+  /**
    * Visual rhythm of the main column. `default` matches the prior shell
    * (vars.space[6] padding + gap); `comfortable` is generous;
    * `compact` is tight (data-dense pages). @default 'default'
@@ -354,6 +386,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     inspector,
     drawer,
     commandPalette,
+    dock,
     children,
     sidebarCollapsed,
     defaultSidebarCollapsed = false,
@@ -379,6 +412,10 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     defaultCommandPaletteOpen = false,
     onCommandPaletteOpenChange,
     commandPaletteHotkey,
+    dockOpen,
+    defaultDockOpen = false,
+    onDockOpenChange,
+    dockHotkey,
     mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
     mobileMenuOpen,
     defaultMobileMenuOpen = false,
@@ -390,6 +427,8 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     storageKey,
     inspectorEdgeTab = true,
     inspectorEdgeTabLabel = 'Open inspector',
+    mobileInspector = 'hidden',
+    mobileInspectorTitle = 'Inspector',
     mainDensity = 'default',
     mainPadding = true,
     keyboardHints,
@@ -503,6 +542,12 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     onChange: onCommandPaletteOpenChange,
   });
 
+  const [dockIsOpen, setDockIsOpen] = useControllableState({
+    value: dockOpen,
+    defaultValue: defaultDockOpen,
+    onChange: onDockOpenChange,
+  });
+
   const [mobileOpen, setMobileOpen] = useControllableState({
     value: mobileMenuOpen,
     defaultValue: defaultMobileMenuOpen,
@@ -510,6 +555,11 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
   });
 
   const isMobile = useMediaQuery(mobileBreakpoint);
+
+  // On mobile the inspector either disappears entirely (default) or slides
+  // in as an edge-anchored Drawer summoned from the edge tab. Computed once
+  // so the body slot, edge tab CSS hint, and the auto-Drawer agree.
+  const inspectorInDrawer = isMobile && mobileInspector === 'drawer';
 
   // Auto-close the mobile overlay when the viewport resizes back to desktop —
   // otherwise an open overlay would linger as a hidden, focus-stealing layer.
@@ -527,6 +577,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     typeof commandPaletteHotkey === 'string'
       ? commandPaletteHotkey
       : DEFAULT_COMMAND_PALETTE_HOTKEY;
+  const dockCombo = typeof dockHotkey === 'string' ? dockHotkey : DEFAULT_DOCK_HOTKEY;
 
   // Remember the last non-collapsed width so ⌘B with resize on swings back
   // to where you left it instead of always landing on `md`.
@@ -566,6 +617,9 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
   useHotkey(commandPaletteCombo, () => setCommandPaletteIsOpen((v) => !v), {
     enabled: commandPalette !== undefined && commandPaletteHotkey !== false,
   });
+  useHotkey(dockCombo, () => setDockIsOpen((v) => !v), {
+    enabled: dock !== undefined && dockHotkey !== false,
+  });
 
   const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
   const cheatSheetCombo =
@@ -591,6 +645,9 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
   if (commandPalette !== undefined && commandPaletteHotkey !== false) {
     shellHints.push({ keys: commandPaletteCombo, description: 'Open command palette' });
   }
+  if (dock !== undefined && dockHotkey !== false) {
+    shellHints.push({ keys: dockCombo, description: 'Toggle dock' });
+  }
   if (keyboardHintsHotkey !== false) {
     shellHints.push({ keys: cheatSheetCombo, description: 'Show keyboard shortcuts' });
   }
@@ -613,24 +670,25 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
         )
       : sidebar;
 
-  const drawerSlot =
-    isValidElement(drawer) && typeof drawer.type !== 'string'
-      ? cloneElement(
-          drawer as ReactElement<{ open?: boolean; onOpenChange?: (open: boolean) => void }>,
-          { open: drawerIsOpen, onOpenChange: setDrawerIsOpen },
-        )
-      : drawer;
+  const drawerSlot = drawer ? (
+    <AppShellSlotProvider value={{ open: drawerIsOpen, onOpenChange: setDrawerIsOpen }}>
+      {drawer}
+    </AppShellSlotProvider>
+  ) : null;
 
-  const commandPaletteSlot =
-    isValidElement(commandPalette) && typeof commandPalette.type !== 'string'
-      ? cloneElement(
-          commandPalette as ReactElement<{
-            open?: boolean;
-            onOpenChange?: (open: boolean) => void;
-          }>,
-          { open: commandPaletteIsOpen, onOpenChange: setCommandPaletteIsOpen },
-        )
-      : commandPalette;
+  const commandPaletteSlot = commandPalette ? (
+    <AppShellSlotProvider
+      value={{ open: commandPaletteIsOpen, onOpenChange: setCommandPaletteIsOpen }}
+    >
+      {commandPalette}
+    </AppShellSlotProvider>
+  ) : null;
+
+  const dockSlot = dock ? (
+    <AppShellSlotProvider value={{ open: dockIsOpen, onOpenChange: setDockIsOpen }}>
+      {dock}
+    </AppShellSlotProvider>
+  ) : null;
 
   const showMenuTrigger = sidebar !== undefined;
   const triggerLabel = mobileOpen ? closeMenuLabel : openMenuLabel;
@@ -727,7 +785,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
             {...inspectorDrag.handleProps}
           />
         ) : null}
-        {inspector ? (
+        {inspector && !inspectorInDrawer ? (
           <div
             id={id ? `${id}-inspector` : undefined}
             className={styles.inspectorSlot}
@@ -752,14 +810,28 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
             aria-label={inspectorEdgeTabLabel}
             aria-expanded={false}
             aria-controls={id ? `${id}-inspector` : undefined}
+            data-mobile-summon={inspectorInDrawer ? 'true' : undefined}
             onClick={() => setInspectorIsOpen(true)}
           >
             <ChevronLeftIcon size={14} />
           </button>
         ) : null}
       </div>
+      {inspector && inspectorInDrawer ? (
+        <Drawer open={inspectorIsOpen} onOpenChange={setInspectorIsOpen}>
+          <Drawer.Content
+            title={mobileInspectorTitle}
+            side="right"
+            size="md"
+            data-testid={id ? `${id}-mobile-inspector` : undefined}
+          >
+            {inspector}
+          </Drawer.Content>
+        </Drawer>
+      ) : null}
       {drawerSlot}
       {commandPaletteSlot}
+      {dockSlot}
       {keyboardHintsHotkey !== false ? (
         <Dialog open={cheatSheetOpen} onOpenChange={setCheatSheetOpen}>
           <Dialog.Content title="Keyboard shortcuts" size="sm">

@@ -9,6 +9,7 @@ import {
 } from '@touchstone/hooks';
 import { Button, Slot } from '@touchstone/atoms';
 import type { BaseComponentProps } from '@touchstone/atoms';
+import { useAppShellSlot } from '../AppShell/appShellSlot.js';
 import * as styles from './Drawer.css.js';
 
 interface DrawerContextValue {
@@ -45,6 +46,12 @@ export interface DrawerProps extends BaseComponentProps {
  *
  * Common shapes: `side="left"` for a settings drawer, `side="right"` for
  * a detail panel, `side="bottom"` for a mobile filter sheet.
+ *
+ * When rendered inside an `AppShell` drawer slot the Drawer auto-wires to
+ * the shell's open/onOpenChange pair — no need to pass them explicitly.
+ * Explicit `open` / `onOpenChange` props always win over the slot context,
+ * so standalone use (a row-triggered Drawer inside `children`) keeps its
+ * own state.
  */
 function DrawerRoot({
   open: controlledOpen,
@@ -52,10 +59,13 @@ function DrawerRoot({
   onOpenChange,
   children,
 }: DrawerProps): React.JSX.Element {
+  const slot = useAppShellSlot();
+  const effectiveOpen = controlledOpen ?? slot?.open;
+  const effectiveOnChange = onOpenChange ?? slot?.onOpenChange;
   const { open, onOpen, onClose } = useDisclosure({
-    ...(controlledOpen !== undefined ? { open: controlledOpen } : {}),
+    ...(effectiveOpen !== undefined ? { open: effectiveOpen } : {}),
     ...(defaultOpen !== undefined ? { defaultOpen } : {}),
-    ...(onOpenChange ? { onOpenChange } : {}),
+    ...(effectiveOnChange ? { onOpenChange: effectiveOnChange } : {}),
   });
   const titleId = useId();
   const descriptionId = useId();

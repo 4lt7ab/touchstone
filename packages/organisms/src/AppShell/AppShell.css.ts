@@ -214,7 +214,10 @@ export const inspectorEdgeTab = style({
     `color ${vars.duration.fast} ${vars.easing.standard}`,
   '@media': {
     [MOBILE_BREAKPOINT]: {
-      // Inspector is hidden entirely on mobile; the tab follows suit.
+      // By default the inspector is hidden entirely on mobile; the tab
+      // follows suit. When AppShell is configured with
+      // `mobileInspector="drawer"`, the tab is re-shown via the data
+      // attribute below so the user can summon the Drawer.
       display: 'none',
     },
   },
@@ -226,6 +229,13 @@ export const inspectorEdgeTab = style({
     '&:focus-visible': {
       outline: `${vars.focus.ringWidth} solid ${vars.focus.ringColor}`,
       outlineOffset: vars.focus.ringOffset,
+    },
+    '&[data-mobile-summon="true"]': {
+      '@media': {
+        [MOBILE_BREAKPOINT]: {
+          display: 'flex',
+        },
+      },
     },
   },
 });
