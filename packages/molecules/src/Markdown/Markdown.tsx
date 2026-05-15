@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 import { Code } from '@touchstone/atoms';
@@ -8,6 +8,20 @@ import { Prose } from '../Prose/Prose.js';
 import type { ProseDensity, ProseWidth } from '../Prose/Prose.js';
 import { Table } from '../Table/Table.js';
 import { markdownToPlainText } from './markdownToPlainText.js';
+import * as styles from './Markdown.css.js';
+
+// `react-markdown` 9 + `remark-gfm` encode GFM column alignment as
+// `style={{ textAlign }}` on each cell — translate that into the Table
+// family's discrete `align` variant.
+function toCellAlign(
+  style: CSSProperties | undefined,
+): 'start' | 'end' | 'center' | undefined {
+  const textAlign = style?.textAlign;
+  if (textAlign === 'right') return 'end';
+  if (textAlign === 'center') return 'center';
+  if (textAlign === 'left') return 'start';
+  return undefined;
+}
 
 export type MarkdownMode = 'rich' | 'text';
 
@@ -38,8 +52,14 @@ const defaultComponents: Components = {
       </Code>
     );
   },
+  // Wrap in an overflow-scrolling box so a wide table doesn't get clipped by
+  // the surrounding Prose's reading-width clamp.
   table({ children }) {
-    return <Table>{children as ReactNode}</Table>;
+    return (
+      <div className={styles.tableWrap}>
+        <Table>{children as ReactNode}</Table>
+      </div>
+    );
   },
   thead({ children }) {
     return <Table.Header>{children as ReactNode}</Table.Header>;
@@ -50,11 +70,21 @@ const defaultComponents: Components = {
   tr({ children }) {
     return <Table.Row>{children as ReactNode}</Table.Row>;
   },
-  th({ children }) {
-    return <Table.HeaderCell>{children as ReactNode}</Table.HeaderCell>;
+  th({ style, children }) {
+    const cellAlign = toCellAlign(style);
+    return (
+      <Table.HeaderCell {...(cellAlign ? { align: cellAlign } : {})}>
+        {children as ReactNode}
+      </Table.HeaderCell>
+    );
   },
-  td({ children }) {
-    return <Table.Cell>{children as ReactNode}</Table.Cell>;
+  td({ style, children }) {
+    const cellAlign = toCellAlign(style);
+    return (
+      <Table.Cell {...(cellAlign ? { align: cellAlign } : {})}>
+        {children as ReactNode}
+      </Table.Cell>
+    );
   },
 };
 

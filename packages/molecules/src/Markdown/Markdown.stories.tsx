@@ -66,13 +66,25 @@ code like \`vars.color.fg\` reads from the active theme.
 
 const gfmTable = `## the apprentice ledger
 
-| name | role | shelves |
-| ---- | ---- | ------- |
-| ada  | apprentice | 3 |
-| sam  | journey    | 7 |
-| mor  | master     | 12 |
+| name | role       | shelves |
+| :--- | :--------: | ------: |
+| ada  | apprentice |       3 |
+| sam  | journey    |       7 |
+| mor  | master     |      12 |
 
 each row is a hand on the bench; the count is the shelves they sealed last week.
+`;
+
+const wideTable = `## the bench inventory
+
+| sku       | vessel                          | dye                       | weight | sealed by         | sealed at  | shelf | notes                                            |
+| :-------- | :------------------------------ | :------------------------ | -----: | :---------------- | :--------- | ----: | :----------------------------------------------- |
+| 001-a-127 | small crucible, banded rim      | indigo, double-dipped     |  1.2kg | ada the apprentice | 2026-03-04 |     3 | reserved for the morning ledger run              |
+| 014-b-038 | hammered chalice, twin handles  | madder, single steep      |  2.8kg | sam the journey    | 2026-03-05 |     7 | dye cracked in the kiln; reseal before shipment  |
+| 027-c-902 | long-stemmed retort, smoke seal | weld + walnut hull blend  |  0.6kg | mor the master     | 2026-03-06 |    12 | for the chamber-of-mirrors commission            |
+| 041-d-441 | ribbed alembic, capped funnel   | walnut hull, three coats  |  3.4kg | ada the apprentice | 2026-03-07 |     1 | the apprentice's first sealed piece              |
+
+the bench keeps a single row per vessel; the shelf number is the apprentice's seat.
 `;
 
 export const LongRead: Story = {
@@ -98,11 +110,27 @@ export const GfmTable: Story = {
         story:
           'Tables, task-lists, and strikethrough require `remark-gfm` — pass it via ' +
           '`remarkPlugins`. The default components map routes `table` and friends through ' +
-          'the `Table` family.',
+          'the `Table` family, honors `:---`/`---:`/`:---:` alignment markers on each ' +
+          'column, and wraps the table in an overflow-scrolling box so wide tables ' +
+          'don’t get clipped by the surrounding Prose reading clamp.',
       },
     },
   },
   render: () => <Markdown remarkPlugins={[remarkGfm]}>{gfmTable}</Markdown>,
+};
+
+export const WideTable: Story = {
+  name: 'GFM table — wide (overflow-scrolls inside reading clamp)',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A table that overflows the 65ch reading clamp scrolls horizontally rather than ' +
+          'being squashed. The overflow wrapper is internal to `Markdown` — no consumer wiring.',
+      },
+    },
+  },
+  render: () => <Markdown remarkPlugins={[remarkGfm]}>{wideTable}</Markdown>,
 };
 
 export const Compact: Story = {

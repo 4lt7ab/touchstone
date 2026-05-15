@@ -41,6 +41,31 @@ describe('Markdown', () => {
     expect(screen.getByRole('cell', { name: 'apprentice' })).toBeInTheDocument();
   });
 
+  it('honors GFM alignment markers on table cells', () => {
+    const md = [
+      '| name | count | note |',
+      '| :--- | ----: | :---: |',
+      '| ada  | 3     | new  |',
+    ].join('\n');
+    render(<Markdown remarkPlugins={[remarkGfm]}>{md}</Markdown>);
+    const name = screen.getByRole('columnheader', { name: 'name' });
+    const count = screen.getByRole('columnheader', { name: 'count' });
+    const note = screen.getByRole('columnheader', { name: 'note' });
+    expect(name.className).toMatch(/align_start/);
+    expect(count.className).toMatch(/align_end/);
+    expect(note.className).toMatch(/align_center/);
+    expect(screen.getByRole('cell', { name: '3' }).className).toMatch(/align_end/);
+  });
+
+  it('wraps tables in an overflow-scrolling container so wide tables don’t get clipped', () => {
+    const md = ['| a | b |', '| - | - |', '| 1 | 2 |'].join('\n');
+    const { container } = render(<Markdown remarkPlugins={[remarkGfm]}>{md}</Markdown>);
+    const table = container.querySelector('table')!;
+    const wrap = table.parentElement!;
+    expect(wrap.tagName).toBe('DIV');
+    expect(wrap.className).toMatch(/tableWrap/);
+  });
+
   it('shallow-merges a components override over the defaults', () => {
     function Loud({ children }: { children?: React.ReactNode }) {
       return <strong data-testid="loud">{children}</strong>;
